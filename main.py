@@ -1183,7 +1183,7 @@ async def ayuda(ctx):
         
         async def page_economia(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 1/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 1/5",
                 description="**Sistema de Economía y Cartas**",
                 color=discord.Color.blue()
             )
@@ -1229,7 +1229,7 @@ async def ayuda(ctx):
         
         async def page_inventario(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 2/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 2/5",
                 description="**Gestión de Inventario y Ventas**",
                 color=discord.Color.green()
             )
@@ -1287,7 +1287,7 @@ async def ayuda(ctx):
         
         async def page_duelos(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 3/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 3/5",
                 description="**Sistema de Duelos PvP**",
                 color=discord.Color.red()
             )
@@ -1327,7 +1327,7 @@ async def ayuda(ctx):
         
         async def page_torre_minijuegos(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 4/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 4/5",
                 description="**Torre, Minijuegos y Utilidades**",
                 color=discord.Color.gold()
             )
@@ -1385,7 +1385,7 @@ async def ayuda(ctx):
         
         async def page_admin_info(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 5/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 5/5",
                 description="**Comandos de Admin e Información**",
                 color=discord.Color.purple()
             )
@@ -4549,85 +4549,11 @@ import asyncio
 import aiohttp
 
 
-async def ping_dashboard():
-    """Hace ping al dashboard cada 5 minutos para mantenerlo activo"""
-    dashboard_url = "https://yugi-kyuu.onrender.com"
-    
-    while True:
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(dashboard_url, timeout=30) as response:
-                    if response.status == 200:
-                        print(f"✅ Ping exitoso al dashboard - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                    else:
-                        print(f"⚠️  Dashboard respondió con código: {response.status}")
-        except asyncio.TimeoutError:
-            print("❌ Timeout al hacer ping al dashboard")
-        except aiohttp.ClientError as e:
-            print(f"❌ Error de conexión al dashboard: {e}")
-        except Exception as e:
-            print(f"❌ Error inesperado en ping: {e}")
-        
-        # Esperar 5 minutos (300 segundos)
-        await asyncio.sleep(300)
-
-# Iniciar el ping automático cuando el bot esté listo
-@bot.event
-async def on_ready():
-    print(f'✅ {bot.user} está listo!')
-    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_buy, work, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio')
-    print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
-    
-    # Iniciar el sistema de ping al dashboard
-    bot.loop.create_task(ping_dashboard())
-    print("🔄 Sistema de ping al dashboard iniciado")
-
-# Comando manual para probar el ping
-@bot.command()
-@commands.has_permissions(administrator=True)
-async def ping_dashboard_cmd(ctx):
-    """Comando manual para probar la conexión al dashboard"""
-    dashboard_url = "https://yugi-kyuu.onrender.com"
-    
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(dashboard_url, timeout=30) as response:
-                if response.status == 200:
-                    embed = discord.Embed(
-                        title="✅ Ping Exitoso",
-                        description=f"Dashboard respondió correctamente\nCódigo: {response.status}",
-                        color=discord.Color.green()
-                    )
-                else:
-                    embed = discord.Embed(
-                        title="⚠️ Respuesta Inesperada",
-                        description=f"Dashboard respondió con código: {response.status}",
-                        color=discord.Color.orange()
-                    )
-                
-                await ctx.send(embed=embed)
-                
-    except asyncio.TimeoutError:
-        embed = discord.Embed(
-            title="❌ Timeout",
-            description="El dashboard no respondió en 30 segundos",
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=embed)
-        
-    except Exception as e:
-        embed = discord.Embed(
-            title="❌ Error de Conexión",
-            description=f"Error al conectar con el dashboard: {str(e)}",
-            color=discord.Color.red()
-        )
-        await ctx.send(embed=embed)
-
 @bot.command()
 async def status(ctx):
     """Muestra el estado del bot y sus servicios"""
     embed = discord.Embed(
-        title="📊 Estado del Sistema Yugi-Kyuu",
+        title="📊 Estado del Sistema Project-KC",
         color=discord.Color.blue()
     )
     
@@ -4639,7 +4565,7 @@ async def status(ctx):
     )
     
     # Estado del dashboard
-    dashboard_url = "https://yugi-kyuu.onrender.com"
+    dashboard_url = "https://Project-KC.onrender.com"
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(dashboard_url, timeout=10) as response:
@@ -5287,7 +5213,7 @@ async def mostrar_torre_info(ctx):
     completed = get_completed_floors(ctx.author.id)
     
     embed = discord.Embed(
-        title="🏰 Torre de Retos Yugi-Kyuu",
+        title="🏰 Torre de Retos Project-KC",
         description="Enfréntate a 10 pisos de dificultad creciente y gana recompensas exclusivas **una vez por piso**!",
         color=discord.Color.gold()
     )
@@ -6153,7 +6079,7 @@ import schedule
 # Configuración de GitHub para backup
 GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', '')  # Usar variable de entorno
 REPO_OWNER = "CosmicDragneel21"
-REPO_NAME = "Yugi-Kyuu"
+REPO_NAME = "Project-KC"
 BACKUP_BRANCH = "backup-auto"
 
 def create_github_backup():

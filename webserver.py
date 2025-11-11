@@ -84,7 +84,7 @@ if FLASK_AVAILABLE:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Yugi-Kyuu APP - Dashboard</title>
+            <title>Project-KC APP - Dashboard</title>
             <style>
                 body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #1e1e1e; color: white; }}
                 .container {{ max-width: 1200px; margin: 0 auto; }}
@@ -104,7 +104,7 @@ if FLASK_AVAILABLE:
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>🎮 Yugi-Kyuu APP Dashboard</h1>
+                    <h1>🎮 Project-KC APP Dashboard</h1>
                     <p>Bot de cartas de Haikyuu!! - Estado en tiempo real</p>
                 </div>
                 
@@ -228,7 +228,7 @@ if FLASK_AVAILABLE:
         return jsonify({
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
-            'service': 'yugi-kyuu-bot',
+            'service': 'Project-KC-bot',
             'deployment': 'render',
             'version': '1.0.0'
         })
