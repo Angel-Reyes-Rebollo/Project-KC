@@ -2360,9 +2360,9 @@ async def gacha(ctx):
 
     user_last_gacha[user_id] = now
 
-    # Filtrar las rarezas que nos interesan (L, SP, UR, SSR, SR, N, C)
+    # Filtrar las rarezas que nos interesan (G, SP, UR, SSR, SR, N, C)
     # NOTA: Las cartas "E" (Evento) NO salen en el gacha, solo las regalan admins
-    target_rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    target_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     available_rarities = []
     available_probabilities = []
     

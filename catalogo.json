@@ -759,6 +759,406 @@
         "carisma": 67,
         "colocacion": 67
       }
+    },
+    {
+      "id": "E001",
+      "nombre": "Kita Shinsuke (Trazo Perfecto)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kita_E.png",
+      "descripcion": "Kita Shinsuke (Trazo Perfecto)",
+      "stats": {
+        "salto": 73,
+        "remate": 73,
+        "recepcion": 100,
+        "bloqueo": 10,
+        "velocidad": 70,
+        "iq": 99,
+        "carisma": 67,
+        "colocacion": 67
+      }
+    },
+    {
+      "id": "E002",
+      "nombre": "Wakatoshi Ushijima (Edición Halloween)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Ushijima_E.png",
+      "descripcion": "Ushijima E (Edición Halloween) - IQ Principal",
+      "stats": {
+        "salto": 77,
+        "remate": 78,
+        "recepcion": 48,
+        "bloqueo": 63,
+        "velocidad": 55,
+        "iq": 85,
+        "carisma": 58,
+        "colocacion": 60
+      }
+    },
+    {
+      "id": "E003",
+      "nombre": "Tatsuki Washio (Edición Halloween)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Washio_E.png",
+      "descripcion": "Washio E (Edición Halloween) - Bloqueo Principal",
+      "stats": {
+        "salto": 72,
+        "remate": 60,
+        "recepcion": 55,
+        "bloqueo": 85,
+        "velocidad": 62,
+        "iq": 74,
+        "carisma": 47,
+        "colocacion": 50
+      }
+    },
+    {
+      "id": "E004",
+      "nombre": "Koshi Sugawara (Trazo perfecto)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Sugawara_E.png",
+      "descripcion": "Sugawara E (Trazo Perfecto)",
+      "stats": {
+        "salto": 78,
+        "remate": 52,
+        "recepcion": 65,
+        "bloqueo": 50,
+        "velocidad": 70,
+        "iq": 80,
+        "carisma": 72,
+        "colocacion": 80
+      }
+    },
+    {
+      "id": "E005",
+      "nombre": "Kenma Kozume (Principe de Halloween)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kenma_E.png",
+      "descripcion": "Kenma E (Principe de Halloween)",
+      "stats": {
+        "salto": 40,
+        "remate": 45,
+        "recepcion": 65,
+        "bloqueo": 52,
+        "velocidad": 58,
+        "iq": 80,
+        "carisma": 80,
+        "colocacion": 80
+      }
+    },
+    {
+      "id": "E006",
+      "nombre": "Tetsuro Kuroo (Guardián del principe)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kuroo_E.png",
+      "descripcion": "Tetsuro Kuroo (Guardián del principe)",
+      "stats": {
+        "salto": 45,
+        "remate": 85,
+        "recepcion": 70,
+        "bloqueo": 70,
+        "velocidad": 40,
+        "iq": 55,
+        "carisma": 25,
+        "colocacion": 10
+      }
+    },
+    {
+      "id": "E007",
+      "nombre": "Atsumu y osamu (E)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Atsumu_Osamu_E.png",
+      "descripcion": "Atsumu y Osamu (E)",
+      "stats": {
+        "salto": 60,
+        "remate": 85,
+        "recepcion": 55,
+        "bloqueo": 45,
+        "velocidad": 58,
+        "iq": 57,
+        "carisma": 65,
+        "colocacion": 90
+      }
+    },
+    {
+      "id": "E008",
+      "nombre": "Bokuto y Akashi (E)",
+      "rareza": "E",
+      "valor": 200,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Bokuto_Akashi_E.png",
+      "descripcion": "Bokuto y akashi (E)",
+      "stats": {
+        "salto": 78,
+        "remate": 85,
+        "recepcion": 50,
+        "bloqueo": 55,
+        "velocidad": 65,
+        "iq": 45,
+        "carisma": 57,
+        "colocacion": 85
+      }
+    },
+    {
+      "id": "S001",
+      "nombre": "Kotaro Bokuto (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Bokuto_S.png",
+      "descripcion": "Bokuto S (Sombra) - Pico Absoluto",
+      "stats": {
+        "salto": 72,
+        "remate": 99,
+        "recepcion": 55,
+        "bloqueo": 68,
+        "velocidad": 100,
+        "iq": 65,
+        "carisma": 74,
+        "colocacion": 60
+      }
+    },
+    {
+      "id": "S002",
+      "nombre": "Koji Sekimukai (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Koji_S.png",
+      "descripcion": "Sekimukai S (Sombra)",
+      "stats": {
+        "salto": 15,
+        "remate": 13,
+        "recepcion": 12,
+        "bloqueo": 11,
+        "velocidad": 60,
+        "iq": 12,
+        "carisma": 14,
+        "colocacion": 13
+      }
+    },
+    {
+      "id": "S003",
+      "nombre": "Hajime Iwaizumi (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Iwaizumi_S.png",
+      "descripcion": "Iwaizumi S (Sombra)",
+      "stats": {
+        "salto": 65,
+        "remate": 38,
+        "recepcion": 33,
+        "bloqueo": 34,
+        "velocidad": 39,
+        "iq": 38,
+        "carisma": 32,
+        "colocacion": 33
+      }
+    },
+    {
+      "id": "S004",
+      "nombre": "Ryunosuke Tanaka (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Tanaka_S.png",
+      "descripcion": "Tanaka S (Sombra)",
+      "stats": {
+        "salto": 54,
+        "remate": 70,
+        "recepcion": 43,
+        "bloqueo": 47,
+        "velocidad": 52,
+        "iq": 42,
+        "carisma": 50,
+        "colocacion": 46
+      }
+    },
+    {
+      "id": "S005",
+      "nombre": "Toru Oikawa (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Oikawa_S.png",
+      "descripcion": "Oikawa S (Sombra)",
+      "stats": {
+        "salto": 46,
+        "remate": 42,
+        "recepcion": 47,
+        "bloqueo": 38,
+        "velocidad": 52,
+        "iq": 61,
+        "carisma": 64,
+        "colocacion": 80
+      }
+    },
+    {
+      "id": "S006",
+      "nombre": "Kita Shinsuke (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kita_S.png",
+      "descripcion": "Kita S (Sombra)",
+      "stats": {
+        "salto": 65,
+        "remate": 40,
+        "recepcion": 86,
+        "bloqueo": 55,
+        "velocidad": 80,
+        "iq": 70,
+        "carisma": 45,
+        "colocacion": 44
+      }
+    },
+    {
+      "id": "S007",
+      "nombre": "Tetsuro Kuroo (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kuroo_S.png",
+      "descripcion": "Kuroo S (Sombra) - Bloqueo Dominante",
+      "stats": {
+        "salto": 88,
+        "remate": 56,
+        "recepcion": 40,
+        "bloqueo": 90,
+        "velocidad": 50,
+        "iq": 65,
+        "carisma": 60,
+        "colocacion": 45
+      }
+    },
+    {
+      "id": "S008",
+      "nombre": "Kenma Kozume (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kenma_S.png",
+      "descripcion": "Kenma S (Sombra)",
+      "stats": {
+        "salto": 40,
+        "remate": 45,
+        "recepcion": 65,
+        "bloqueo": 52,
+        "velocidad": 58,
+        "iq": 80,
+        "carisma": 80,
+        "colocacion": 80
+      }
+    },
+    {
+      "id": "S009",
+      "nombre": "Korai Hoshiumi (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Hoshiumi_S.png",
+      "descripcion": "Hoshiumi S (Sombra) - Ataque Dominante",
+      "stats": {
+        "salto": 85,
+        "remate": 95,
+        "recepcion": 65,
+        "bloqueo": 60,
+        "velocidad": 80,
+        "iq": 65,
+        "carisma": 50,
+        "colocacion": 55
+      }
+    },
+    {
+      "id": "S010",
+      "nombre": "Shoyo Hinata (Sombra)",
+      "rareza": "S",
+      "valor": 1,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Hinata_S.png",
+      "descripcion": "Hinata S (Sombra) - Pico Absoluto",
+      "stats": {
+        "salto": 99,
+        "remate": 99,
+        "recepcion": 45,
+        "bloqueo": 40,
+        "velocidad": 100,
+        "iq": 40,
+        "carisma": 60,
+        "colocacion": 50
+      }
+    },
+    {
+      "id": "ADN001",
+      "nombre": "Nagi Seishiro (Hakuho) (ADN)",
+      "rareza": "ADN",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Nagi_ADN.png",
+      "descripcion": "Nagi Seishiro (Hakuho) (ADN)",
+      "stats": {
+        "salto": 88,
+        "remate": 100,
+        "recepcion": 72,
+        "bloqueo": 80,
+        "velocidad": 99,
+        "iq": 85,
+        "carisma": 99,
+        "colocacion": 55
+      }
+    },
+    {
+      "id": "ADN002",
+      "nombre": "Rensuke Kunigami (Versión Base) (ADN)",
+      "rareza": "ADN",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/Kunigami_ADN.png",
+      "descripcion": "Rensuke Kunigami (Versión Base) (ADN)",
+      "stats": {
+        "salto": 99,
+        "remate": 99,
+        "recepcion": 55,
+        "bloqueo": 68,
+        "velocidad": 100,
+        "iq": 65,
+        "carisma": 74,
+        "colocacion": 60
+      }
     }
   ]
 }
