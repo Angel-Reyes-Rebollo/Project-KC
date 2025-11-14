@@ -32,13 +32,13 @@ for card in catalog_cards:
 
 # Nuevas probabilidades que incluyen UR, SP y L
 rarity_probabilities = {
-    "G": 0.005,   # Galaxia (0.5%) - Muy raro
-    "SP": 0.010,  # Special (1%) - Raro
-    "UR": 0.015,  # Ultra Raro (1.5%) - Poco común
-    "SSR": 0.030, # Super Super Raro (3%)
-    "SR": 0.060,  # Super Raro (6%)
-    "N": 0.200,   # Normal (20%)
-    "C": 0.680    # Común (68%) - Ajustado para completar 100%
+    "G": 0.001,   # Galaxia (0.10%) - Muy raro
+    "SP": 0.007,  # Special (0.70%) - Raro  
+    "UR": 0.022,  # Ultra Raro (2.2%) - Poco común
+    "SSR": 0.080, # Super Super Raro (8%)
+    "SR": 0.17,  # Super Raro (17%)
+    "N": 0.270,   # Normal (27%)
+    "C": 0.450    # Común (45%) - Ajustado para completar 100%
 }
 
 # ----------------------------
@@ -6563,6 +6563,311 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
             await interaction.response.send_message("❌ Por favor ingresa un número válido (ej: 1.5 para 1.5%).", ephemeral=True)
 
 # ----------------------------
+# ESTADO GLOBAL PARA ELECCIÓN DE CARTAS GLOBAL
+# ----------------------------
+# Almacena la oferta global activa: [card_id_1, card_id_2] o None si no hay oferta.
+current_global_choice = None
+
+# Almacena los IDs de usuario que ya han reclamado la recompensa.
+users_claimed_global_choice = set()
+
+# ----------------------------
+# FUNCIONES DE UTILITY (Asumiendo que no existen)
+# ----------------------------
+
+def find_card_by_id(card_id):
+    """Busca una carta en el catálogo por su ID."""
+    # Nota: Asume que 'catalog_cards' está cargado y disponible
+    for card in catalog_cards:
+        if str(card.get('id')) == str(card_id):
+            return card
+    return None
+
+# Debes asegurarte de que esta función exista y que get_user_data y save_data también lo hagan
+def add_card_to_inventory(user_id, card_id, amount=1):
+    """Añade una carta al inventario del usuario."""
+    # **REEMPLAZA ESTO CON TUS FUNCIONES REALES DE GESTIÓN DE DATOS**
+    # Si ya tienes estas funciones definidas en otra parte, no las redefinas,
+    # solo asegúrate de que find_card_by_id esté disponible.
+    try:
+        user_data = get_user_data(user_id) 
+        inventory = user_data.get('inventory', {})
+        inventory[card_id] = inventory.get(card_id, 0) + amount
+        user_data['inventory'] = inventory
+        save_data()
+    except NameError:
+        print("ADVERTENCIA: Las funciones get_user_data/save_data/add_card_to_inventory no están definidas.")
+        # Manejo de error si las funciones no existen
+        pass
+
+    # ----------------------------
+# VISTAS PARA ELECCIÓN DE CARTA
+# ----------------------------
+
+class CardChoiceView(discord.ui.View):
+    def __init__(self, user_id, cards_data, timeout=180):
+        super().__init__(timeout=timeout)
+        self.user_id = user_id
+        # cards_data: Lista de [card_id, card_name, card_rareza]
+        self.cards_data = cards_data 
+        self.chosen_card_id = None
+        self._create_choice_buttons()
+
+    def _create_choice_buttons(self):
+        """Crea los botones de elección iniciales."""
+        self.clear_items()
+        for card in self.cards_data:
+            card_id, card_name, _ = card
+            button = discord.ui.Button(
+                label=f"Elegir {card_name}",
+                style=discord.ButtonStyle.primary,
+                custom_id=f"card_choice_{card_id}",
+                row=0
+            )
+            # Usar lambda para pasar el card_id al callback
+            button.callback = lambda interaction, cid=card_id: self.choice_callback(interaction, cid)
+            self.add_item(button)
+
+    async def confirm_callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            return await interaction.response.send_message("❌ Esta elección es solo para ti.", ephemeral=True)
+
+        if not self.chosen_card_id:
+            return await interaction.response.send_message("❌ No has seleccionado una carta aún.", ephemeral=True)
+        
+        # 🛑 NUEVA LÓGICA DE RECLAMO GLOBAL 🛑
+        if self.user_id in users_claimed_global_choice:
+             # Doble verificación por seguridad, aunque el comando !eleccion_recompensa ya la hace
+            self.clear_items()
+            self.stop()
+            return await interaction.response.edit_message(content="🛑 Ya has reclamado esta recompensa.", embed=None, view=None)
+
+        # 1. Procesar recompensa (añadir al inventario)
+        add_card_to_inventory(self.user_id, self.chosen_card_id)
+        
+        # 2. Marcar al usuario como reclamante
+        users_claimed_global_choice.add(self.user_id)
+        
+        chosen_card = find_card_by_id(self.chosen_card_id)
+        chosen_name = chosen_card['nombre']
+        
+        # 3. Actualizar mensaje final
+        self.clear_items()
+        self.stop()
+        
+        embed = interaction.message.embeds[0]
+        embed.title = "🎉 ¡Recompensa Reclamada!"
+        embed.description = f"Has elegido exitosamente **{chosen_name}** ({self.chosen_card_id}) y se ha añadido a tu inventario."
+        embed.color = discord.Color.green()
+        embed.set_footer(text="¡Disfruta tu nueva carta!")
+        
+        await interaction.response.edit_message(embed=embed, view=self)
+
+
+    async def confirm_callback(self, interaction: discord.Interaction):
+        """Maneja la confirmación final de la elección."""
+        if interaction.user.id != self.user_id:
+            return await interaction.response.send_message("❌ Esta elección es solo para ti.", ephemeral=True)
+
+        if not self.chosen_card_id:
+            return await interaction.response.send_message("❌ No has seleccionado una carta aún.", ephemeral=True)
+        
+        # 1. Procesar recompensa (añadir al inventario)
+        add_card_to_inventory(self.user_id, self.chosen_card_id)
+        
+        # 2. Limpiar oferta del estado global
+        if self.user_id in card_choice_offers:
+            del card_choice_offers[self.user_id]
+        
+        chosen_card = find_card_by_id(self.chosen_card_id)
+        chosen_name = chosen_card['nombre']
+        
+        # 3. Actualizar mensaje final
+        self.clear_items()
+        self.stop() # Detener la vista
+        
+        embed = interaction.message.embeds[0]
+        embed.title = "🎉 ¡Recompensa Reclamada!"
+        embed.description = f"Has elegido exitosamente **{chosen_name}** ({self.chosen_card_id}) y se ha añadido a tu inventario."
+        embed.color = discord.Color.green()
+        embed.set_footer(text="¡Disfruta tu nueva carta!")
+        
+        await interaction.response.edit_message(embed=embed, view=self)
+
+    async def cancel_callback(self, interaction: discord.Interaction):
+        """Maneja la cancelación y vuelve a la vista de elección inicial."""
+        if interaction.user.id != self.user_id:
+            return await interaction.response.send_message("❌ Esta elección es solo para ti.", ephemeral=True)
+
+        # Restaurar la vista original
+        self.chosen_card_id = None
+        self._create_choice_buttons()
+
+        embed = interaction.message.embeds[0]
+        embed.set_footer(text="Selecciona una de las cartas ofrecidas.")
+
+        await interaction.response.edit_message(embed=embed, view=self)
+
+# ----------------------------
+# COMANDO DE USUARIO: !eleccion_recompensa y !eleccion_carta
+# ----------------------------
+
+# ----------------------------
+# COMANDOS DE ELECCIÓN DE CARTA (¡Colócalos a nivel superior!)
+# ----------------------------
+
+@bot.command(name="eleccion_carta")
+@commands.has_permissions(administrator=True)
+async def eleccion_carta(ctx, card_id1: str, card_id2: str): 
+    """
+    [ADMIN] Establece una elección global entre dos cartas para todos los usuarios.
+    Uso: !eleccion_carta <id_carta1> <id_carta2>
+    """
+    global current_global_choice, users_claimed_global_choice
+
+    if current_global_choice:
+        return await ctx.send("❌ Error: Ya existe una elección de carta global activa. Usa `!cancelar_eleccion` para limpiarla antes de crear una nueva.")
+        
+    card1 = find_card_by_id(card_id1)
+    card2 = find_card_by_id(card_id2)
+
+    if not card1 or not card2:
+        error_msg = "❌ Error: Una o ambas IDs de carta no son válidas. No se ha creado la elección."
+        return await ctx.send(error_msg)
+
+    # Almacenar la oferta global y resetear la lista de reclamantes
+    current_global_choice = [card_id1, card_id2]
+    users_claimed_global_choice.clear() 
+
+    # ... (Resto del código para el embed) ...
+    embed = discord.Embed(
+        title="✨ ¡Elección de Carta Global ACTIVADA!",
+        description="Una nueva recompensa de elección ha sido establecida. **Cualquier usuario puede usar `!eleccion_recompensa` para reclamarla (una sola vez por usuario).**",
+        color=discord.Color.blue()
+    )
+    embed.add_field(name="Opción 1", value=f"{card1['nombre']} ({card1['rareza']})", inline=True)
+    embed.add_field(name="Opción 2", value=f"{card2['nombre']} ({card2['rareza']})", inline=True)
+    embed.set_footer(text="¡Date prisa y reclama tu carta!")
+
+    await ctx.send(embed=embed)
+
+# ----------------------------
+# COMANDO DE USUARIO: !eleccion_recompensa
+# ----------------------------
+
+@bot.command(name="eleccion_recompensa")
+async def eleccion_recompensa(ctx):
+    """
+    Permite al usuario reclamar una carta de la elección global ofrecida mediante texto.
+    """
+    user_id = ctx.author.id
+    global current_global_choice, users_claimed_global_choice
+
+    if not current_global_choice:
+        return await ctx.send("❌ Actualmente **no hay** una elección de carta global activa para reclamar. ¡Consulta a un administrador!")
+
+    if user_id in users_claimed_global_choice:
+        return await ctx.send("🛑 Ya has reclamado tu recompensa de elección de carta global.")
+
+    card_id1, card_id2 = current_global_choice
+    card1 = find_card_by_id(card_id1)
+    card2 = find_card_by_id(card_id2)
+
+    if not card1 or not card2:
+        return await ctx.send("❌ Error interno: La oferta global es inválida. Contacta al administrador.")
+
+    embed = discord.Embed(
+        title="💌 ¡Reclama tu Elección Global!",
+        description=f"**{ctx.author.mention}**, selecciona una de estas dos cartas. **Solo puedes elegir una vez.**\n\n**¡Responde a este mensaje con `opcion 1` o `opcion 2` para hacer tu elección!**",
+        color=discord.Color.gold()
+    )
+    
+    # Mostrar detalles de las cartas
+    embed.add_field(
+        name=f"1. {card1['nombre']} ({card1['rareza']})",
+        value=f"**Opción 1** | ID: `{card_id1}`",
+        inline=False
+    )
+    embed.add_field(
+        name=f"2. {card2['nombre']} ({card2['rareza']})",
+        value=f"**Opción 2** | ID: `{card_id2}`",
+        inline=False
+    )
+
+    embed.set_footer(text="Tienes 30 segundos para responder con 'opcion 1' o 'opcion 2'.")
+
+    # Enviar el mensaje y esperar la respuesta
+    await ctx.send(embed=embed)
+    
+    def check(m):
+        # Verifica que el mensaje provenga del mismo usuario, en el mismo canal
+        # y que el contenido sea 'opcion 1' o 'opcion 2' (sin importar mayúsculas)
+        return m.author == ctx.author and m.channel == ctx.channel and m.content.lower() in ['opcion 1', 'opcion 2']
+
+    try:
+        # Esperar la respuesta del usuario por 30 segundos
+        msg = await bot.wait_for('message', check=check, timeout=30.0)
+    except asyncio.TimeoutError:
+        return await ctx.send("⏳ Tiempo agotado. No seleccionaste una carta a tiempo. La oferta sigue activa.")
+
+    # Procesar la elección
+    eleccion = msg.content.lower()
+    
+    if eleccion == 'opcion 1':
+        chosen_card_id = card_id1
+        chosen_card_name = card1['nombre']
+    elif eleccion == 'opcion 2':
+        chosen_card_id = card_id2
+        chosen_card_name = card2['nombre']
+    else:
+        # Esto no debería ocurrir gracias a la función check
+        return await ctx.send("❌ Elección inválida. Inténtalo de nuevo con `!eleccion_recompensa`.")
+
+    # ******* Lógica de confirmación y reclamo *******
+    
+    # 1. Añadir la carta al inventario (usando la función que ya tienes)
+    chosen_card = find_card_by_id(chosen_card_id)
+    if chosen_card:
+        add_to_inventory(user_id, chosen_card) 
+    
+    # 2. Marcar al usuario como reclamante
+    users_claimed_global_choice.add(user_id)
+
+    # Mensaje de confirmación final
+    embed_final = discord.Embed(
+        title="🎉 ¡Recompensa Reclamada!",
+        description=f"Has elegido exitosamente **{chosen_card_name}** (`{chosen_card_id}`) y se ha añadido a tu inventario.\n\nLa elección global ha sido registrada para ti.",
+        color=discord.Color.green()
+    )
+    await ctx.send(embed=embed_final)
+
+    # ----------------------------
+# COMANDO DE ADMINISTRACIÓN: !cancelar_eleccion
+# ----------------------------
+
+@bot.command(name="cancelar_eleccion")
+@commands.has_permissions(administrator=True)
+async def cancelar_eleccion(ctx):
+    """
+    [ADMIN] Cancela la elección de carta global actual y resetea los reclamantes.
+    """
+    global current_global_choice, users_claimed_global_choice
+
+    if not current_global_choice:
+        return await ctx.send("⚠️ No hay ninguna elección de carta global activa para cancelar.")
+    
+    current_global_choice = None
+    reclamantes = len(users_claimed_global_choice)
+    users_claimed_global_choice.clear()
+    
+    await ctx.send(f"✅ La elección de carta global ha sido **CANCELADA**.\nSe resetearon los datos de **{reclamantes}** usuarios que ya habían reclamado.")
+
+    # Se debe guardar el estado de estas variables globales para que persista
+    # entre reinicios del bot.
+
+
+
+# ----------------------------
 # COMANDO RAPIDO PARA VER RATES
 # ----------------------------
 @bot.command()
@@ -6585,13 +6890,13 @@ async def rates(ctx):
         
         embed.add_field(
             name=f"{emoji} {rarity}",
-            value=f"{percentage:.2f}%",
+            value=f"{percentage:.3f}%",
             inline=True
         )
     
     embed.add_field(
         name="📊 Total",
-        value=f"{sum(rarity_probabilities.values()) * 100:.2f}%",
+        value=f"{sum(rarity_probabilities.values()) * 100:.3f}%",
         inline=False
     )
     
