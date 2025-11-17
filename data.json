@@ -344,7 +344,28 @@
                 }
             }
         ],
-        "785751101210624011": [],
+        "785751101210624011": [
+            {
+                "id": "C002",
+                "nombre": "Tatsuya Mori (Yukigaoka)",
+                "rareza": "C",
+                "valor": 15,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tatsuya_C.png",
+                "descripcion": "Tatsuya C (Yukigaoka)",
+                "stats": {
+                    "salto": 16,
+                    "remate": 48,
+                    "recepcion": 12,
+                    "bloqueo": 14,
+                    "velocidad": 15,
+                    "iq": 11,
+                    "carisma": 17,
+                    "colocacion": 13
+                }
+            }
+        ],
         "1394789612672647253": [
             {
                 "id": "C003",
@@ -1591,6 +1612,26 @@
                     "carisma": 50,
                     "colocacion": 46
                 }
+            },
+            {
+                "id": "SR002",
+                "nombre": "Kenji Futakuchi (Dateko)",
+                "rareza": "SR",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Futakuchi_SR.png",
+                "descripcion": "Futakuchi SR (Dateko) - Remate Medio",
+                "stats": {
+                    "salto": 38,
+                    "remate": 69,
+                    "recepcion": 32,
+                    "bloqueo": 33,
+                    "velocidad": 37,
+                    "iq": 35,
+                    "carisma": 34,
+                    "colocacion": 35
+                }
             }
         ],
         "1410065063255216299": [
@@ -1752,6 +1793,26 @@
                     "iq": 35,
                     "carisma": 34,
                     "colocacion": 35
+                }
+            },
+            {
+                "id": "SR001",
+                "nombre": "Kanji Koganegawa (Dateko)",
+                "rareza": "SR",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Koganegawa_SR.png",
+                "descripcion": "Koganegawa SR (Dateko) - Colocación Media",
+                "stats": {
+                    "salto": 34,
+                    "remate": 32,
+                    "recepcion": 33,
+                    "bloqueo": 35,
+                    "velocidad": 37,
+                    "iq": 39,
+                    "carisma": 38,
+                    "colocacion": 68
                 }
             }
         ],
@@ -2675,6 +2736,26 @@
                     "carisma": 17,
                     "colocacion": 13
                 }
+            },
+            {
+                "id": "SR004",
+                "nombre": "Hajime Iwaizumi (Aoba Johsai)",
+                "rareza": "SR",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Iwaizumi_SR.png",
+                "descripcion": "Iwaizumi SR (Aoba Johsai) - Salto Alto",
+                "stats": {
+                    "salto": 70,
+                    "remate": 38,
+                    "recepcion": 33,
+                    "bloqueo": 34,
+                    "velocidad": 39,
+                    "iq": 38,
+                    "carisma": 32,
+                    "colocacion": 33
+                }
             }
         ],
         "1152419874472214540": [
@@ -3156,6 +3237,26 @@
                     "iq": 22,
                     "carisma": 21,
                     "colocacion": 23
+                }
+            },
+            {
+                "id": "N002",
+                "nombre": "Akira Kunimi (Kitagawa)",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kunimi_N.png",
+                "descripcion": "Kunimi N (Kitagawa)",
+                "stats": {
+                    "salto": 21,
+                    "remate": 22,
+                    "recepcion": 59,
+                    "bloqueo": 23,
+                    "velocidad": 26,
+                    "iq": 27,
+                    "carisma": 22,
+                    "colocacion": 24
                 }
             }
         ],
@@ -3935,18 +4036,58 @@
                     "carisma": 43,
                     "colocacion": 30
                 }
+            },
+            {
+                "id": "C001",
+                "nombre": "Koji Sekimukai (Yukigaoka)",
+                "rareza": "C",
+                "valor": 15,
+                "stock": "Unlimited",
+                "max_per_user": 10000,
+                "imagen": "images/Koji_C.png",
+                "descripcion": "Koji C (Yukigaoka)",
+                "stats": {
+                    "salto": 15,
+                    "remate": 13,
+                    "recepcion": 12,
+                    "bloqueo": 11,
+                    "velocidad": 50,
+                    "iq": 12,
+                    "carisma": 14,
+                    "colocacion": 13
+                }
+            },
+            {
+                "id": "SR001",
+                "nombre": "Kanji Koganegawa (Dateko)",
+                "rareza": "SR",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Koganegawa_SR.png",
+                "descripcion": "Koganegawa SR (Dateko) - Colocación Media",
+                "stats": {
+                    "salto": 34,
+                    "remate": 32,
+                    "recepcion": 33,
+                    "bloqueo": 35,
+                    "velocidad": 37,
+                    "iq": 39,
+                    "carisma": 38,
+                    "colocacion": 68
+                }
             }
         ]
     },
     "balances": {
         "1394789612672647253": 31,
-        "785751101210624011": 70,
+        "785751101210624011": 131,
         "807024335122333777": 2990,
-        "754530308845469829": 330,
-        "1001180830162485439": 468,
+        "754530308845469829": 397,
+        "1001180830162485439": 517,
         "388418629999394817": 674,
-        "1410065063255216299": 184,
-        "1152419874472214540": 756,
+        "1410065063255216299": 249,
+        "1152419874472214540": 776,
         "1379257561039114241": 28,
         "474740908596658176": 307,
         "659546852412096523": 910,
@@ -3954,10 +4095,10 @@
         "339181724162588674": 63,
         "170315995204812800": 32,
         "750806741972942989": 101,
-        "1324155618696630304": 137,
+        "1324155618696630304": 177,
         "1430949435398950937": 131,
         "1341145593090805790": 159,
-        "574486937746800662": 127
+        "574486937746800662": 91
     },
     "rob_penalties": {
         "1394789612672647253": 1763175767.4620216
