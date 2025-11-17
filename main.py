@@ -2428,7 +2428,7 @@ async def gacha(ctx):
     except (IndexError, KeyError) as e:
         print(f"❌ Error en gacha: {e}")
         # Fallback seguro si algo sale mal
-        safe_rarities = ["C", "N", "SR", "SSR", "UR", "SP", "L"]
+        safe_rarities = ["C", "N", "SR", "SSR", "UR", "SP", "G"]
         for safe_r in safe_rarities:
             if safe_r in cards_catalog and cards_catalog[safe_r]:
                 card = random.choice(cards_catalog[safe_r])
@@ -2471,7 +2471,7 @@ async def gacha_buy(ctx, cantidad: int = 1):
         return
     
     # Filtrar las rarezas del gacha (L, SP, UR, SSR, SR, N, C)
-    target_rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    target_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     available_rarities = []
     available_probabilities = []
     
@@ -2910,7 +2910,7 @@ async def inventario(ctx):
     
     rarity_text = ""
     # Se itera en el orden deseado para mostrar el resumen
-    for rarity in ["L", "SP", "UR", "SSR", "SR", "N", "C"]:
+    for rarity in ["G", "SP", "UR", "SSR", "SR", "N", "C"]:
         if rarity in rarity_count:
             emoji = get_rarity_emoji(rarity)
             rarity_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
@@ -3048,7 +3048,7 @@ duel_attributes = {
 }
 
 # Orden de rarezas para filtros
-rarity_order = {"L": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
 
 class DuelAcceptView(View):
     def __init__(self, duel_id, challenger, challenged, duel_type="amistoso", max_rarity=None, timeout=120):
@@ -3740,7 +3740,7 @@ async def dueloamistoso(ctx, member: discord.Member):
 async def duelohonor(ctx, member: discord.Member, max_rarity: str = "UR"):
     """Retar a otro usuario a un duelo de honor de 5 rondas con apuesta de cartas"""
     # Validar rareza máxima
-    valid_rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     max_rarity = max_rarity.upper()
     
     if max_rarity not in valid_rarities:
@@ -3985,7 +3985,7 @@ async def cancelar_duelo(ctx):
 def get_rarity_emoji(rarity):
     """Devuelve el emoji correspondiente a la rareza"""
     emoji_map = {
-        "L": "💎", "SP": "✨", "UR": "🔥", 
+        "G": "💎", "SP": "✨", "UR": "🔥", 
         "SSR": "⭐", "SR": "🌟", "N": "🟢", "C": "⚪"
     }
     return emoji_map.get(rarity.upper(), "⚪")
@@ -4018,7 +4018,7 @@ async def inventario_personal(ctx):
         return
     
     # Ordenar inventario por rareza (L, SP, UR, SSR, SR, N, C)
-    rarity_order = {"L": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
     sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
     
     # Dividir en chunks para evitar límites de Discord
@@ -4045,7 +4045,7 @@ async def inventario_personal(ctx):
         
         # Agregar conteo por rareza
         rarity_text = ""
-        for rarity in ["L", "SP", "UR", "SSR", "SR", "N", "C"]:
+        for rarity in ["G", "SP", "UR", "SSR", "SR", "N", "C"]:
             if rarity in rarity_count:
                 emoji = get_rarity_emoji(rarity)
                 rarity_text += f"{emoji} **{rarity}**: {rarity_count[rarity]}\n"
@@ -4393,7 +4393,7 @@ async def vender_rareza(ctx, rareza: str):
     
     # Validar y normalizar la rareza
     rareza = rareza.upper()
-    valid_rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     
     if rareza not in valid_rarities:
         await ctx.send(f"❌ Rareza inválida. Usa: {', '.join(valid_rarities)}")
@@ -4786,7 +4786,7 @@ class TorreDuelView:
             return
         
         # Ordenar cartas por rareza (de mayor a menor)
-        rarity_order = {"L": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+        rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
         sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
         
         # Dividir en páginas de 10 cartas
@@ -5397,7 +5397,7 @@ async def album(ctx):
         return
     
     # Eliminar duplicados (usando el ID de la carta) y ordenar por rareza
-    rarity_order = {"L": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
     
     # Crear diccionario para eliminar duplicados
     unique_cards = {}
@@ -6319,7 +6319,7 @@ async def modificar_rates(ctx):
         return rarity_callback
     
     # Crear botones para cada rareza
-    rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     for rarity in rarities:
         emoji = get_rarity_emoji(rarity)
         btn = Button(label=f"Modificar {rarity}", style=discord.ButtonStyle.blurple, emoji=emoji)
@@ -6511,7 +6511,7 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
                 
                 return rarity_callback
             
-            rarities = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+            rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
             for rarity in rarities:
                 emoji = get_rarity_emoji(rarity)
                 btn = Button(label=f"Modificar {rarity}", style=discord.ButtonStyle.blurple, emoji=emoji)
@@ -6881,7 +6881,7 @@ async def rates(ctx):
     )
     
     # Mostrar probabilidades en orden de rareza
-    rarities_order = ["L", "SP", "UR", "SSR", "SR", "N", "C"]
+    rarities_order = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
     
     for rarity in rarities_order:
         prob = rarity_probabilities.get(rarity, 0)
