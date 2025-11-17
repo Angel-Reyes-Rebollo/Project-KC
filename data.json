@@ -346,23 +346,83 @@
         ],
         "785751101210624011": [
             {
-                "id": "C002",
-                "nombre": "Tatsuya Mori (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
+                "id": "N001",
+                "nombre": "Yutaro Kindaichi (Kitagawa)",
+                "rareza": "N",
+                "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Tatsuya_C.png",
-                "descripcion": "Tatsuya C (Yukigaoka)",
+                "imagen": "images/Kindaichi_N.png",
+                "descripcion": "Kindaichi N (Kitagawa)",
                 "stats": {
-                    "salto": 16,
-                    "remate": 48,
-                    "recepcion": 12,
-                    "bloqueo": 14,
-                    "velocidad": 15,
-                    "iq": 11,
-                    "carisma": 17,
-                    "colocacion": 13
+                    "salto": 24,
+                    "remate": 22,
+                    "recepcion": 25,
+                    "bloqueo": 58,
+                    "velocidad": 26,
+                    "iq": 22,
+                    "carisma": 21,
+                    "colocacion": 23
+                }
+            },
+            {
+                "id": "SR004",
+                "nombre": "Hajime Iwaizumi (Aoba Johsai)",
+                "rareza": "SR",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Iwaizumi_SR.png",
+                "descripcion": "Iwaizumi SR (Aoba Johsai) - Salto Alto",
+                "stats": {
+                    "salto": 70,
+                    "remate": 38,
+                    "recepcion": 33,
+                    "bloqueo": 34,
+                    "velocidad": 39,
+                    "iq": 38,
+                    "carisma": 32,
+                    "colocacion": 33
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yuki Shibayama (Nekoma)",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Yuki_N.png",
+                "descripcion": "Yuki N (Nekoma)",
+                "stats": {
+                    "salto": 22,
+                    "remate": 20,
+                    "recepcion": 55,
+                    "bloqueo": 23,
+                    "velocidad": 27,
+                    "iq": 25,
+                    "carisma": 22,
+                    "colocacion": 26
+                }
+            },
+            {
+                "id": "E008",
+                "nombre": "Bokuto y Akashi (E)",
+                "rareza": "E",
+                "valor": 200,
+                "stock": "Unlimited",
+                "max_per_user": 1,
+                "imagen": "images/Bokuto_Akashi_E.png",
+                "descripcion": "Bokuto y akashi (E)",
+                "stats": {
+                    "salto": 78,
+                    "remate": 85,
+                    "recepcion": 50,
+                    "bloqueo": 55,
+                    "velocidad": 65,
+                    "iq": 45,
+                    "carisma": 57,
+                    "colocacion": 85
                 }
             }
         ],
@@ -792,46 +852,6 @@
                 }
             },
             {
-                "id": "N001",
-                "nombre": "Yutaro Kindaichi (Kitagawa)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kindaichi_N.png",
-                "descripcion": "Kindaichi N (Kitagawa)",
-                "stats": {
-                    "salto": 24,
-                    "remate": 22,
-                    "recepcion": 25,
-                    "bloqueo": 58,
-                    "velocidad": 26,
-                    "iq": 22,
-                    "carisma": 21,
-                    "colocacion": 23
-                }
-            },
-            {
-                "id": "SR005",
-                "nombre": "Kentaro Kyotani (Aoba Johsai)",
-                "rareza": "SR",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Kyotani_SR.png",
-                "descripcion": "Kyotani SR (Aoba Johsai) - Frenesí de Locura",
-                "stats": {
-                    "salto": 35,
-                    "remate": 37,
-                    "recepcion": 32,
-                    "bloqueo": 33,
-                    "velocidad": 65,
-                    "iq": 31,
-                    "carisma": 38,
-                    "colocacion": 32
-                }
-            },
-            {
                 "id": "SSR006",
                 "nombre": "Yu Nishinoya (Karasuno)",
                 "rareza": "SSR",
@@ -892,266 +912,6 @@
                 }
             },
             {
-                "id": "N001",
-                "nombre": "Yutaro Kindaichi (Kitagawa)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kindaichi_N.png",
-                "descripcion": "Kindaichi N (Kitagawa)",
-                "stats": {
-                    "salto": 24,
-                    "remate": 22,
-                    "recepcion": 25,
-                    "bloqueo": 58,
-                    "velocidad": 26,
-                    "iq": 22,
-                    "carisma": 21,
-                    "colocacion": 23
-                }
-            },
-            {
-                "id": "N003",
-                "nombre": "Yuki Shibayama (Nekoma)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Yuki_N.png",
-                "descripcion": "Yuki N (Nekoma)",
-                "stats": {
-                    "salto": 22,
-                    "remate": 20,
-                    "recepcion": 55,
-                    "bloqueo": 23,
-                    "velocidad": 27,
-                    "iq": 25,
-                    "carisma": 22,
-                    "colocacion": 26
-                }
-            },
-            {
-                "id": "N003",
-                "nombre": "Yuki Shibayama (Nekoma)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Yuki_N.png",
-                "descripcion": "Yuki N (Nekoma)",
-                "stats": {
-                    "salto": 22,
-                    "remate": 20,
-                    "recepcion": 55,
-                    "bloqueo": 23,
-                    "velocidad": 27,
-                    "iq": 25,
-                    "carisma": 22,
-                    "colocacion": 26
-                }
-            },
-            {
-                "id": "N002",
-                "nombre": "Akira Kunimi (Kitagawa)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kunimi_N.png",
-                "descripcion": "Kunimi N (Kitagawa)",
-                "stats": {
-                    "salto": 21,
-                    "remate": 22,
-                    "recepcion": 59,
-                    "bloqueo": 23,
-                    "velocidad": 26,
-                    "iq": 27,
-                    "carisma": 22,
-                    "colocacion": 24
-                }
-            },
-            {
-                "id": "C001",
-                "nombre": "Koji Sekimukai (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 10000,
-                "imagen": "images/Koji_C.png",
-                "descripcion": "Koji C (Yukigaoka)",
-                "stats": {
-                    "salto": 15,
-                    "remate": 13,
-                    "recepcion": 12,
-                    "bloqueo": 11,
-                    "velocidad": 50,
-                    "iq": 12,
-                    "carisma": 14,
-                    "colocacion": 13
-                }
-            },
-            {
-                "id": "C001",
-                "nombre": "Koji Sekimukai (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 10000,
-                "imagen": "images/Koji_C.png",
-                "descripcion": "Koji C (Yukigaoka)",
-                "stats": {
-                    "salto": 15,
-                    "remate": 13,
-                    "recepcion": 12,
-                    "bloqueo": 11,
-                    "velocidad": 50,
-                    "iq": 12,
-                    "carisma": 14,
-                    "colocacion": 13
-                }
-            },
-            {
-                "id": "N001",
-                "nombre": "Yutaro Kindaichi (Kitagawa)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kindaichi_N.png",
-                "descripcion": "Kindaichi N (Kitagawa)",
-                "stats": {
-                    "salto": 24,
-                    "remate": 22,
-                    "recepcion": 25,
-                    "bloqueo": 58,
-                    "velocidad": 26,
-                    "iq": 22,
-                    "carisma": 21,
-                    "colocacion": 23
-                }
-            },
-            {
-                "id": "C001",
-                "nombre": "Koji Sekimukai (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 10000,
-                "imagen": "images/Koji_C.png",
-                "descripcion": "Koji C (Yukigaoka)",
-                "stats": {
-                    "salto": 15,
-                    "remate": 13,
-                    "recepcion": 12,
-                    "bloqueo": 11,
-                    "velocidad": 50,
-                    "iq": 12,
-                    "carisma": 14,
-                    "colocacion": 13
-                }
-            },
-            {
-                "id": "N002",
-                "nombre": "Akira Kunimi (Kitagawa)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kunimi_N.png",
-                "descripcion": "Kunimi N (Kitagawa)",
-                "stats": {
-                    "salto": 21,
-                    "remate": 22,
-                    "recepcion": 59,
-                    "bloqueo": 23,
-                    "velocidad": 26,
-                    "iq": 27,
-                    "carisma": 22,
-                    "colocacion": 24
-                }
-            },
-            {
-                "id": "N003",
-                "nombre": "Yuki Shibayama (Nekoma)",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Yuki_N.png",
-                "descripcion": "Yuki N (Nekoma)",
-                "stats": {
-                    "salto": 22,
-                    "remate": 20,
-                    "recepcion": 55,
-                    "bloqueo": 23,
-                    "velocidad": 27,
-                    "iq": 25,
-                    "carisma": 22,
-                    "colocacion": 26
-                }
-            },
-            {
-                "id": "SR005",
-                "nombre": "Kentaro Kyotani (Aoba Johsai)",
-                "rareza": "SR",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Kyotani_SR.png",
-                "descripcion": "Kyotani SR (Aoba Johsai) - Frenesí de Locura",
-                "stats": {
-                    "salto": 35,
-                    "remate": 37,
-                    "recepcion": 32,
-                    "bloqueo": 33,
-                    "velocidad": 65,
-                    "iq": 31,
-                    "carisma": 38,
-                    "colocacion": 32
-                }
-            },
-            {
-                "id": "SR005",
-                "nombre": "Kentaro Kyotani (Aoba Johsai)",
-                "rareza": "SR",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Kyotani_SR.png",
-                "descripcion": "Kyotani SR (Aoba Johsai) - Frenesí de Locura",
-                "stats": {
-                    "salto": 35,
-                    "remate": 37,
-                    "recepcion": 32,
-                    "bloqueo": 33,
-                    "velocidad": 65,
-                    "iq": 31,
-                    "carisma": 38,
-                    "colocacion": 32
-                }
-            },
-            {
-                "id": "SR003",
-                "nombre": "Takehito Sasaya (Dateko)",
-                "rareza": "SR",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Takehito_SR.png",
-                "descripcion": "Takehito SR (Dateko) - Bloqueo Medio",
-                "stats": {
-                    "salto": 37,
-                    "remate": 38,
-                    "recepcion": 31,
-                    "bloqueo": 70,
-                    "velocidad": 33,
-                    "iq": 39,
-                    "carisma": 32,
-                    "colocacion": 35
-                }
-            },
-            {
                 "id": "SSR003",
                 "nombre": "Daichi Sawamura (Karasuno)",
                 "rareza": "SSR",
@@ -1189,86 +949,6 @@
                     "iq": 37,
                     "carisma": 80,
                     "colocacion": 60
-                }
-            },
-            {
-                "id": "C002",
-                "nombre": "Tatsuya Mori (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Tatsuya_C.png",
-                "descripcion": "Tatsuya C (Yukigaoka)",
-                "stats": {
-                    "salto": 16,
-                    "remate": 48,
-                    "recepcion": 12,
-                    "bloqueo": 14,
-                    "velocidad": 15,
-                    "iq": 11,
-                    "carisma": 17,
-                    "colocacion": 13
-                }
-            },
-            {
-                "id": "SR003",
-                "nombre": "Takehito Sasaya (Dateko)",
-                "rareza": "SR",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Takehito_SR.png",
-                "descripcion": "Takehito SR (Dateko) - Bloqueo Medio",
-                "stats": {
-                    "salto": 37,
-                    "remate": 38,
-                    "recepcion": 31,
-                    "bloqueo": 70,
-                    "velocidad": 33,
-                    "iq": 39,
-                    "carisma": 32,
-                    "colocacion": 35
-                }
-            },
-            {
-                "id": "C001",
-                "nombre": "Koji Sekimukai (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 10000,
-                "imagen": "images/Koji_C.png",
-                "descripcion": "Koji C (Yukigaoka)",
-                "stats": {
-                    "salto": 15,
-                    "remate": 13,
-                    "recepcion": 12,
-                    "bloqueo": 11,
-                    "velocidad": 50,
-                    "iq": 12,
-                    "carisma": 14,
-                    "colocacion": 13
-                }
-            },
-            {
-                "id": "C002",
-                "nombre": "Tatsuya Mori (Yukigaoka)",
-                "rareza": "C",
-                "valor": 15,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Tatsuya_C.png",
-                "descripcion": "Tatsuya C (Yukigaoka)",
-                "stats": {
-                    "salto": 16,
-                    "remate": 48,
-                    "recepcion": 12,
-                    "bloqueo": 14,
-                    "velocidad": 15,
-                    "iq": 11,
-                    "carisma": 17,
-                    "colocacion": 13
                 }
             },
             {
@@ -3664,6 +3344,46 @@
                     "carisma": 22,
                     "colocacion": 24
                 }
+            },
+            {
+                "id": "N002",
+                "nombre": "Akira Kunimi (Kitagawa)",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kunimi_N.png",
+                "descripcion": "Kunimi N (Kitagawa)",
+                "stats": {
+                    "salto": 21,
+                    "remate": 22,
+                    "recepcion": 59,
+                    "bloqueo": 23,
+                    "velocidad": 26,
+                    "iq": 27,
+                    "carisma": 22,
+                    "colocacion": 24
+                }
+            },
+            {
+                "id": "SSR002",
+                "nombre": "Shoyo Hinata (Karasuno)",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Hinata_SSR.png",
+                "descripcion": "Hinata SSR (Karasuno) - Estrella del Karasuno / Remate Rápido",
+                "stats": {
+                    "salto": 80,
+                    "remate": 52,
+                    "recepcion": 45,
+                    "bloqueo": 34,
+                    "velocidad": 79,
+                    "iq": 33,
+                    "carisma": 47,
+                    "colocacion": 44
+                }
             }
         ],
         "170315995204812800": [
@@ -4082,7 +3802,7 @@
     "balances": {
         "1394789612672647253": 31,
         "785751101210624011": 131,
-        "807024335122333777": 2990,
+        "807024335122333777": 3539,
         "754530308845469829": 397,
         "1001180830162485439": 517,
         "388418629999394817": 674,
@@ -4092,7 +3812,7 @@
         "474740908596658176": 307,
         "659546852412096523": 910,
         "750799795257475125": 40,
-        "339181724162588674": 63,
+        "339181724162588674": 22,
         "170315995204812800": 32,
         "750806741972942989": 101,
         "1324155618696630304": 177,
