@@ -1119,46 +1119,6 @@
         "carisma": 60,
         "colocacion": 50
       }
-    },
-    {
-      "id": "ADN001",
-      "nombre": "Nagi Seishiro (Hakuho) (ADN)",
-      "rareza": "ADN",
-      "valor": 400,
-      "stock": "Unlimited",
-      "max_per_user": 1,
-      "imagen": "images/Nagi_ADN.png",
-      "descripcion": "Nagi Seishiro (Hakuho) (ADN)",
-      "stats": {
-        "salto": 88,
-        "remate": 100,
-        "recepcion": 72,
-        "bloqueo": 80,
-        "velocidad": 99,
-        "iq": 85,
-        "carisma": 99,
-        "colocacion": 55
-      }
-    },
-    {
-      "id": "ADN002",
-      "nombre": "Rensuke Kunigami (Versión Base) (ADN)",
-      "rareza": "ADN",
-      "valor": 400,
-      "stock": "Unlimited",
-      "max_per_user": 1,
-      "imagen": "images/Kunigami_ADN.png",
-      "descripcion": "Rensuke Kunigami (Versión Base) (ADN)",
-      "stats": {
-        "salto": 99,
-        "remate": 99,
-        "recepcion": 55,
-        "bloqueo": 68,
-        "velocidad": 100,
-        "iq": 65,
-        "carisma": 74,
-        "colocacion": 60
-      }
     }
   ]
 }

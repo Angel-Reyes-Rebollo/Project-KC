@@ -81,11 +81,164 @@ intents.message_content = True  # necesario si usas comandos por mensajes
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Tiempos / cooldowns
-user_last_work = {}    # {user_id: timestamp}
+user_last_trabajar = {}    # {user_id: timestamp}
 user_last_daily = {}   # {user_id: timestamp}
 user_last_gacha = {}   # {user_id: timestamp}
 user_last_adivina = {} # {user_id: timestamp}
 user_last_rob = {}     # {user_id: timestamp}
+user_last_casino = {}  # {user_id: timestamp}
+
+# ----------------------------
+# CONSTANTES Y COMANDO !ESPERA
+# ----------------------------
+
+# CONSTANTES DE COOLDOWNS (en segundos)
+COOLDOWN_DIARIA = 24 * 3600    # !diaria (24 horas)
+COOLDOWN_GACHA = 4 * 3600      # !gacha (4 horas)
+COOLDOWN_ADIVINA = 1 * 3600    # !adivina (1 hora)
+COOLDOWN_ROB = 30 * 60         # !rob (30 minutos)
+COOLDOWN_TRABAJAR = 1 * 3600   # !trabajar (Asumido 1 hora, valor común)
+COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
+
+def format_cooldown(seconds):
+    """Convierte segundos en un formato de horas, minutos y segundos (Ej: 1h 30m 5s)."""
+    if seconds <= 0:
+        return "**✅ ¡LISTO!**"
+    
+    seconds = int(seconds)
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    parts = []
+    if hours > 0:
+        parts.append(f"{hours}h")
+    if minutes > 0:
+        parts.append(f"{minutes}m")
+    if seconds > 0:
+        parts.append(f"{seconds}s")
+    
+    # Si el tiempo restante es > 0 pero no hay horas, minutos o segundos (e.g. 0.9s), forzar < 1s
+    if not parts:
+        return "< 1s"
+
+    return " ".join(parts)
+
+@bot.command(aliases=['cd'])
+async def espera(ctx):
+    """Muestra el tiempo restante de todos los cooldowns del usuario en horas, minutos y segundos."""
+    user_id = ctx.author.id
+    now = time.time()
+
+    # Definir los comandos y sus cooldowns asociados
+    cooldowns_config = [
+        ("🎲 Gacha", user_last_gacha, COOLDOWN_GACHA),
+        ("💼 Trabajar", user_last_trabajar, COOLDOWN_TRABAJAR),
+        ("🎁 Recompensa Diaria", user_last_daily, COOLDOWN_DIARIA),
+        ("🎯 Adivina Número", user_last_adivina, COOLDOWN_ADIVINA),
+        ("🦹 Robo", user_last_rob, COOLDOWN_ROB),
+        ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), # <--- NUEVO
+    ]
+    
+    cooldowns_text = []
+
+    for name, last_used_dict, duration in cooldowns_config:
+        last_used = last_used_dict.get(user_id, 0)
+        time_elapsed = now - last_used
+        time_remaining = duration - time_elapsed
+
+        if time_remaining <= 0:
+            status = "**✅ ¡LISTO!**"
+        else:
+            status = format_cooldown(time_remaining)
+
+        cooldowns_text.append(f"• **{name}:** {status}")
+
+    embed = discord.Embed(
+        title=f"⏰ Cooldowns de {ctx.author.display_name}",
+        description="Tiempo restante para poder usar los comandos (`!espera` también funciona como `!cd`).",
+        color=discord.Color.gold()
+    )
+    
+    embed.add_field(name="Comandos", value="\n".join(cooldowns_text), inline=False)
+    embed.set_footer(text="¡Usa los comandos cuando estén listos!")
+    
+    await ctx.send(embed=embed)
+
+
+# ----------------------------
+# COMANDO !CASINO (Tragaperras) <--- NUEVO COMANDO
+# ----------------------------
+
+@bot.command()
+async def casino(ctx):
+    """Juega a la tragaperras y gana entre 25 y 50 gemas con un cooldown de 1 hora."""
+    user_id = ctx.author.id
+    now = time.time()
+    
+    # 1. Verificar cooldown
+    if user_id in user_last_casino and now - user_last_casino[user_id] < COOLDOWN_CASINO:
+        time_remaining = COOLDOWN_CASINO - (now - user_last_casino[user_id])
+        await ctx.send(f"⏰ **¡Espera!** Debes esperar {format_cooldown(time_remaining)} antes de volver a jugar al casino.")
+        return
+
+    user_last_casino[user_id] = now # Actualizar el tiempo de uso
+    
+    # 2. Configuración de la tragaperras
+    # Símbolos comunes de tragaperras
+    SYMBOLS = ["🍒", "🍋", "7️⃣", "💰", "💎", "⭐"]
+    
+    # Simular las 3 ruedas
+    result = [random.choice(SYMBOLS) for _ in range(3)]
+    
+    # Determinar si hay premio gordo (Jackpot: tres iguales)
+    is_jackpot = (result[0] == result[1] == result[2])
+    
+    # 3. Calcular recompensa
+    if is_jackpot:
+        reward_amount = 50 # Recompensa máxima
+        title = "🎉 ¡JACKPOT!"
+        color = discord.Color.gold()
+        description = f"¡Tres símbolos iguales! Has ganado la recompensa máxima."
+    else:
+        # Recompensa mínima de 25, hasta 49 (para reservar 50 para el jackpot)
+        reward_amount = random.randint(25, 49)
+        title = "🎰 ¡A Rodar!"
+        color = discord.Color.blue()
+        
+        # Mejorar el mensaje si hay 2 iguales (premio intermedio)
+        if result[0] == result[1] or result[1] == result[2] or result[0] == result[2]:
+            description = f"¡Casi! Has ganado gemas por una pequeña coincidencia."
+            color = discord.Color.orange()
+            # Asegurar que el premio sea más cercano al máximo en caso de 2 aciertos
+            reward_amount = random.randint(35, 49)
+        else:
+            description = f"Has ganado gemas por participación."
+
+    # Asegurar el rango 25-50 (por si acaso la lógica anterior fallara en el futuro)
+    if reward_amount > 50:
+        reward_amount = 50
+    if reward_amount < 25:
+        reward_amount = 25
+        
+    # 4. Añadir balance y guardar
+    add_balance(user_id, reward_amount)
+    save_data()
+    
+    # 5. Enviar mensaje
+    embed = discord.Embed(
+        title=title,
+        description=description,
+        color=color
+    )
+    # Formatear el resultado de las tragaperras para que se vea claramente
+    slots_display = " | ".join(result)
+    embed.add_field(name="Tragaperras", value=f"**{slots_display}**", inline=False)
+    embed.add_field(name="🎁 Recompensa", value=format_gems(reward_amount), inline=True)
+    embed.add_field(name="💰 Nuevo Balance", value=format_gems(get_balance(user_id)), inline=True)
+    embed.set_footer(text=f"Próximo !casino en {format_cooldown(COOLDOWN_CASINO)}")
+    
+    await ctx.send(f"**{ctx.author.mention}** ha tirado de la palanca...", embed=embed)
+
 
 # ----------------------------
 # SISTEMA DE INTERCAMBIO
@@ -1195,13 +1348,13 @@ async def ayuda(ctx):
             )
             
             embed.add_field(
-                name="💰 **!gacha_buy**",
+                name="💰 **!gacha_comprar**",
                 value="Compra tiradas (1/5/10)",
                 inline=True
             )
             
             embed.add_field(
-                name="💼 **!work**",
+                name="💼 **!trabajar**",
                 value="Gana 20-40 gemas (4h cooldown)",
                 inline=True
             )
@@ -1395,11 +1548,11 @@ async def ayuda(ctx):
             • `!interfaz` - Panel admin
             • `!modificar_rates` - Modificar probabilidades gacha
             • `!subir_imagen` - Subir imagen carta
-            • `!givegems` - Dar gemas
-            • `!removegems` - Quitar gemas  
-            • `!givecard` - Regalar carta
-            • `!clear_inventory` - Limpiar inventario
-            • `!remove_card` - Eliminar carta
+            • `!dargemas` - Dar gemas
+            • `!quitargemas` - Quitar gemas  
+            • `!darcarta` - Regalar carta
+            • `!limpiar_inventario` - Limpiar inventario
+            • `!quitarcarta` - Eliminar carta
             • `!reset_data` - Resetear datos
             • `!clear` - Borrar mensajes
             • `!recompensa_tiempo` - Recompensa temporal
@@ -1871,7 +2024,7 @@ async def rob(ctx, member: discord.Member):
     if has_rob_penalty(user_id):
         penalty_end = get_rob_penalty_time(user_id)
         restante = int((penalty_end - now) / 60)
-        await ctx.send(f"⏰ Tienes una penalización activa por robo fallido. Espera {restante} minutos para poder usar !work nuevamente.")
+        await ctx.send(f"⏰ Tienes una penalización activa por robo fallido. Espera {restante} minutos para poder usar !trabajar nuevamente.")
         return
     
     # Verificar que el objetivo tenga gemas
@@ -1939,7 +2092,7 @@ async def rob(ctx, member: discord.Member):
                 color=discord.Color.red()
             )
             embed.add_field(name="Penalización", value="No tenías gemas para pagar la multa", inline=True)
-            embed.add_field(name="Consecuencia", value="Tu próximo !work tendrá 1 hora adicional de cooldown", inline=True)
+            embed.add_field(name="Consecuencia", value="Tu próximo !trabajar tendrá 1 hora adicional de cooldown", inline=True)
             embed.set_footer(text="La penalización durará 1 hora")
             
             await ctx.send(embed=embed)
@@ -2457,12 +2610,12 @@ async def gacha(ctx):
 
 # 💰 Comprar tiradas - VERSIÓN CON PARÁMETROS
 @bot.command()
-async def gacha_buy(ctx, cantidad: int = 1):
+async def gacha_comprar(ctx, cantidad: int = 1):
     """Compra tiradas de gacha con gemas
     Ejemplos:
-    !gacha_buy 1    - Compra 1 tirada
-    !gacha_buy 5    - Compra 5 tiradas  
-    !gacha_buy 10   - Compra 10 tiradas
+    !gacha_comprar 1    - Compra 1 tirada
+    !gacha_comprar 5    - Compra 5 tiradas  
+    !gacha_comprar 10   - Compra 10 tiradas
     """
     
     # Validar la cantidad
@@ -2677,9 +2830,9 @@ async def show_cards_carousel(ctx_or_interaction, cards, title=None):
 
 
 
-# 💼 Work (cada 4 hrs) - CON MODIFICACIÓN PARA PENALIZACIONES
+# 💼 trabajar (cada 4 hrs) - CON MODIFICACIÓN PARA PENALIZACIONES
 @bot.command()
-async def work(ctx):
+async def trabajar(ctx):
     user_id = ctx.author.id
     now = time.time()
     cooldown = 4 * 3600  # 4 horas base
@@ -2701,8 +2854,8 @@ async def work(ctx):
                 save_data()
     
     # Verificar cooldown normal
-    if user_id in user_last_work and now - user_last_work[user_id] < cooldown:
-        restante = int((cooldown - (now - user_last_work[user_id])) / 60)
+    if user_id in user_last_trabajar and now - user_last_trabajar[user_id] < cooldown:
+        restante = int((cooldown - (now - user_last_trabajar[user_id])) / 60)
         await ctx.send(f"💼 Debes esperar {restante} minutos para volver a trabajar.")
         return
 
@@ -2710,7 +2863,7 @@ async def work(ctx):
     fail_chance = random.uniform(0.05, 0.10)  # 5% a 10% de probabilidad de fallar
     if random.random() < fail_chance:
         # FALLO - No gana gemas
-        user_last_work[user_id] = now
+        user_last_trabajar[user_id] = now
         
         # Mensajes de fallo aleatorios
         fail_messages = [
@@ -2743,7 +2896,7 @@ async def work(ctx):
     # ÉXITO - Gana gemas normalmente (95% a 90% de probabilidad)
     reward = random.randint(20, 40)
     add_balance(user_id, reward)
-    user_last_work[user_id] = now
+    user_last_trabajar[user_id] = now
     
     # Mensajes de éxito aleatorios
     success_messages = [
@@ -3566,13 +3719,13 @@ class DuelCardSelectionHonorView:
             final_loser = duel_data['challenged']
             # El ganador recibe la carta apostada del perdedor
             add_to_inventory(final_winner.id, challenged_bet.copy())
-            remove_card_from_inventory(final_loser.id, challenged_bet['id'])
+            quitarcarta_from_inventory(final_loser.id, challenged_bet['id'])
         elif challenged_wins > challenger_wins:
             final_winner = duel_data['challenged']
             final_loser = duel_data['challenger']
             # El ganador recibe la carta apostada del perdedor
             add_to_inventory(final_winner.id, challenger_bet.copy())
-            remove_card_from_inventory(final_loser.id, challenger_bet['id'])
+            quitarcarta_from_inventory(final_loser.id, challenger_bet['id'])
         else:
             final_winner = None
             # En caso de empate, nadie gana las cartas apostadas
@@ -3643,7 +3796,7 @@ class DuelCardSelectionHonorView:
         if self.duel_id in pending_duels:
             del pending_duels[self.duel_id]
 
-def remove_card_from_inventory(user_id, card_id):
+def quitarcarta_from_inventory(user_id, card_id):
     """Elimina una carta específica del inventario de un usuario"""
     uid = str(user_id)
     if uid in user_inventories:
@@ -4007,7 +4160,7 @@ async def inventario_personal(ctx):
         )
         embed.add_field(
             name="💡 Consejo", 
-            value="Usa `!gacha` para obtener cartas gratis cada 4 horas\nUsa `!gacha_buy` para comprar tiradas con gemas",
+            value="Usa `!gacha` para obtener cartas gratis cada 4 horas\nUsa `!gacha_comprar` para comprar tiradas con gemas",
             inline=False
         )
         try:
@@ -4337,14 +4490,14 @@ async def diaria(ctx):
 # 💎 Dar gemas (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def givegems(ctx, member: discord.Member, amount: int):
+async def dargemas(ctx, member: discord.Member, amount: int):
     add_balance(member.id, amount)
     await ctx.send(f"💎 {member.mention} recibió {format_gems(amount)}. Total: {format_gems(get_balance(member.id))}")
 
 # 💎 Quitar gemas (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def removegems(ctx, member: discord.Member, amount: int):
+async def quitargemas(ctx, member: discord.Member, amount: int):
     uid = str(member.id)
     if uid not in user_balances:
         await ctx.send(f"❌ {member.mention} no tiene registro de gemas.")
@@ -4359,7 +4512,7 @@ async def removegems(ctx, member: discord.Member, amount: int):
 # 🗑️ Borrar inventario completo (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def clear_inventory(ctx, member: discord.Member):
+async def limpiar_inventario(ctx, member: discord.Member):
     user_inventories[str(member.id)] = []
     save_data()
     await ctx.send(f"🗑️ Se borró todo el inventario de {member.mention}.")
@@ -4367,7 +4520,7 @@ async def clear_inventory(ctx, member: discord.Member):
 # 🗑️ Borrar una carta específica (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def remove_card(ctx, member: discord.Member, card_id: str):
+async def quitarcarta(ctx, member: discord.Member, card_id: str):
     inv = get_inventory(member.id)
     for i, card in enumerate(inv):
         if card.get("id") == card_id:
@@ -5608,7 +5761,7 @@ async def album(ctx):
 # 💝 Regalar carta (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def givecard(ctx, member: discord.Member, card_id: str):
+async def darcarta(ctx, member: discord.Member, card_id: str):
     found_card = None
     for rarity_cards in cards_catalog.values():
         for card in rarity_cards:
@@ -5640,10 +5793,10 @@ async def givecard(ctx, member: discord.Member, card_id: str):
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def reset_data(ctx):
-    global user_inventories, user_balances, user_last_work, user_last_daily, user_last_gacha, user_last_adivina, user_last_rob, user_rob_penalties
+    global user_inventories, user_balances, user_last_trabajar, user_last_daily, user_last_gacha, user_last_adivina, user_last_rob, user_rob_penalties
     user_inventories = {}
     user_balances = {}
-    user_last_work = {}
+    user_last_trabajar = {}
     user_last_daily = {}
     user_last_gacha = {}
     user_last_adivina = {}
@@ -6051,7 +6204,7 @@ try:
     webserver.catalog_cards = catalog_cards
     webserver.cards_catalog = cards_catalog
     webserver.pending_trades = pending_trades
-    webserver.user_last_work = user_last_work
+    webserver.user_last_trabajar = user_last_trabajar
     webserver.user_last_daily = user_last_daily
     webserver.user_last_gacha = user_last_gacha
     webserver.user_last_adivina = user_last_adivina
@@ -6932,14 +7085,14 @@ async def gemas_fijas(ctx, cantidad: int, tiempo_horas: float):
 
     embed = discord.Embed(
         title="💎 Recompensa Fija Activada",
-        description=f"Los usuarios pueden reclamar **{cantidad} gemas** usando `!reward_gemas` durante las próximas **{tiempo_horas} horas**.",
+        description=f"Los usuarios pueden reclamar **{cantidad} gemas** usando `!recibir_gemas` durante las próximas **{tiempo_horas} horas**.",
         color=discord.Color.gold()
     )
     embed.set_footer(text="Comando exclusivo de administradores")
     await ctx.send(embed=embed)
 
 @bot.command()
-async def reward_gemas(ctx):
+async def recibir_gemas(ctx):
     """Permite reclamar la recompensa fija de gemas activa"""
     global active_gem_reward
     user_id = str(ctx.author.id)
@@ -7088,8 +7241,8 @@ class GachaBuyModal(discord.ui.Modal, title="🛒 Comprar Tiradas de Gacha"):
             await interaction.response.send_message("❌ La cantidad debe ser un número entero válido.", ephemeral=True)
             return
             
-        # Ejecutar el comando !gacha_buy con el argumento
-        await invoke_command_from_interaction(interaction.client, interaction, "gacha_buy", args=quantity)
+        # Ejecutar el comando !gacha_comprar con el argumento
+        await invoke_command_from_interaction(interaction.client, interaction, "gacha_comprar", args=quantity)
 
 
 class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
@@ -7126,10 +7279,7 @@ class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
 # FIN MODALES
 # ----------------------------
 
-
-
-
-    # ----------------------------
+# ----------------------------
 # SISTEMA DE MENÚ (BOTONES - EJECUTORES Y MODALES)
 # ----------------------------
 
@@ -7151,16 +7301,16 @@ class GachaMenuView(View):
     async def gacha_free_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await invoke_command_from_interaction(interaction.client, interaction, "gacha")
 
-    # 🚀 MODAL: !gacha_buy
+    # 🚀 MODAL: !gacha_comprar
     @discord.ui.button(label="🛒 Comprar Tiradas", style=discord.ButtonStyle.blurple, row=0)
-    async def gacha_buy_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def gacha_comprar_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Muestra el modal para pedir la cantidad
         await interaction.response.send_modal(GachaBuyModal())
 
-    # 🎯 EJECUCIÓN DIRECTA: !work
+    # 🎯 EJECUCIÓN DIRECTA: !trabajar
     @discord.ui.button(label="💼 Trabajar", style=discord.ButtonStyle.gray, row=0)
-    async def work_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await invoke_command_from_interaction(interaction.client, interaction, "work")
+    async def trabajar_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await invoke_command_from_interaction(interaction.client, interaction, "trabajar")
 
     # --- FILA 2: INVENTARIO Y ECONOMÍA ---
     
@@ -7233,8 +7383,8 @@ async def menu_principal(ctx):
 @bot.event
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
-    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_buy, work, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio')
-    print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
+    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino')
+    print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
 
 # ----------------------------
 # Arrancar el bot (no compartas tu token)
