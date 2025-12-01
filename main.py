@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 
 # ----------------------------
-# Archivos de datos
+# Archivos de datos a crear
 # ----------------------------
 CATALOG_FILE = "catalogo.json"
 DATA_FILE = "data.json"
