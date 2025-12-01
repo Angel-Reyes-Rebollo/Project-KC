@@ -80,6 +80,47 @@ intents.message_content = True  # necesario si usas comandos por mensajes
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# ----------------------------
+# Estado de Pausa Global
+# ----------------------------
+bot_paused = False # Controla si el bot está en modo mantenimiento
+
+# ----------------------------
+# CHECK GLOBAL DE PAUSA
+# ----------------------------
+@bot.check
+async def global_commands_check(ctx):
+    """Bloquea comandos si el bot está pausado, excepto para admins o comandos de control."""
+    global bot_paused
+    
+    # Comandos que deben funcionar incluso en pausa (Admin commands para reactivar)
+    allowed_commands = ["pausa", "continuar", "reanudar"]
+    
+    # Si el bot NO está pausado, permite la ejecución.
+    if not bot_paused:
+        return True
+
+    # Si el usuario es administrador (tiene permisos de administrador), permite.
+    if ctx.author.guild_permissions.administrator:
+        return True
+
+    # Si el bot está pausado y el usuario NO es admin:
+    # 1. Verifica si el comando es de la lista blanca.
+    if ctx.command and ctx.command.name in allowed_commands:
+        return True
+    
+    # 2. Si es un comando cualquiera y el bot está pausado, lo bloquea y notifica.
+    embed = discord.Embed(
+        title="❌ Bot Pausado por Mantenimiento",
+        description="El bot se encuentra actualmente en modo de mantenimiento. Solo los administradores pueden usar comandos.",
+        color=discord.Color.red()
+    )
+    # Enviar solo si no está en un DM para evitar errores.
+    if ctx.guild:
+        await ctx.send(embed=embed)
+    return False
+
+
 # Tiempos / cooldowns
 user_last_trabajar = {}    # {user_id: timestamp}
 user_last_daily = {}   # {user_id: timestamp}
@@ -87,6 +128,8 @@ user_last_gacha = {}   # {user_id: timestamp}
 user_last_adivina = {} # {user_id: timestamp}
 user_last_rob = {}     # {user_id: timestamp}
 user_last_casino = {}  # {user_id: timestamp}
+user_last_pesca = {}       # {user_id: timestamp}
+user_last_remate = {}      # {user_id: timestamp}
 
 # ----------------------------
 # CONSTANTES Y COMANDO !ESPERA
@@ -99,6 +142,9 @@ COOLDOWN_ADIVINA = 1 * 3600    # !adivina (1 hora)
 COOLDOWN_ROB = 30 * 60         # !rob (30 minutos)
 COOLDOWN_TRABAJAR = 1 * 3600   # !trabajar (Asumido 1 hora, valor común)
 COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
+COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
+COOLDOWN_REMATE = 3 * 3600     # !remate (3 horas) <--- NUEVA
+
 
 def format_cooldown(seconds):
     """Convierte segundos en un formato de horas, minutos y segundos (Ej: 1h 30m 5s)."""
@@ -137,6 +183,8 @@ async def espera(ctx):
         ("🎯 Adivina Número", user_last_adivina, COOLDOWN_ADIVINA),
         ("🦹 Robo", user_last_rob, COOLDOWN_ROB),
         ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), # <--- NUEVO
+        ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA), # <-- ¡AÑADE ESTA LÍNEA!
+        ("🏐 Remate", user_last_remate, COOLDOWN_REMATE), # <-- ¡AÑADE ESTA LÍNEA!
     ]
     
     cooldowns_text = []
@@ -162,6 +210,36 @@ async def espera(ctx):
     embed.add_field(name="Comandos", value="\n".join(cooldowns_text), inline=False)
     embed.set_footer(text="¡Usa los comandos cuando estén listos!")
     
+    await ctx.send(embed=embed)
+
+# ----------------------------
+# COMANDOS DE PAUSA/REANUDACIÓN (Solo para administradores)
+# ----------------------------
+
+@bot.command()
+@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
+async def pausa(ctx):
+    """Pausa el uso de la mayoría de los comandos del bot para los usuarios no administradores."""
+    global bot_paused
+    bot_paused = True
+    embed = discord.Embed(
+        title="⏸️ Bot Pausado",
+        description="¡El bot ha sido puesto en modo de mantenimiento! Los comandos (excepto los de administración y los de control) no estarán disponibles para los usuarios hasta que se reanude.",
+        color=discord.Color.red()
+    )
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=['reanudar'])
+@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
+async def continuar(ctx):
+    """Reanuda el uso de todos los comandos del bot."""
+    global bot_paused
+    bot_paused = False
+    embed = discord.Embed(
+        title="▶️ Bot Reanudado",
+        description="¡El modo de mantenimiento ha finalizado! Los usuarios pueden volver a usar todos los comandos.",
+        color=discord.Color.green()
+    )
     await ctx.send(embed=embed)
 
 
@@ -7312,6 +7390,16 @@ class GachaMenuView(View):
     async def trabajar_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await invoke_command_from_interaction(interaction.client, interaction, "trabajar")
 
+    # 🎯 EJECUCIÓN DIRECTA: !pesca
+    @discord.ui.button(label="🎣 Pesca", style=discord.ButtonStyle.secondary, emoji="🎣", row=0)
+    async def pesca_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await invoke_command_from_interaction(interaction.client, interaction, "pesca")
+
+    # 🎯 EJECUCIÓN DIRECTA: !remate
+    @discord.ui.button(label="🏐 Remate", style=discord.ButtonStyle.secondary, emoji="🏐", row=0)
+    async def remate_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await invoke_command_from_interaction(interaction.client, interaction, "remate") 
+
     # --- FILA 2: INVENTARIO Y ECONOMÍA ---
     
     # 🎯 EJECUCIÓN DIRECTA: !diaria
@@ -7377,13 +7465,135 @@ async def menu_principal(ctx):
     view = GachaMenuView(ctx.author.id)
     await ctx.send(embed=embed, view=view)
 
+    
+    
+# ----------------------------
+# COMANDO !REMATE CORREGIDO
+# ----------------------------
+@bot.command(aliases=['spike'])
+async def remate(ctx):
+    """Permite al usuario realizar un remate de voleibol para ganar gemas."""
+    user_id = str(ctx.author.id)
+    now = time.time()
+
+    # 1. Verificar Cooldown
+    last_remate = user_last_remate.get(user_id, 0)
+    if now - last_remate < COOLDOWN_REMATE:
+        time_remaining = COOLDOWN_REMATE - (now - last_remate)
+        await ctx.send(f"❌ ¡Estás agotado! Debes esperar **{format_cooldown(time_remaining)}** para tu próximo salto y remate. 🏐")
+        return
+
+    # 2. Inicializar balance del usuario si no existe
+    if user_id not in user_balances:
+        user_balances[user_id] = 0
+
+    # 3. Simulación de la jugada
+    message = await ctx.send("🚀 ¡Preparando el salto y el ataque! ¿Será un punto o un bloqueo? (3 segundos)")
+    await asyncio.sleep(3)
+    
+    # Probabilidades: Punto Directo (55%), Bloqueado (30%), Fuera/Fallo (15%)
+    roll = random.random() 
+    
+    winnings = 0
+    outcome_message = ""
+
+    if roll < 0.55:  # 55% de probabilidad de Punto Directo
+        winnings = random.randint(30, 45)
+        user_balances[user_id] += winnings
+        
+        outcome_message = (
+            f"💥 **¡PUNTO DIRECTO!** Tu remate fue imparable, la pelota golpeó el suelo. "
+            f"Ganas **💎 {winnings}**."
+        )
+        
+    elif roll < 0.85:  # 30% de probabilidad de Bloqueo (0.55 a 0.85)
+        winnings = random.randint(5, 15) # Recompensa de consolación por forzar un error
+        user_balances[user_id] += winnings
+        
+        outcome_message = (
+            f"✋ El bloqueo fue sólido, pero la pelota se fue por la banda. ¡Punto para ti! "
+            f"Ganas una recompensa menor de **💎 {winnings}**."
+        )
+        
+    else:  # 15% de probabilidad de Fuera/Fallo (0.85 a 1.0)
+        
+        outcome_message = (
+            "😫 ¡Oh no! Le pegaste con mucha fuerza y el balón se fue **fuera** de la cancha. "
+            "Punto perdido, no ganas gemas esta vez."
+        )
+        
+    # 4. Actualizar Cooldown y Guardar Datos
+    user_last_remate[user_id] = now
+    save_data()
+    
+    await message.edit(content=f"🏐 {outcome_message}")
+
+# ----------------------------
+# COMANDO !PESCA CORREGIDO
+# ----------------------------
+@bot.command(aliases=['fish'])
+async def pesca(ctx):
+    """Permite al usuario intentar pescar y ganar gemas."""
+    user_id = str(ctx.author.id)
+    now = time.time()
+
+    # 1. Verificar Cooldown
+    last_fished = user_last_pesca.get(user_id, 0)
+    if now - last_fished < COOLDOWN_PESCA:
+        time_remaining = COOLDOWN_PESCA - (now - last_fished)
+        await ctx.send(f"❌ ¡Aún no pican! Debes esperar **{format_cooldown(time_remaining)}** para volver a pescar.")
+        return
+
+    # 2. Inicializar balance del usuario si no existe
+    if user_id not in user_balances:
+        user_balances[user_id] = 0
+
+    # 3. Lógica de Pesca (30% de Error)
+    
+    # Simula un pequeño tiempo de espera (para darle emoción)
+    message = await ctx.send("🎣 Lanzando la caña... esperando que piquen... (2 segundos)")
+    await asyncio.sleep(2)
+    
+    success_roll = random.random() # Número entre 0.0 y 1.0
+
+    if success_roll < 0.30:  # 30% de probabilidad de fallo
+        
+        fail_messages = [
+            "El pez era demasiado rápido y se escapó. 😭",
+            "Tu sedal se rompió. ¡Qué frustración! 💢",
+            "Solo sacaste una bota vieja y con algas. 🥾",
+            "Un pájaro se llevó tu carnada. 🐦",
+            "El río está vacío. Vuelve más tarde.",
+        ]
+        
+        await message.edit(content=f"🎣 ¡Oh no! {random.choice(fail_messages)}")
+        
+    else: # 70% de probabilidad de éxito
+        
+        # Recompensa entre 15 y 25 gemas
+        winnings = random.randint(15, 25)
+        user_balances[user_id] += winnings
+
+        success_messages = [
+            f"¡Woooow! Sacaste un **salmón gigante** y ganas **💎 {winnings}**.",
+            f"¡Picó! Pescaste una **trucha brillante** y ganas **💎 {winnings}**.",
+            f"¡Éxito! Lograste atrapar un **pez dorado** y ganas **💎 {winnings}**.",
+            f"Tu caña se dobló. Pescaste algo valioso y ganas **💎 {winnings}**.",
+        ]
+
+        await message.edit(content=f"🎉 ¡Felicidades! {random.choice(success_messages)}")
+        
+    # 4. Actualizar Cooldown y Guardar Datos
+    user_last_pesca[user_id] = now
+    save_data()
+
 # ----------------------------
 # EVENTO DE INICIO
 # ----------------------------
 @bot.event
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
-    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino')
+    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca, remate')
     print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
 
 # ----------------------------
