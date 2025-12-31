@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 
 # ----------------------------
-# Archivos de datos a crear
+# Archivos de datos
 # ----------------------------
 CATALOG_FILE = "catalogo.json"
 DATA_FILE = "data.json"
@@ -30,13 +30,13 @@ for card in catalog_cards:
     rarity = card.get("rareza", "N")
     cards_catalog.setdefault(rarity, []).append(card)
 
-# Nuevas probabilidades que incluyen UR, SP y L
+# Nuevas probabilidades que incluyen UR, SP y G
 rarity_probabilities = {
     "G": 0.010,   # Galaxia (1%) - Aumentado de 0.5%
     "SP": 0.020,  # Special (2%) - Aumentado de 1%
     "UR": 0.030,  # Ultra Raro (3%) - Aumentado de 1.5%
     "SSR": 0.060, # Super Super Raro (6%) - Aumentado de 3%
-    "R": 0.120,  # Super Raro (12%) - Aumentado de 6%
+    "R": 0.120,   # Raro (12%) - Aumentado de 6%
     "N": 0.400,   # Normal (40%) - Aumentado de 20%
 }
 
@@ -50,7 +50,7 @@ if os.path.exists(DATA_FILE):
         user_inventories = user_data.get("inventories", {})
         user_balances = user_data.get("balances", {})
         user_rob_penalties = user_data.get("rob_penalties", {})
-        user_completed_floors = user_data.get("completed_floors", {})  # Esta línea debe estar
+        
 else:
     user_inventories = {}
     user_balances = {}
@@ -62,8 +62,7 @@ def save_data():
         json.dump({
             "inventories": user_inventories,
             "balances": user_balances,
-            "rob_penalties": user_rob_penalties,
-            "completed_floors": user_completed_floors  # Asegúrate de que esta línea esté presente
+            "rob_penalties": user_rob_penalties
         }, f, ensure_ascii=False, indent=4)
 
         
@@ -116,17 +115,18 @@ async def global_commands_check(ctx):
         await ctx.send(embed=embed)
     return False
 
-
 # Tiempos / cooldowns
 user_last_trabajar = {}    # {user_id: timestamp}
+
+# Tiempos / cooldowns
 user_last_daily = {}   # {user_id: timestamp}
 user_last_gacha = {}   # {user_id: timestamp}
 user_last_adivina = {} # {user_id: timestamp}
 user_last_rob = {}     # {user_id: timestamp}
 user_last_casino = {}  # {user_id: timestamp}
-user_last_pesca = {}       # {user_id: timestamp}
-user_last_minar = {}   # {user_id: timestamp}
-user_last_jefe = {}  
+user_last_pesca = {}   # {user_id: timestamp}
+user_last_minar = {}
+user_last_jefe = {}  # {user_id: timestamp}
 
 
 # ----------------------------
@@ -138,11 +138,11 @@ COOLDOWN_DIARIA = 24 * 3600    # !diaria (24 horas)
 COOLDOWN_GACHA = 4 * 3600      # !gacha (4 horas)
 COOLDOWN_ADIVINA = 1 * 3600    # !adivina (1 hora)
 COOLDOWN_ROB = 30 * 60         # !rob (30 minutos)
-COOLDOWN_TRABAJAR = 4 * 3600   # !trabajar (4 horas)
+COOLDOWN_TRABAJAR = 4 * 3600   # !trabajar (Asumido 1 hora, valor común)
 COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
-COOLDOWN_MINAR = 60            # !minar (1 minuto)
-COOLDOWN_JEFE = 7 * 24 * 3600 
+COOLDOWN_MINAR = 60
+COOLDOWN_JEFE = 60
 
 def format_cooldown(seconds):
     """Convierte segundos en un formato de horas, minutos y segundos (Ej: 1h 30m 5s)."""
@@ -180,10 +180,9 @@ async def espera(ctx):
         ("🎁 Recompensa Diaria", user_last_daily, COOLDOWN_DIARIA),
         ("🎯 Adivina Número", user_last_adivina, COOLDOWN_ADIVINA),
         ("🦹 Robo", user_last_rob, COOLDOWN_ROB),
-        ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), 
+        ("🎰 Casino", user_last_casino, COOLDOWN_CASINO),
         ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA),
         ("⛏️ Minar", user_last_minar, COOLDOWN_MINAR),
-        ("👑 Jefe Semanal", user_last_jefe, COOLDOWN_JEFE),
     ]
     
     cooldowns_text = []
@@ -210,37 +209,6 @@ async def espera(ctx):
     embed.set_footer(text="¡Usa los comandos cuando estén listos!")
     
     await ctx.send(embed=embed)
-
-# ----------------------------
-# COMANDOS DE PAUSA/REANUDACIÓN (Solo para administradores)
-# ----------------------------
-
-@bot.command()
-@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
-async def pausa(ctx):
-    """Pausa el uso de la mayoría de los comandos del bot para los usuarios no administradores."""
-    global bot_paused
-    bot_paused = True
-    embed = discord.Embed(
-        title="⏸️ Bot Pausado",
-        description="¡El bot ha sido puesto en modo de mantenimiento! Los comandos (excepto los de administración y los de control) no estarán disponibles para los usuarios hasta que se reanude.",
-        color=discord.Color.red()
-    )
-    await ctx.send(embed=embed)
-
-@bot.command(aliases=['reanudar'])
-@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
-async def continuar(ctx):
-    """Reanuda el uso de todos los comandos del bot."""
-    global bot_paused
-    bot_paused = False
-    embed = discord.Embed(
-        title="▶️ Bot Reanudado",
-        description="¡El modo de mantenimiento ha finalizado! Los usuarios pueden volver a usar todos los comandos.",
-        color=discord.Color.green()
-    )
-    await ctx.send(embed=embed)
-
 
 # ----------------------------
 # COMANDO !CASINO (Tragaperras) <--- NUEVO COMANDO
@@ -316,6 +284,35 @@ async def casino(ctx):
     
     await ctx.send(f"**{ctx.author.mention}** ha tirado de la palanca...", embed=embed)
 
+# ----------------------------
+# COMANDOS DE PAUSA/REANUDACIÓN (Solo para administradores)
+# ----------------------------
+
+@bot.command()
+@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
+async def pausa(ctx):
+    """Pausa el uso de la mayoría de los comandos del bot para los usuarios no administradores."""
+    global bot_paused
+    bot_paused = True
+    embed = discord.Embed(
+        title="⏸️ Bot Pausado",
+        description="¡El bot ha sido puesto en modo de mantenimiento! Los comandos (excepto los de administración y los de control) no estarán disponibles para los usuarios hasta que se reanude.",
+        color=discord.Color.red()
+    )
+    await ctx.send(embed=embed)
+
+@bot.command(aliases=['reanudar'])
+@commands.has_permissions(administrator=True) # <--- ESTE ES EL CHECK DE ADMINISTRADOR
+async def continuar(ctx):
+    """Reanuda el uso de todos los comandos del bot."""
+    global bot_paused
+    bot_paused = False
+    embed = discord.Embed(
+        title="▶️ Bot Reanudado",
+        description="¡El modo de mantenimiento ha finalizado! Los usuarios pueden volver a usar todos los comandos.",
+        color=discord.Color.green()
+    )
+    await ctx.send(embed=embed)
 
 # ----------------------------
 # SISTEMA DE INTERCAMBIO
@@ -1202,9 +1199,9 @@ class EditarStatsFormView(View):
         modal = EditarStatModal(self.carta, "Evasion")
         await interaction.response.send_modal(modal)
     
-    @discord.ui.button(label="✏️ Editar Ataque", style=discord.ButtonStyle.blurple)
-    async def editar_ataque_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "ataque")
+    @discord.ui.button(label="✏️ Editar Fuerza", style=discord.ButtonStyle.blurple)
+    async def editar_Fuerza_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Fuerza")
         await interaction.response.send_modal(modal)
     
     @discord.ui.button(label="✏️ Editar Reacción", style=discord.ButtonStyle.blurple)
@@ -1248,7 +1245,7 @@ class EditarStatsFormView(View):
         
         stats = self.carta.get("stats", {})
         embed.add_field(name="Evasion", value=stats.get("Evasion", 1), inline=True)
-        embed.add_field(name="Ataque", value=stats.get("Ataque", 1), inline=True)
+        embed.add_field(name="Fuerza", value=stats.get("Fuerza", 1), inline=True)
         embed.add_field(name="Reacción", value=stats.get("Reacción", 1), inline=True)
         embed.add_field(name="Defensa", value=stats.get("Defensa", 1), inline=True)
         embed.add_field(name="Velocidad", value=stats.get("Velocidad", 1), inline=True)
@@ -1358,6 +1355,8 @@ async def ayuda(ctx):
             elif page_num == 2:
                 embed = await self.page_duelos()
             elif page_num == 3:
+                embed = await self.page_torre_minijuegos()
+            elif page_num == 4:
                 embed = await self.page_admin_info()
             
             if self.message:
@@ -1367,7 +1366,7 @@ async def ayuda(ctx):
         
         async def page_economia(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 1/4",
+                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 1/5",
                 description="**Sistema de Economía y Cartas**",
                 color=discord.Color.blue()
             )
@@ -1379,7 +1378,7 @@ async def ayuda(ctx):
             )
             
             embed.add_field(
-                name="💰 **!gacha_comprar**",
+                name="💰 **!gacha_buy**",
                 value="Compra tiradas (1/5/10)",
                 inline=True
             )
@@ -1408,12 +1407,12 @@ async def ayuda(ctx):
                 inline=False
             )
             
-            embed.set_footer(text="Página 1/4 - Usa los botones para navegar")
+            embed.set_footer(text="Página 1/5 - Usa los botones para navegar")
             return embed
         
         async def page_inventario(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 2/4",
+                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 2/5",
                 description="**Gestión de Inventario y Ventas**",
                 color=discord.Color.green()
             )
@@ -1466,12 +1465,12 @@ async def ayuda(ctx):
                 inline=True
             )
             
-            embed.set_footer(text="Página 2/4 - Usa los botones para navegar")
+            embed.set_footer(text="Página 2/5 - Usa los botones para navegar")
             return embed
         
         async def page_duelos(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 3/5",
+                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 3/5",
                 description="**Sistema de Duelos PvP**",
                 color=discord.Color.red()
             )
@@ -1506,12 +1505,70 @@ async def ayuda(ctx):
                 inline=True
             )
             
-            embed.set_footer(text="Página 3/4 - Usa los botones para navegar")
+            embed.set_footer(text="Página 3/5 - Usa los botones para navegar")
             return embed
-                    
+        
+        async def page_torre_minijuegos(self):
+            embed = discord.Embed(
+                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 4/5",
+                description="**Torre, Minijuegos y Utilidades**",
+                color=discord.Color.gold()
+            )
+            
+            embed.add_field(
+                name="🏰 **!torre**",
+                value="10 pisos progresivos",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="📊 **!progreso_torre**",
+                value="Tu progreso en torre",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="🎯 **!adivina**",
+                value="Adivina número (1h cooldown)",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="🦹 **!rob**",
+                value="Roba gemas (30m cooldown)",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="🎁 **!recibir_recompensa**",
+                value="Reclama recompensa temporal",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="📊 **!estado_recompensa**",
+                value="Estado de recompensa",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="📊 **!status**",
+                value="Estado del bot",
+                inline=True
+            )
+            
+            embed.add_field(
+                name="🏰 **Torre Info**",
+                value="10 pisos • 5 rondas • Recompensas exclusivas • ¡Carta G en piso 10!",
+                inline=False
+            )
+            
+            embed.set_footer(text="Página 4/5 - Usa los botones para navegar")
+            return embed
+        
         async def page_admin_info(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 4/4",
+                title="🎮 **Comandos de Yugi-Kyuu APP** - Página 5/5",
                 description="**Comandos de Admin e Información**",
                 color=discord.Color.purple()
             )
@@ -1521,11 +1578,11 @@ async def ayuda(ctx):
             • `!interfaz` - Panel admin
             • `!modificar_rates` - Modificar probabilidades gacha
             • `!subir_imagen` - Subir imagen carta
-            • `!dargemas` - Dar gemas
-            • `!quitargemas` - Quitar gemas  
-            • `!darcarta` - Regalar carta
-            • `!limpiar_inventario` - Limpiar inventario
-            • `!quitarcarta` - Eliminar carta
+            • `!givegems` - Dar gemas
+            • `!removegems` - Quitar gemas  
+            • `!givecard` - Regalar carta
+            • `!clear_inventory` - Limpiar inventario
+            • `!remove_card` - Eliminar carta
             • `!reset_data` - Resetear datos
             • `!clear` - Borrar mensajes
             • `!recompensa_tiempo` - Recompensa temporal
@@ -1553,7 +1610,7 @@ async def ayuda(ctx):
             
             embed.add_field(
                 name="💡 **Sistemas Disponibles**",
-                value="Cartas • Intercambios • Duelos PvP • Recompensas • Backup • Dashboard • Álbum • Sistema de Rates",
+                value="Cartas • Intercambios • Duelos PvP • Torre • Recompensas • Backup • Dashboard • Álbum • Sistema de Rates",
                 inline=False
             )
             
@@ -2485,7 +2542,7 @@ async def gacha(ctx):
 
     user_last_gacha[user_id] = now
 
-    # Filtrar las rarezas que nos interesan (G, SP, UR, SSR, R, N, C)
+    # Filtrar las rarezas que nos interesan (L, SP, UR, SSR, R, N, C)
     # NOTA: Las cartas "E" (Evento) NO salen en el gacha, solo las regalan admins
     target_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     available_rarities = []
@@ -2582,12 +2639,12 @@ async def gacha(ctx):
 
 # 💰 Comprar tiradas - VERSIÓN CON PARÁMETROS
 @bot.command()
-async def gacha_comprar(ctx, cantidad: int = 1):
+async def gacha_buy(ctx, cantidad: int = 1):
     """Compra tiradas de gacha con gemas
     Ejemplos:
-    !gacha_comprar 1    - Compra 1 tirada
-    !gacha_comprar 5    - Compra 5 tiradas  
-    !gacha_comprar 10   - Compra 10 tiradas
+    !gacha_buy 1    - Compra 1 tirada
+    !gacha_buy 5    - Compra 5 tiradas  
+    !gacha_buy 10   - Compra 10 tiradas
     """
     
     # Validar la cantidad
@@ -3297,7 +3354,7 @@ class DuelCardSelectionAmistosoView:
             return
         
         # Ordenar por rareza (de más rara a menos rara)
-        self.sorted_cards = sorted(available_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
+        self.sorted_cards = sorted(available_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 7))
         
         # Crear embed con la lista de cartas
         embed = discord.Embed(
@@ -3510,7 +3567,7 @@ class DuelCardSelectionHonorView:
             instructions = "Selecciona la carta que apostarás en este duelo (puede ser de cualquier rareza):"
             
             # Para la carta apostada, mostrar todo el inventario
-            self.sorted_cards = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
+            self.sorted_cards = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 7))
             
         else:
             # SELECCIÓN DE CARTAS PARA RONDAS: CON FILTRO DE RAREZA Y SIN DUPLICADOS
@@ -3532,7 +3589,7 @@ class DuelCardSelectionHonorView:
             # Filtrar por rareza
             filtered_inventory = [
                 card for card in inventory_without_bet_and_selected 
-                if rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value
+                if rarity_order.get(card.get("rareza", "n"), 7) >= max_rarity_value
             ]
             
             if not filtered_inventory:
@@ -3541,7 +3598,7 @@ class DuelCardSelectionHonorView:
                     del pending_duels[self.duel_id]
                 return
             
-            self.sorted_cards = sorted(filtered_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
+            self.sorted_cards = sorted(filtered_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 7))
         
         # Crear embed con la lista de cartas
         embed = discord.Embed(
@@ -3552,7 +3609,7 @@ class DuelCardSelectionHonorView:
         
         # Agregar cartas numeradas
         for i, card in enumerate(self.sorted_cards, 1):
-            rarity = card.get("rareza", "N")
+            rarity = card.get("rareza", "C")
             rarity_emoji = get_rarity_emoji(rarity)
             embed.description += f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity})\n"
         
@@ -3693,13 +3750,13 @@ class DuelCardSelectionHonorView:
             final_loser = duel_data['challenged']
             # El ganador recibe la carta apostada del perdedor
             add_to_inventory(final_winner.id, challenged_bet.copy())
-            quitarcarta_from_inventory(final_loser.id, challenged_bet['id'])
+            remove_card_from_inventory(final_loser.id, challenged_bet['id'])
         elif challenged_wins > challenger_wins:
             final_winner = duel_data['challenged']
             final_loser = duel_data['challenger']
             # El ganador recibe la carta apostada del perdedor
             add_to_inventory(final_winner.id, challenger_bet.copy())
-            quitarcarta_from_inventory(final_loser.id, challenger_bet['id'])
+            remove_card_from_inventory(final_loser.id, challenger_bet['id'])
         else:
             final_winner = None
             # En caso de empate, nadie gana las cartas apostadas
@@ -3770,7 +3827,7 @@ class DuelCardSelectionHonorView:
         if self.duel_id in pending_duels:
             del pending_duels[self.duel_id]
 
-def quitarcarta_from_inventory(user_id, card_id):
+def remove_card_from_inventory(user_id, card_id):
     """Elimina una carta específica del inventario de un usuario"""
     uid = str(user_id)
     if uid in user_inventories:
@@ -3867,7 +3924,7 @@ async def dueloamistoso(ctx, member: discord.Member):
 async def duelohonor(ctx, member: discord.Member, max_rarity: str = "UR"):
     """Retar a otro usuario a un duelo de honor de 5 rondas con apuesta de cartas"""
     # Validar rareza máxima
-    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N", "C"]
     max_rarity = max_rarity.upper()
     
     if max_rarity not in valid_rarities:
@@ -3898,8 +3955,8 @@ async def duelohonor(ctx, member: discord.Member, max_rarity: str = "UR"):
     # Verificar que ambos tienen cartas de la rareza especificada o superior
     max_rarity_value = rarity_order.get(max_rarity, 6)
     
-    author_has_rarity = any(rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value for card in author_inv)
-    member_has_rarity = any(rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value for card in member_inv)
+    author_has_rarity = any(rarity_order.get(card.get("rareza", "C"), 7) >= max_rarity_value for card in author_inv)
+    member_has_rarity = any(rarity_order.get(card.get("rareza", "C"), 7) >= max_rarity_value for card in member_inv)
     
     if not author_has_rarity:
         await ctx.send(f"❌ No tienes cartas con rareza {max_rarity} o superior para el duelo.")
@@ -4113,9 +4170,9 @@ def get_rarity_emoji(rarity):
     """Devuelve el emoji correspondiente a la rareza"""
     emoji_map = {
         "G": "💎", "SP": "✨", "UR": "🔥", 
-        "SSR": "⭐", "R": "🌟", "N": "🟢"
+        "SSR": "⭐", "R": "🌟", "N": "🟢", "C": "⚪"
     }
-    return emoji_map.get(rarity.upper(), "🟢")
+    return emoji_map.get(rarity.upper(), "⚪")
 
 # ----------------------------
 # COMANDO INVENTARIO PERSONAL (MD)
@@ -4134,7 +4191,7 @@ async def inventario_personal(ctx):
         )
         embed.add_field(
             name="💡 Consejo", 
-            value="Usa `!gacha` para obtener cartas gratis cada 4 horas\nUsa `!gacha_comprar` para comprar tiradas con gemas",
+            value="Usa `!gacha` para obtener cartas gratis cada 4 horas\nUsa `!gacha_buy` para comprar tiradas con gemas",
             inline=False
         )
         try:
@@ -4144,9 +4201,9 @@ async def inventario_personal(ctx):
             await ctx.send("❌ No puedo enviarte mensajes directos. Por favor, habilita los MDs y usa el comando nuevamente.")
         return
     
-    # Ordenar inventario por rareza (L, SP, UR, SSR, R, N, C)
+    # Ordenar inventario por rareza (L, SP, UR, SSR, R, N)
     rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
-    sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
+    sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
     
     # Dividir en chunks para evitar límites de Discord
     chunk_size = 10  # Número de cartas por mensaje
@@ -4160,7 +4217,7 @@ async def inventario_personal(ctx):
         # Contar cartas por rareza
         rarity_count = {}
         for card in inventory:
-            rarity = card.get("rareza", "N")
+            rarity = card.get("rareza", "C")
             rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
         
         # Crear embed de resumen
@@ -4172,7 +4229,7 @@ async def inventario_personal(ctx):
         
         # Agregar conteo por rareza
         rarity_text = ""
-        for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
+        for rarity in ["G", "SP", "UR", "SSR", "R", "N", "C"]:
             if rarity in rarity_count:
                 emoji = get_rarity_emoji(rarity)
                 rarity_text += f"{emoji} **{rarity}**: {rarity_count[rarity]}\n"
@@ -4191,19 +4248,19 @@ async def inventario_personal(ctx):
             )
             
             for i, card in enumerate(chunk, 1):
-                rarity = card.get("rareza", "N")
+                rarity = card.get("rareza", "C")
                 rarity_emoji = get_rarity_emoji(rarity)
                 card_value = format_gems(card.get('valor', 0))
                 
-                # Obtener stats (solo mostrar las que no sean 1)
+                # Obtener stats (solo mostrar las que no sean 0)
                 stats = card.get("stats", {})
                 stats_text = ""
                 for stat_name, stat_value in stats.items():
-                    if stat_value > 1:  # Solo mostrar stats que no sean el valor por defecto (1)
+                    if stat_value > 0:  # Solo mostrar stats que no sean el valor por defecto (0)
                         stat_display = {
                             "Evasion": "👻 Eva",
                             "Fuerza": "💥 Fuer", 
-                            "Reacción": "🌀 Reacción",
+                            "Reacción": "🌀 Reacc",
                             "Defensa": "🛡️ Def",
                             "Velocidad": "💨 Vel",
                             "IQ": "🧠 IQ",
@@ -4239,7 +4296,7 @@ async def inventario_personal(ctx):
     except Exception as e:
         await ctx.send(f"❌ Error al enviar el inventario: {str(e)}")
 
-        # ----------------------------
+# ----------------------------
 # COMANDO VENDER MAYOREO
 # ----------------------------
 @bot.command()
@@ -4257,7 +4314,7 @@ async def vender_mayoreo(ctx):
     total_valor = 0
     
     for i, card in enumerate(inventory, 1):
-        rarity = card.get("rareza", "N")
+        rarity = card.get("rareza", "C")
         rarity_emoji = get_rarity_emoji(rarity)
         valor = card.get('valor', 0)
         total_valor += valor
@@ -4466,14 +4523,14 @@ async def diaria(ctx):
 # 💎 Dar gemas (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def dargemas(ctx, member: discord.Member, amount: int):
+async def givegems(ctx, member: discord.Member, amount: int):
     add_balance(member.id, amount)
     await ctx.send(f"💎 {member.mention} recibió {format_gems(amount)}. Total: {format_gems(get_balance(member.id))}")
 
 # 💎 Quitar gemas (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def quitargemas(ctx, member: discord.Member, amount: int):
+async def removegems(ctx, member: discord.Member, amount: int):
     uid = str(member.id)
     if uid not in user_balances:
         await ctx.send(f"❌ {member.mention} no tiene registro de gemas.")
@@ -4488,7 +4545,7 @@ async def quitargemas(ctx, member: discord.Member, amount: int):
 # 🗑️ Borrar inventario completo (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def limpiar_inventario(ctx, member: discord.Member):
+async def clear_inventory(ctx, member: discord.Member):
     user_inventories[str(member.id)] = []
     save_data()
     await ctx.send(f"🗑️ Se borró todo el inventario de {member.mention}.")
@@ -4496,7 +4553,7 @@ async def limpiar_inventario(ctx, member: discord.Member):
 # 🗑️ Borrar una carta específica (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def quitarcarta(ctx, member: discord.Member, card_id: str):
+async def remove_card(ctx, member: discord.Member, card_id: str):
     inv = get_inventory(member.id)
     for i, card in enumerate(inv):
         if card.get("id") == card_id:
@@ -4522,14 +4579,14 @@ async def vender_rareza(ctx, rareza: str):
     
     # Validar y normalizar la rareza
     rareza = rareza.upper()
-    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N", "C"]
     
     if rareza not in valid_rarities:
         await ctx.send(f"❌ Rareza inválida. Usa: {', '.join(valid_rarities)}")
         return
     
     # Filtrar cartas de la rareza especificada
-    cartas_a_vender = [card for card in inventory if card.get("rareza", "N") == rareza]
+    cartas_a_vender = [card for card in inventory if card.get("rareza", "C") == rareza]
     
     if not cartas_a_vender:
         await ctx.send(f"❌ No tienes cartas de rareza **{rareza}** en tu inventario.")
@@ -4592,7 +4649,7 @@ async def vender_rareza(ctx, rareza: str):
             
             # Eliminar las cartas del inventario
             user_inv = get_inventory(ctx.author.id)
-            nuevas_cartas = [card for card in user_inv if card.get("rareza", "N") != self.rareza]
+            nuevas_cartas = [card for card in user_inv if card.get("rareza", "C") != self.rareza]
             user_inventories[str(ctx.author.id)] = nuevas_cartas
             
             # Añadir las gemas ganadas
@@ -4672,17 +4729,12 @@ async def vender_rareza(ctx, rareza: str):
 
 import asyncio
 
-# ----------------------------
-# SISTEMA DE PING AL DASHBOARD (Keep Alive)
-# ----------------------------
-
-
 
 @bot.command()
 async def status(ctx):
     """Muestra el estado del bot y sus servicios"""
     embed = discord.Embed(
-        title="📊 Estado del Sistema Project-KC",
+        title="📊 Estado del Sistema Yugi-Kyuu",
         color=discord.Color.blue()
     )
     
@@ -4694,7 +4746,7 @@ async def status(ctx):
     )
     
     # Estado del dashboard
-    dashboard_url = "https://Project-KC.onrender.com"
+    dashboard_url = "https://project-kc.onrender.com"
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(dashboard_url, timeout=10) as response:
@@ -4749,6 +4801,8 @@ async def status(ctx):
     
     await ctx.send(embed=embed)
 
+
+
 # ----------------------------
 # COMANDO ALBUM
 # ----------------------------
@@ -4779,7 +4833,7 @@ async def album(ctx):
     
     # Convertir a lista y ordenar por rareza
     unique_cards_list = list(unique_cards.values())
-    unique_cards_list.sort(key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
+    unique_cards_list.sort(key=lambda x: rarity_order.get(x.get("rareza", "N"), 7))
     
     # Estadísticas
     total_cards = len(inventory)
@@ -4979,7 +5033,7 @@ async def album(ctx):
 # 💝 Regalar carta (admins)
 @bot.command()
 @commands.has_permissions(administrator=True)
-async def darcarta(ctx, member: discord.Member, card_id: str):
+async def givecard(ctx, member: discord.Member, card_id: str):
     found_card = None
     for rarity_cards in cards_catalog.values():
         for card in rarity_cards:
@@ -5382,6 +5436,7 @@ async def clear(ctx, amount: int = 10):
     await ctx.channel.purge(limit=amount + 1)
     await ctx.send(f"🧹 Se borraron {amount} mensajes.", delete_after=5)
 
+
 # ----------------------------
 # INICIAR SERVIDOR WEB (AL FINAL, ANTES DEL bot.run)
 # ----------------------------
@@ -5683,7 +5738,7 @@ async def modificar_rates(ctx):
             "SP": 0.020,  # Special (2%) - aumentado de 1%
             "UR": 0.035,  # Ultra Raro (3.5%) - aumentado de 1.5%
             "SSR": 0.065, # Super Super Raro (6.5%) - aumentado de 3%
-            "R": 0.100,  # Super Raro (10%) - aumentado de 6%
+            "R": 0.100,   # Raro (10%) - aumentado de 6%
             "N": 0.770,   # Normal (77%) - aumentado de 20%
         }
         
@@ -5789,7 +5844,7 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
                 name="📊 Cambios Realizados",
                 value=(
                     f"**{self.rarity}**: {prob_anterior * 100:.2f}% → {nueva_probabilidad * 100:.2f}%\n"
-                    f"**C**: {prob_anterior * 100:.2f}% → {rarity_probabilities['C'] * 100:.2f}%"
+                    f"**N**: {prob_anterior * 100:.2f}% → {rarity_probabilities['C'] * 100:.2f}%"
                 ),
                 inline=False
             )
@@ -6208,8 +6263,6 @@ async def cancelar_eleccion(ctx):
     # Se debe guardar el estado de estas variables globales para que persista
     # entre reinicios del bot.
 
-
-
 # ----------------------------
 # COMANDO RAPIDO PARA VER RATES
 # ----------------------------
@@ -6249,6 +6302,101 @@ async def rates(ctx):
 
 
     # ----------------------------
+# COMANDO !PROBABILIDAD
+# ----------------------------
+@bot.command(name="probabilidad")
+async def probabilidad(ctx):
+    """Muestra la probabilidad de obtener cada carta del gacha."""
+
+    # 1. Calcular el número de cartas por rareza
+    #    cards_catalog es un diccionario {rareza: [carta1, carta2, ...]}
+    rarity_counts = {r: len(cards) for r, cards in cards_catalog.items()}
+
+    # 2. Generar la lista de cartas con sus probabilidades individuales
+    card_list_lines = []
+    
+    # catalog_cards es la lista plana de todas las cartas (de scope global)
+    for card in catalog_cards:
+        rarity = card.get("rareza", "N")
+        nombre = card.get("nombre", "Carta Desconocida")
+        
+        # Probabilidad de obtener la rareza (ej: 0.001 para G) (de scope global)
+        prob_rarity = rarity_probabilities.get(rarity, 0)
+        
+        # Número de cartas en esa rareza
+        count = rarity_counts.get(rarity, 1)
+
+        # Probabilidad individual: P(Rareza) / N(Cartas en esa Rareza)
+        prob_individual = prob_rarity / count if count > 0 else 0
+        
+        # Formato de porcentaje con 4 decimales para mayor precisión
+        prob_percent = f"{prob_individual * 100:.4f}%"
+
+        # Formato de lista: - [Nombre] - Rareza: [R] - Prob: [X.XX%]
+        line = f"- {nombre} - Rareza: {rarity} - Prob: {prob_percent}"
+        card_list_lines.append(line)
+        
+    # --- Preparar Mensaje de Discord ---
+    
+    embed_desc = (
+        "A continuación se muestra la lista de **todas las cartas** obtenibles, junto con su rareza y su probabilidad individual de ser obtenida en un solo tiro de gacha.\n\n"
+        "**Resumen de Probabilidades por Rareza:**\n"
+    )
+    
+    rarity_summary = []
+    # Ordenar por probabilidad descendente para mejor visualización
+    sorted_probabilities = sorted(rarity_probabilities.items(), key=lambda item: item[1], reverse=True)
+    for r, p in sorted_probabilities:
+        rarity_summary.append(f"`{r}`: **{p*100:.2f}%**")
+    
+    embed_desc += " | ".join(rarity_summary)
+    
+    full_list_content = "\n".join(card_list_lines)
+    
+    # El límite de caracteres de la descripción de un embed es 4096. Usamos un margen.
+    if len(embed_desc) + len(full_list_content) < 3500:
+        # Si cabe en la descripción del embed
+        embed = discord.Embed(
+            title="✨ Probabilidades del Gacha ✨",
+            description=f"{embed_desc}\n\n**Lista de Cartas:**\n```\n{full_list_content}\n```",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+    else:
+        # Si es demasiado largo, enviamos el resumen en el embed y la lista en mensajes separados (chunking).
+        embed = discord.Embed(
+            title="✨ Probabilidades del Gacha (Resumen) ✨",
+            description=embed_desc,
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+        
+        await ctx.send("**Lista Completa de Cartas (Nombre - Rareza - Probabilidad):**")
+        
+        # Dividir el contenido en chunks de max 1990 caracteres para caber en bloques de código de Discord (límite 2000)
+        MAX_LEN = 1990
+        
+        chunks = []
+        current_chunk = ""
+        
+        for line in card_list_lines:
+            # +1 por el caracter de nueva línea
+            if len(current_chunk) + len(line) + 1 > MAX_LEN: 
+                chunks.append(current_chunk)
+                current_chunk = line
+            else:
+                if current_chunk:
+                    current_chunk += "\n"
+                current_chunk += line
+                
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        for chunk in chunks:
+            await ctx.send(f"```\n{chunk}\n```")
+
+
+    # ----------------------------
 # RECOMPENSA FIJA DE GEMAS (ADMIN)
 # ----------------------------
 active_gem_reward = {
@@ -6275,14 +6423,14 @@ async def gemas_fijas(ctx, cantidad: int, tiempo_horas: float):
 
     embed = discord.Embed(
         title="💎 Recompensa Fija Activada",
-        description=f"Los usuarios pueden reclamar **{cantidad} gemas** usando `!recibir_gemas` durante las próximas **{tiempo_horas} horas**.",
+        description=f"Los usuarios pueden reclamar **{cantidad} gemas** usando `!reward_gemas` durante las próximas **{tiempo_horas} horas**.",
         color=discord.Color.gold()
     )
     embed.set_footer(text="Comando exclusivo de administradores")
     await ctx.send(embed=embed)
 
 @bot.command()
-async def recibir_gemas(ctx):
+async def reward_gemas(ctx):
     """Permite reclamar la recompensa fija de gemas activa"""
     global active_gem_reward
     user_id = str(ctx.author.id)
@@ -6324,7 +6472,7 @@ async def estado_gemas_fijas(ctx):
         f"👥 **Usuarios que reclamaron:** {len(active_gem_reward['claimed_users'])}"
     )
 
-    # ----------------------------
+# ----------------------------
 # COMANDO PARA CANCELAR RECOMPENSA FIJA DE GEMAS
 # ----------------------------
 @bot.command()
@@ -6388,7 +6536,6 @@ async def cancelar_gemas_fijas(ctx):
     embed.set_footer(text=f"Cancelada por {ctx.author.display_name}")
     
     await ctx.send(embed=embed) 
-
 
 
 # ----------------------------
@@ -6497,8 +6644,8 @@ class GachaBuyModal(discord.ui.Modal, title="🛒 Comprar Tiradas de Gacha"):
             await interaction.response.send_message("❌ La cantidad debe ser un número entero válido.", ephemeral=True)
             return
             
-        # Ejecutar el comando !gacha_comprar con el argumento
-        await invoke_command_from_interaction(interaction.client, interaction, "gacha_comprar", args=quantity)
+        # Ejecutar el comando !gacha_buy con el argumento
+        await invoke_command_from_interaction(interaction.client, interaction, "gacha_buy", args=quantity)
 
 
 class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
@@ -6524,8 +6671,8 @@ class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
         amount_input = self.amount.value.lower()
         
         # Validar la rareza rápidamente (C, N, R, etc.)
-        if rarity_input not in ['N', 'R', 'SSR', 'UR', 'SP', 'G']: 
-            await interaction.response.send_message("❌ Rareza no reconocida. Usa N, R, SSR, UR, SP o G.", ephemeral=True)
+        if rarity_input not in ['C', 'N', 'R', 'SSR', 'UR', 'SP', 'G']: 
+            await interaction.response.send_message("❌ Rareza no reconocida. Usa C, N, R, SSR, UR, SP o G.", ephemeral=True)
             return
 
         # El comando !vender debe manejar la lógica de 'all' y la validación numérica
@@ -6535,7 +6682,10 @@ class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
 # FIN MODALES
 # ----------------------------
 
-# ----------------------------
+
+
+
+    # ----------------------------
 # SISTEMA DE MENÚ (BOTONES - EJECUTORES Y MODALES)
 # ----------------------------
 
@@ -6557,9 +6707,9 @@ class GachaMenuView(View):
     async def gacha_free_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await invoke_command_from_interaction(interaction.client, interaction, "gacha")
 
-    # 🚀 MODAL: !gacha_comprar
+    # 🚀 MODAL: !gacha_buy
     @discord.ui.button(label="🛒 Comprar Tiradas", style=discord.ButtonStyle.blurple, row=0)
-    async def gacha_comprar_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def gacha_buy_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         # Muestra el modal para pedir la cantidad
         await interaction.response.send_modal(GachaBuyModal())
 
@@ -6572,7 +6722,6 @@ class GachaMenuView(View):
     @discord.ui.button(label="🎣 Pesca", style=discord.ButtonStyle.secondary, emoji="🎣", row=0)
     async def pesca_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await invoke_command_from_interaction(interaction.client, interaction, "pesca")
-
 
     # --- FILA 2: INVENTARIO Y ECONOMÍA ---
     
@@ -6702,7 +6851,7 @@ async def pesca(ctx):
     save_data()
 
 
-# ----------------------------
+    # ----------------------------
 # COMANDO !MINAR
 # ----------------------------
 
@@ -7100,43 +7249,11 @@ async def cancelar_jefe(ctx):
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
     print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca')
-    print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
+    print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
 
 # ----------------------------
-# Función principal de arranque corregida
+# Arrancar el bot (no compartas tu token)
 # ----------------------------
-async def main():
-    import config
-    token = config.DISCORD_TOKEN
-    
-    max_retries = 10
-    retry_delay = 60
-    
-    # IMPORTANTE: Cargamos el servidor web o cualquier otra tarea async aquí si es necesario
-    
-    for attempt in range(max_retries):
-        try:
-            print(f"🚀 [Intento {attempt + 1}/{max_retries}] Iniciando bot...")
-            # Usamos un context manager para asegurar que el bot se limpie bien si falla
-            async with bot:
-                await bot.start(token)
-                
-        except discord.errors.HTTPException as e:
-            if e.status == 429 or e.status == 1015:
-                wait_time = retry_delay * (2 ** attempt)
-                print(f"⚠️ IP BLOQUEADA (Error {e.status}). Reintentando en {wait_time}s...")
-                await asyncio.sleep(wait_time)
-            else:
-                print(f"❌ Error HTTP: {e}")
-                break
-        except Exception as e:
-            print(f"❌ Error inesperado: {e}")
-            await asyncio.sleep(10)
-    else:
-        print("❌ No se pudo conectar.")
-
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("Log: Bot apagado manualmente.")
+    import config  # asegúrate de que en config.py está DISCORD_TOKEN
+    bot.run(config.DISCORD_TOKEN)
