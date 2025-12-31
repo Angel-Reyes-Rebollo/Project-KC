@@ -7092,78 +7092,60 @@ async def cancelar_jefe(ctx):
     else:
         await ctx.send("❌ No tienes un desafío activo al jefe semanal.")
 
-
 # ----------------------------
-# EVENTO DE INICIO (Tus comandos están aquí)
+# EVENTO DE INICIO (Tus comandos intactos)
 # ----------------------------
 @bot.event
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
-    # Esta línea verifica qué comandos reconoció el bot realmente
-    comandos_reales = [c.name for c in bot.commands]
-    print(f'🎮 Comandos cargados correctamente: {", ".join(comandos_reales)}')
-    print(f'👑 Comandos de admin listos para usar.')
-
-import threading
+    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca')
+    print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
 
 # ----------------------------
-# SERVIDOR WEB PARA RENDER (Evita que se apague)
+# ARRANQUE PARA PLAN GRATUITO (Resistente a bloqueos de IP)
 # ----------------------------
-from flask import Flask
-
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "Bot is online!", 200
-
-def run_flask():
-    # Render usa el puerto 10000 por defecto
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
-
-# ----------------------------
-# ARRANQUE CON REINTENTOS Y REGISTRO DE COMANDOS
-# ----------------------------
-async def start_bot_with_retry():
+async def main_startup():
     import config
     token = config.DISCORD_TOKEN
     
-    max_retries = 10
-    retry_delay = 60
-    
-    for attempt in range(max_retries):
+    # El bucle intentará conectar hasta que la IP de Render se libere
+    while True:
         try:
-            print(f"🚀 [Intento {attempt + 1}] Conectando a Discord...")
-            
-            # El uso de 'async with bot' es FUNDAMENTAL para que los 
-            # comandos cargados arriba no se borren de la memoria.
+            print(f"🚀 Intentando conectar a Discord...")
+            # 'async with' es OBLIGATORIO para evitar el error "Session is closed"
             async with bot:
                 await bot.start(token)
                 
         except discord.errors.HTTPException as e:
             if e.status == 429 or e.status == 1015:
-                wait_time = retry_delay * (2 ** (attempt % 5))
-                print(f"⚠️ IP BLOQUEADA. Reintentando en {wait_time}s...")
-                # Cerramos la sesión fallida para que no cause errores de comandos
+                print(f"⚠️ Render está bajo Rate Limit (IP compartida usada).")
+                print(f"🕒 Esperando 60 segundos para limpiar conexión y reintentar...")
+                # Cerramos la sesión rota antes de esperar
                 await bot.close()
-                await asyncio.sleep(wait_time)
+                await asyncio.sleep(60)
             else:
                 print(f"❌ Error de Discord: {e}")
+                await bot.close()
                 break
         except Exception as e:
             print(f"❌ Error inesperado: {e}")
-            await bot.close()
-            await asyncio.sleep(10)
+            try:
+                await bot.close()
+            except:
+                pass
+            await asyncio.sleep(20)
 
 if __name__ == "__main__":
-    # 1. Iniciamos Flask para que Render vea el puerto abierto
-    t = threading.Thread(target=run_flask)
-    t.daemon = True
-    t.start()
-    
-    # 2. Iniciamos el bot de Discord con el sistema de reintentos
+    # 1. Iniciamos el webserver de tu archivo webserver.py
     try:
-        asyncio.run(start_bot_with_retry())
+        from webserver import start_webserver
+        start_webserver()
+        print("✅ Servidor web iniciado (Dashboard)")
+    except Exception as e:
+        print(f"⚠️ No se pudo iniciar el webserver: {e}")
+
+    # 2. Iniciamos el bot con el sistema de limpieza de sesión
+    try:
+        asyncio.run(main_startup())
     except KeyboardInterrupt:
-        print("Bot apagado manualmente.")
+        print("Bot apagado.")
