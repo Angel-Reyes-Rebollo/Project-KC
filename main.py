@@ -7093,7 +7093,7 @@ async def cancelar_jefe(ctx):
         await ctx.send("❌ No tienes un desafío activo al jefe semanal.")
 
 # ----------------------------
-# EVENTO DE INICIO (Tus comandos intactos)
+# EVENTO DE INICIO
 # ----------------------------
 @bot.event
 async def on_ready():
@@ -7102,50 +7102,8 @@ async def on_ready():
     print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
 
 # ----------------------------
-# ARRANQUE PARA PLAN GRATUITO (Resistente a bloqueos de IP)
+# Arrancar el bot (no compartas tu token)
 # ----------------------------
-async def main_startup():
-    import config
-    token = config.DISCORD_TOKEN
-    
-    # El bucle intentará conectar hasta que la IP de Render se libere
-    while True:
-        try:
-            print(f"🚀 Intentando conectar a Discord...")
-            # 'async with' es OBLIGATORIO para evitar el error "Session is closed"
-            async with bot:
-                await bot.start(token)
-                
-        except discord.errors.HTTPException as e:
-            if e.status == 429 or e.status == 1015:
-                print(f"⚠️ Render está bajo Rate Limit (IP compartida usada).")
-                print(f"🕒 Esperando 60 segundos para limpiar conexión y reintentar...")
-                # Cerramos la sesión rota antes de esperar
-                await bot.close()
-                await asyncio.sleep(60)
-            else:
-                print(f"❌ Error de Discord: {e}")
-                await bot.close()
-                break
-        except Exception as e:
-            print(f"❌ Error inesperado: {e}")
-            try:
-                await bot.close()
-            except:
-                pass
-            await asyncio.sleep(20)
-
 if __name__ == "__main__":
-    # 1. Iniciamos el webserver de tu archivo webserver.py
-    try:
-        from webserver import start_webserver
-        start_webserver()
-        print("✅ Servidor web iniciado (Dashboard)")
-    except Exception as e:
-        print(f"⚠️ No se pudo iniciar el webserver: {e}")
-
-    # 2. Iniciamos el bot con el sistema de limpieza de sesión
-    try:
-        asyncio.run(main_startup())
-    except KeyboardInterrupt:
-        print("Bot apagado.")
+    import config  # asegúrate de que en config.py está DISCORD_TOKEN
+    bot.run(config.DISCORD_TOKEN)
