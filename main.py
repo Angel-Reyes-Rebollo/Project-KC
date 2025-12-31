@@ -7103,39 +7103,8 @@ async def on_ready():
     print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
 
 # ----------------------------
-# Arrancar el bot con sistema anti-bloqueo (Error 1015/429)
+# Arrancar el bot (no compartas tu token)
 # ----------------------------
-async def start_bot_with_retry():
-    import config  # Importamos tu archivo de configuración
-    token = config.DISCORD_TOKEN
-    
-    max_retries = 10    # Intentará conectar hasta 10 veces
-    retry_delay = 60    # Empezará esperando 1 minuto si falla
-    
-    for attempt in range(max_retries):
-        try:
-            print(f"🚀 [Intento {attempt + 1}/{max_retries}] Conectando a Discord...")
-            # Usamos start() en lugar de run() para poder controlar los reintentos
-            await bot.start(token)
-            
-        except discord.errors.HTTPException as e:
-            # Si el error es 429 (Too many requests) o 1015 (Rate limited by Cloudflare)
-            if e.status == 429 or e.status == 1015:
-                wait_time = retry_delay * (2 ** attempt)  # Espera exponencial: 60s, 120s, 240s...
-                print(f"⚠️ IP BLOQUEADA (Error {e.status}). Reintentando en {wait_time} segundos...")
-                await asyncio.sleep(wait_time)
-            else:
-                print(f"❌ Error de Discord no recuperable: {e}")
-                break
-        except Exception as e:
-            print(f"❌ Error inesperado: {e}")
-            await asyncio.sleep(10) # Espera genérica antes de reintentar
-    else:
-        print("❌ Se agotaron los intentos. No se pudo establecer conexión.")
-
 if __name__ == "__main__":
-    try:
-        # Iniciamos el bucle de eventos para el bot
-        asyncio.run(start_bot_with_retry())
-    except KeyboardInterrupt:
-        print("Log: Bot apagado manualmente.")
+    import config  # asegúrate de que en config.py está DISCORD_TOKEN
+    bot.run(config.DISCORD_TOKEN)
