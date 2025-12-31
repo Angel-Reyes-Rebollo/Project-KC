@@ -7103,8 +7103,40 @@ async def on_ready():
     print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
 
 # ----------------------------
-# Arrancar el bot (no compartas tu token)
+# Función principal de arranque corregida
 # ----------------------------
+async def main():
+    import config
+    token = config.DISCORD_TOKEN
+    
+    max_retries = 10
+    retry_delay = 60
+    
+    # IMPORTANTE: Cargamos el servidor web o cualquier otra tarea async aquí si es necesario
+    
+    for attempt in range(max_retries):
+        try:
+            print(f"🚀 [Intento {attempt + 1}/{max_retries}] Iniciando bot...")
+            # Usamos un context manager para asegurar que el bot se limpie bien si falla
+            async with bot:
+                await bot.start(token)
+                
+        except discord.errors.HTTPException as e:
+            if e.status == 429 or e.status == 1015:
+                wait_time = retry_delay * (2 ** attempt)
+                print(f"⚠️ IP BLOQUEADA (Error {e.status}). Reintentando en {wait_time}s...")
+                await asyncio.sleep(wait_time)
+            else:
+                print(f"❌ Error HTTP: {e}")
+                break
+        except Exception as e:
+            print(f"❌ Error inesperado: {e}")
+            await asyncio.sleep(10)
+    else:
+        print("❌ No se pudo conectar.")
+
 if __name__ == "__main__":
-    import config  # asegúrate de que en config.py está DISCORD_TOKEN
-    bot.run(config.DISCORD_TOKEN)
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Log: Bot apagado manualmente.")
