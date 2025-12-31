@@ -27,18 +27,17 @@ catalog_cards = catalog_data.get("cards", [])
 # Organizar cartas por rareza
 cards_catalog = {}
 for card in catalog_cards:
-    rarity = card.get("rareza", "C")
+    rarity = card.get("rareza", "N")
     cards_catalog.setdefault(rarity, []).append(card)
 
 # Nuevas probabilidades que incluyen UR, SP y L
 rarity_probabilities = {
-    "G": 0.001,   # Galaxia (0.10%) - Muy raro
-    "SP": 0.007,  # Special (0.70%) - Raro  
-    "UR": 0.022,  # Ultra Raro (2.2%) - Poco común
-    "SSR": 0.080, # Super Super Raro (8%)
-    "SR": 0.17,  # Super Raro (17%)
-    "N": 0.270,   # Normal (27%)
-    "C": 0.450    # Común (45%) - Ajustado para completar 100%
+    "G": 0.010,   # Galaxia (1%) - Aumentado de 0.5%
+    "SP": 0.020,  # Special (2%) - Aumentado de 1%
+    "UR": 0.030,  # Ultra Raro (3%) - Aumentado de 1.5%
+    "SSR": 0.060, # Super Super Raro (6%) - Aumentado de 3%
+    "R": 0.120,  # Super Raro (12%) - Aumentado de 6%
+    "N": 0.400,   # Normal (40%) - Aumentado de 20%
 }
 
 # ----------------------------
@@ -51,13 +50,11 @@ if os.path.exists(DATA_FILE):
         user_inventories = user_data.get("inventories", {})
         user_balances = user_data.get("balances", {})
         user_rob_penalties = user_data.get("rob_penalties", {})
-        user_torre_progress = user_data.get("torre_progress", {})
         user_completed_floors = user_data.get("completed_floors", {})  # Esta línea debe estar
 else:
     user_inventories = {}
     user_balances = {}
     user_rob_penalties = {}
-    user_torre_progress = {}
     user_completed_floors = {}  # Y esta también
 
 def save_data():
@@ -66,7 +63,6 @@ def save_data():
             "inventories": user_inventories,
             "balances": user_balances,
             "rob_penalties": user_rob_penalties,
-            "torre_progress": user_torre_progress,
             "completed_floors": user_completed_floors  # Asegúrate de que esta línea esté presente
         }, f, ensure_ascii=False, indent=4)
 
@@ -129,7 +125,9 @@ user_last_adivina = {} # {user_id: timestamp}
 user_last_rob = {}     # {user_id: timestamp}
 user_last_casino = {}  # {user_id: timestamp}
 user_last_pesca = {}       # {user_id: timestamp}
-user_last_remate = {}      # {user_id: timestamp}
+user_last_minar = {}   # {user_id: timestamp}
+user_last_jefe = {}  
+
 
 # ----------------------------
 # CONSTANTES Y COMANDO !ESPERA
@@ -140,11 +138,11 @@ COOLDOWN_DIARIA = 24 * 3600    # !diaria (24 horas)
 COOLDOWN_GACHA = 4 * 3600      # !gacha (4 horas)
 COOLDOWN_ADIVINA = 1 * 3600    # !adivina (1 hora)
 COOLDOWN_ROB = 30 * 60         # !rob (30 minutos)
-COOLDOWN_TRABAJAR = 1 * 3600   # !trabajar (Asumido 1 hora, valor común)
+COOLDOWN_TRABAJAR = 4 * 3600   # !trabajar (4 horas)
 COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
-COOLDOWN_REMATE = 3 * 3600     # !remate (3 horas) <--- NUEVA
-
+COOLDOWN_MINAR = 60            # !minar (1 minuto)
+COOLDOWN_JEFE = 7 * 24 * 3600 
 
 def format_cooldown(seconds):
     """Convierte segundos en un formato de horas, minutos y segundos (Ej: 1h 30m 5s)."""
@@ -182,9 +180,10 @@ async def espera(ctx):
         ("🎁 Recompensa Diaria", user_last_daily, COOLDOWN_DIARIA),
         ("🎯 Adivina Número", user_last_adivina, COOLDOWN_ADIVINA),
         ("🦹 Robo", user_last_rob, COOLDOWN_ROB),
-        ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), # <--- NUEVO
-        ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA), # <-- ¡AÑADE ESTA LÍNEA!
-        ("🏐 Remate", user_last_remate, COOLDOWN_REMATE), # <-- ¡AÑADE ESTA LÍNEA!
+        ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), 
+        ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA),
+        ("⛏️ Minar", user_last_minar, COOLDOWN_MINAR),
+        ("👑 Jefe Semanal", user_last_jefe, COOLDOWN_JEFE),
     ]
     
     cooldowns_text = []
@@ -389,7 +388,7 @@ class TradeSelectionView(View):
         card = inventory[user_index]
         file = discord.File(card["imagen"], filename="carta_trade.png")
         
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
         
         role = "Usuario 1" if is_user1 else "Usuario 2"
@@ -525,54 +524,6 @@ class TradeSelectionView(View):
             await interaction.followup.send("✅ ¡Intercambio listo! Revisa tus mensajes privados para confirmar.", ephemeral=True)
         except:
             await interaction.followup.send("❌ No puedo enviar mensajes privados. Asegúrate de tener los MD abiertos.", ephemeral=True)
-
-@bot.command()
-async def mis_pisos(ctx):
-    """Muestra qué pisos de la torre has completado y cuáles faltan"""
-    user_id_str = str(ctx.author.id)
-    completed = get_completed_floors(ctx.author.id)
-    max_piso = user_torre_progress.get(user_id_str, 0)
-    
-    embed = discord.Embed(
-        title=f"🏰 Progreso de {ctx.author.display_name}",
-        description="Pisos completados en la Torre de Retos",
-        color=discord.Color.blue()
-    )
-    
-    # Crear lista de pisos
-    pisos_info = ""
-    for piso in range(1, 11):
-        estado = "✅ Completado" if piso in completed else "🔒 Disponible" if piso <= max_piso + 1 else "🔒 Bloqueado"
-        boss_nombre = torre_config[piso]["boss"]
-        
-        if piso in completed:
-            recompensa = f"{torre_config[piso]['recompensa_gemas']}💎 + {torre_config[piso]['recompensa_carta'] or 'Nada'}"
-        else:
-            recompensa = f"{torre_config[piso]['recompensa_gemas']}💎 + {torre_config[piso]['recompensa_carta'] or 'Nada'}"
-        
-        pisos_info += f"**Piso {piso}** - {boss_nombre}\n"
-        pisos_info += f"   {estado} | Recompensa: {recompensa}\n\n"
-    
-    embed.add_field(
-        name="📊 Estado de Pisos",
-        value=pisos_info,
-        inline=False
-    )
-    
-    embed.add_field(
-        name="🎯 Progreso General",
-        value=f"**Pisos completados:** {len(completed)}/10\n**Piso máximo alcanzado:** {max_piso}/10",
-        inline=True
-    )
-    
-    if len(completed) == 10:
-        embed.add_field(
-            name="🏆 ¡Torre Completada!",
-            value="¡Has completado todos los pisos de la torre!",
-            inline=False
-        )
-    
-    await ctx.send(embed=embed)
 
 class FinalTradeView(View):
     def __init__(self, trade_id, user1, user2, timeout=300):
@@ -753,9 +704,8 @@ def get_rarity_emoji(rarity):
         "SP": "🎀",  # Special - Moño
         "UR": "💫",  # Ultra Raro - Estrella fugaz
         "SSR": "🔥", # Super Super Raro - Fuego
-        "SR": "⭐",   # Super Raro - Estrella
+        "R": "⭐",   # Super Raro - Estrella
         "N": "🔹",   # Normal - Diamante azul
-        "C": "🔸"    # Común - Diamante naranja
     }
     return rarity_emojis.get(rarity, "📄")
 
@@ -778,9 +728,8 @@ def get_rarity_color(rarity):
         "SP": 0xFF69B4,  # Special - Rosa
         "UR": 0x3498DB,  # Ultra Raro - Azul
         "SSR": 0xE74C3C, # Super Super Raro - Rojo
-        "SR": 0xF1C40F,  # Super Raro - Amarillo
+        "R": 0xF1C40F,  # Super Raro - Amarillo
         "N": 0x3498DB,   # Normal - Azul claro
-        "C": 0x95A5A6    # Común - Gris
     }
     return rarity_colors.get(rarity, 0x000000)
 
@@ -870,7 +819,7 @@ class AgregarCartaModalInicial(discord.ui.Modal, title='➕ Agregar Nueva Carta'
         ))
         self.add_item(discord.ui.TextInput(
             label='Rareza',
-            placeholder='C, N, SR, SSR, UR, SP, L',
+            placeholder='C, N, R, SSR, UR, SP, L',
             required=True
         ))
         self.add_item(discord.ui.TextInput(
@@ -980,14 +929,16 @@ class CompletarCartaModal(discord.ui.Modal, title='📝 Completar Información d
             "imagen": f"images/{self.card_id}.png",  # Ruta por defecto
             "descripcion": descripcion,
             "stats": {
-                "salto": 1,
-                "remate": 1,
-                "recepcion": 1,
-                "bloqueo": 1,
-                "velocidad": 1,
-                "iq": 1,
-                "carisma": 1,
-                "colocacion": 1
+                "Evasion": 1,
+                "Fuerza": 1,
+                "Reacción": 1,
+                "Defensa": 1,
+                "Velocidad": 1,
+                "IQ": 1,
+                "Carisma ": 1,
+                "Precisión": 1,
+                "Energia": 1,
+                "Suerte": 1
             }
         }
         
@@ -1161,14 +1112,16 @@ class BuscarCartaModal(discord.ui.Modal, title='🔍 Buscar Carta por ID'):
             )
             
             stats = carta_encontrada.get("stats", {})
-            embed.add_field(name="Salto", value=stats.get("salto", 1), inline=True)
-            embed.add_field(name="Remate", value=stats.get("remate", 1), inline=True)
-            embed.add_field(name="Recepción", value=stats.get("recepcion", 1), inline=True)
-            embed.add_field(name="Bloqueo", value=stats.get("bloqueo", 1), inline=True)
-            embed.add_field(name="Velocidad", value=stats.get("velocidad", 1), inline=True)
-            embed.add_field(name="IQ", value=stats.get("iq", 1), inline=True)
-            embed.add_field(name="Carisma", value=stats.get("carisma", 1), inline=True)
-            embed.add_field(name="Colocacion", value=stats.get("colocacion", 1), inline=True)
+            embed.add_field(name="Evasion", value=stats.get("Evasion", 1), inline=True)
+            embed.add_field(name="Fuerza", value=stats.get("Fuerza", 1), inline=True)
+            embed.add_field(name="Reacción", value=stats.get("Reacción", 1), inline=True)
+            embed.add_field(name="Defensa", value=stats.get("Defensa", 1), inline=True)
+            embed.add_field(name="Velocidad", value=stats.get("Velocidad", 1), inline=True)
+            embed.add_field(name="IQ", value=stats.get("IQ", 1), inline=True)
+            embed.add_field(name="Carisma", value=stats.get("Carisma", 1), inline=True)
+            embed.add_field(name="Precisión", value=stats.get("Precisión", 1), inline=True)
+            embed.add_field(name="Energia", value=stats.get("Energia", 1), inline=True)
+            embed.add_field(name="Suerte", value=stats.get("Suerte", 1), inline=True)
             
             try:
                 file = discord.File(carta_encontrada["imagen"], filename="carta.png")
@@ -1244,9 +1197,9 @@ class EditarStatsFormView(View):
         super().__init__(timeout=300)
         self.carta = carta
     
-    @discord.ui.button(label="✏️ Editar Salto", style=discord.ButtonStyle.blurple)
-    async def editar_salto_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "salto")
+    @discord.ui.button(label="✏️ Editar Evasion", style=discord.ButtonStyle.blurple)
+    async def editar_Evasion_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Evasion")
         await interaction.response.send_modal(modal)
     
     @discord.ui.button(label="✏️ Editar Ataque", style=discord.ButtonStyle.blurple)
@@ -1254,34 +1207,34 @@ class EditarStatsFormView(View):
         modal = EditarStatModal(self.carta, "ataque")
         await interaction.response.send_modal(modal)
     
-    @discord.ui.button(label="✏️ Editar Recepción", style=discord.ButtonStyle.blurple)
-    async def editar_recepcion_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "recepcion")
+    @discord.ui.button(label="✏️ Editar Reacción", style=discord.ButtonStyle.blurple)
+    async def editar_Reacción_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Reacción")
         await interaction.response.send_modal(modal)
     
-    @discord.ui.button(label="✏️ Editar Bloqueo", style=discord.ButtonStyle.blurple)
-    async def editar_bloqueo_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "bloqueo")
+    @discord.ui.button(label="✏️ Editar Defensa", style=discord.ButtonStyle.blurple)
+    async def editar_Defensa_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Defensa")
         await interaction.response.send_modal(modal)
     
     @discord.ui.button(label="✏️ Editar Velocidad", style=discord.ButtonStyle.blurple)
-    async def editar_velocidad_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "velocidad")
+    async def editar_Velocidad_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Velocidad")
         await interaction.response.send_modal(modal)
     
     @discord.ui.button(label="✏️ Editar IQ", style=discord.ButtonStyle.blurple)
-    async def editar_iq_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "iq")
+    async def editar_IQ_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "IQ")
         await interaction.response.send_modal(modal)
 
     @discord.ui.button(label="✏️ Editar Carisma", style=discord.ButtonStyle.blurple)
-    async def editar_carisma_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "carisma")
+    async def editar_Carisma_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Carisma")
         await interaction.response.send_modal(modal)
 
-    @discord.ui.button(label="✏️ Editar Colocacion", style=discord.ButtonStyle.blurple)
-    async def editar_colocacion_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "colocacion")
+    @discord.ui.button(label="✏️ Editar Precisión", style=discord.ButtonStyle.blurple)
+    async def editar_Precisión_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Precisión")
         await interaction.response.send_modal(modal)        
     
     @discord.ui.button(label="💾 Guardar Cambios", style=discord.ButtonStyle.green)
@@ -1294,14 +1247,14 @@ class EditarStatsFormView(View):
         )
         
         stats = self.carta.get("stats", {})
-        embed.add_field(name="Salto", value=stats.get("salto", 1), inline=True)
-        embed.add_field(name="Ataque", value=stats.get("ataque", 1), inline=True)
-        embed.add_field(name="Recepción", value=stats.get("recepcion", 1), inline=True)
-        embed.add_field(name="Bloqueo", value=stats.get("bloqueo", 1), inline=True)
-        embed.add_field(name="Velocidad", value=stats.get("velocidad", 1), inline=True)
-        embed.add_field(name="IQ", value=stats.get("iq", 1), inline=True)
-        embed.add_field(name="Carisma", value=stats.get("carisma", 1), inline=True)
-        embed.add_field(name="Colocacion", value=stats.get("colocacion", 1), inline=True)
+        embed.add_field(name="Evasion", value=stats.get("Evasion", 1), inline=True)
+        embed.add_field(name="Ataque", value=stats.get("Ataque", 1), inline=True)
+        embed.add_field(name="Reacción", value=stats.get("Reacción", 1), inline=True)
+        embed.add_field(name="Defensa", value=stats.get("Defensa", 1), inline=True)
+        embed.add_field(name="Velocidad", value=stats.get("Velocidad", 1), inline=True)
+        embed.add_field(name="IQ", value=stats.get("IQ", 1), inline=True)
+        embed.add_field(name="Carisma", value=stats.get("Carisma", 1), inline=True)
+        embed.add_field(name="Precisión", value=stats.get("Precisión", 1), inline=True)
         
         # Deshabilitar botones
         for item in self.children:
@@ -1317,14 +1270,16 @@ class EditarStatModal(discord.ui.Modal, title='✏️ Editar Estadística'):
         
         # Traducir nombre de stat para mostrar
         stat_names = {
-            "salto": "Salto",
-            "ataque": "Remate", 
-            "recepcion": "Recepción",
-            "bloqueo": "Bloqueo",
-            "velocidad": "Velocidad",
-            "iq": "IQ",
-            "carisma": "Carisma",
-            "colocacion": "Colocacion"
+            "Evasion": "Evasion",
+            "Fuerza": "Fuerza", 
+            "Reacción": "Reacción",
+            "Defensa": "Defensa",
+            "Velocidad": "Velocidad",
+            "IQ": "IQ",
+            "Carisma": "Carisma",
+            "Precisión": "Precisión",
+            "Energia": "Energia",
+            "Suerte": "Suerte"
 
         }
         
@@ -1366,14 +1321,14 @@ class EditarStatModal(discord.ui.Modal, title='✏️ Editar Estadística'):
                     break
         
         stat_names = {
-            "salto": "Salto",
-            "ataque": "Ataque",
-            "recepcion": "Recepción", 
-            "bloqueo": "Bloqueo",
-            "velocidad": "Velocidad",
-            "iq": "IQ",
-            "carisma": "Carisma",
-            "colocacion": "Colocacion"
+            "Evasion": "Evasion",
+            "Ataque": "Ataque",
+            "Reacción": "Reacción", 
+            "Defensa": "Defensa",
+            "Velocidad": "Velocidad",
+            "IQ": "IQ",
+            "Carisma": "Carisma",
+            "Precisión": "Precisión"
         }
         
         await interaction.response.send_message(
@@ -1403,8 +1358,6 @@ async def ayuda(ctx):
             elif page_num == 2:
                 embed = await self.page_duelos()
             elif page_num == 3:
-                embed = await self.page_torre_minijuegos()
-            elif page_num == 4:
                 embed = await self.page_admin_info()
             
             if self.message:
@@ -1414,7 +1367,7 @@ async def ayuda(ctx):
         
         async def page_economia(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 1/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 1/4",
                 description="**Sistema de Economía y Cartas**",
                 color=discord.Color.blue()
             )
@@ -1451,16 +1404,16 @@ async def ayuda(ctx):
             
             embed.add_field(
                 name="🎴 **Rarezas**",
-                value="G(0.5%) SP(1%) UR(1.5%) SSR(3%) SR(6%) N(20%) C(68%)",
+                value="G(0.5%) SP(1%) UR(1.5%) SSR(3%) R(6%) N(20%) C(68%)",
                 inline=False
             )
             
-            embed.set_footer(text="Página 1/5 - Usa los botones para navegar")
+            embed.set_footer(text="Página 1/4 - Usa los botones para navegar")
             return embed
         
         async def page_inventario(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 2/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 2/4",
                 description="**Gestión de Inventario y Ventas**",
                 color=discord.Color.green()
             )
@@ -1513,7 +1466,7 @@ async def ayuda(ctx):
                 inline=True
             )
             
-            embed.set_footer(text="Página 2/5 - Usa los botones para navegar")
+            embed.set_footer(text="Página 2/4 - Usa los botones para navegar")
             return embed
         
         async def page_duelos(self):
@@ -1553,70 +1506,12 @@ async def ayuda(ctx):
                 inline=True
             )
             
-            embed.set_footer(text="Página 3/5 - Usa los botones para navegar")
+            embed.set_footer(text="Página 3/4 - Usa los botones para navegar")
             return embed
-        
-        async def page_torre_minijuegos(self):
-            embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 4/5",
-                description="**Torre, Minijuegos y Utilidades**",
-                color=discord.Color.gold()
-            )
-            
-            embed.add_field(
-                name="🏰 **!torre**",
-                value="10 pisos progresivos",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="📊 **!progreso_torre**",
-                value="Tu progreso en torre",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🎯 **!adivina**",
-                value="Adivina número (1h cooldown)",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🦹 **!rob**",
-                value="Roba gemas (30m cooldown)",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🎁 **!recibir_recompensa**",
-                value="Reclama recompensa temporal",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="📊 **!estado_recompensa**",
-                value="Estado de recompensa",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="📊 **!status**",
-                value="Estado del bot",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🏰 **Torre Info**",
-                value="10 pisos • 5 rondas • Recompensas exclusivas • ¡Carta G en piso 10!",
-                inline=False
-            )
-            
-            embed.set_footer(text="Página 4/5 - Usa los botones para navegar")
-            return embed
-        
+                    
         async def page_admin_info(self):
             embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 5/5",
+                title="🎮 **Comandos de Project-KC APP** - Página 4/4",
                 description="**Comandos de Admin e Información**",
                 color=discord.Color.purple()
             )
@@ -1658,7 +1553,7 @@ async def ayuda(ctx):
             
             embed.add_field(
                 name="💡 **Sistemas Disponibles**",
-                value="Cartas • Intercambios • Duelos PvP • Torre • Recompensas • Backup • Dashboard • Álbum • Sistema de Rates",
+                value="Cartas • Intercambios • Duelos PvP • Recompensas • Backup • Dashboard • Álbum • Sistema de Rates",
                 inline=False
             )
             
@@ -1819,7 +1714,7 @@ class TradeSelectionView(View):
             file = None
             image_url = None
         
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
         
         role = "Tus cartas" if is_user1 else "Tus cartas"
@@ -2290,7 +2185,7 @@ async def recompensa_tiempo(ctx, card_id: str = None, duracion_minutos: int = 60
     recompensa_claimers.clear()  # Resetear lista de reclamantes
 
     # Embed de anuncio
-    rarity = found_card.get("rareza", "C")
+    rarity = found_card.get("rareza", "N")
     rarity_emoji = get_rarity_emoji(rarity)
     
     embed = discord.Embed(
@@ -2417,7 +2312,7 @@ async def recibir_recompensa(ctx):
         recompensa_claimers.add(ctx.author.id)
         
         # Embed de éxito
-        rarity = carta.get("rareza", "C")
+        rarity = carta.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
         
         embed = discord.Embed(
@@ -2482,7 +2377,7 @@ async def estado_recompensa(ctx):
         return
     
     carta = recompensa_activa['carta']
-    rarity = carta.get("rareza", "C")
+    rarity = carta.get("rareza", "N")
     rarity_emoji = get_rarity_emoji(rarity)
     
     # Calcular tiempo restante
@@ -2563,18 +2458,17 @@ async def cancelar_recompensa(ctx):
     await ctx.send(embed=embed)
 
 # ----------------------------
-# GACHA MEJORADO (Ahora incluye L, SP, UR, SSR, SR, N, C)
+# GACHA MEJORADO (Ahora incluye L, SP, UR, SSR, R, N, C)
 # ----------------------------
 
 # Nuevas probabilidades que incluyen todas las rarezas del gacha
 rarity_probabilities = {
-    "G": 0.001,   # Galaxia (0.10%) - Muy raro
-    "SP": 0.007,  # Special (0.70%) - Raro  
-    "UR": 0.022,  # Ultra Raro (2.2%) - Poco común
-    "SSR": 0.080, # Super Super Raro (8%)
-    "SR": 0.17,  # Super Raro (17%)
-    "N": 0.270,   # Normal (27%)
-    "C": 0.450    # Común (45%) - Ajustado para completar 100%
+    "G": 0.010,   # Galaxia (1%) - aumentado de 0.5%
+    "SP": 0.020,  # Special (2%) - aumentado de 1%
+    "UR": 0.035,  # Ultra Raro (3.5%) - aumentado de 1.5%
+    "SSR": 0.065, # Super Super Raro (6.5%) - aumentado de 3%
+    "R": 0.100,  # Super Raro (10%) - aumentado de 6%
+    "N": 0.770,   # Normal (77%) - aumentado de 20%
 }
 
 # 🎲 Gacha gratuita
@@ -2591,9 +2485,9 @@ async def gacha(ctx):
 
     user_last_gacha[user_id] = now
 
-    # Filtrar las rarezas que nos interesan (G, SP, UR, SSR, SR, N, C)
+    # Filtrar las rarezas que nos interesan (G, SP, UR, SSR, R, N, C)
     # NOTA: Las cartas "E" (Evento) NO salen en el gacha, solo las regalan admins
-    target_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    target_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     available_rarities = []
     available_probabilities = []
     
@@ -2659,7 +2553,7 @@ async def gacha(ctx):
     except (IndexError, KeyError) as e:
         print(f"❌ Error en gacha: {e}")
         # Fallback seguro si algo sale mal
-        safe_rarities = ["C", "N", "SR", "SSR", "UR", "SP", "G"]
+        safe_rarities = ["N", "R", "SSR", "UR", "SP", "G"]
         for safe_r in safe_rarities:
             if safe_r in cards_catalog and cards_catalog[safe_r]:
                 card = random.choice(cards_catalog[safe_r])
@@ -2701,8 +2595,8 @@ async def gacha_comprar(ctx, cantidad: int = 1):
         await ctx.send("❌ Cantidad inválida. Solo puedes comprar 1, 5 o 10 tiradas.")
         return
     
-    # Filtrar las rarezas del gacha (L, SP, UR, SSR, SR, N, C)
-    target_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    # Filtrar las rarezas del gacha (L, SP, UR, SSR, R, N, C)
+    target_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     available_rarities = []
     available_probabilities = []
     
@@ -2749,8 +2643,8 @@ async def gacha_comprar(ctx, cantidad: int = 1):
         except (IndexError, KeyError) as e:
             print(f"Error en gacha: {e}")
             # Fallback a carta común
-            if "C" in cards_catalog and cards_catalog["C"]:
-                card = random.choice(cards_catalog["C"])
+            if "N" in cards_catalog and cards_catalog["N"]:
+                card = random.choice(cards_catalog["N"])
                 card_copy = card.copy()
                 add_to_inventory(user_id, card_copy)
                 cartas_obtenidas.append(card_copy)
@@ -2808,14 +2702,14 @@ async def show_cards_carousel(ctx_or_interaction, cards, title=None):
         if card_idx == 0 and title:
             embed_title = title
         else:
-            rarity = card.get("rareza", "C")
+            rarity = card.get("rareza", "N")
             rarity_emoji = get_rarity_emoji(rarity)
             embed_title = f"{rarity_emoji} {card['nombre']} ({rarity}) {rarity_emoji}"
         
         embed = discord.Embed(
             title=embed_title,
             description=card.get("descripcion", ""),
-            color=get_rarity_color(card.get("rareza", "C"))
+            color=get_rarity_color(card.get("rareza", "N"))
         )
         embed.add_field(name="Valor", value=format_gems(card.get('valor', 0)), inline=True)
         
@@ -3000,11 +2894,11 @@ async def trabajar(ctx):
 
 # Mapeo de rareza para el orden (Asegúrate de que esto esté definido globalmente en main.py)
 # 0 es la rareza más alta (mayor)
-RARITY_ORDER = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+RARITY_ORDER = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
 
 def get_rarity_sort_key(card):
     """Obtiene la clave de rareza para ordenar (0 es la más rara/mayor)."""
-    rarity = card.get("rareza", "C")
+    rarity = card.get("rareza", "N")
     return RARITY_ORDER.get(rarity, 99) 
 
 # --- CLASE VIEW RESTAURADA Y CORREGIDA ---
@@ -3036,7 +2930,7 @@ class InventoryView(View):
             return # No debería pasar si se maneja antes, pero por seguridad
             
         card = self.inv[self.index]
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
         
         # --- Construcción del Embed (Carrusel de 1 Carta) ---
@@ -3136,12 +3030,12 @@ async def inventario(ctx):
     # Contar por rareza (usando el inventario completo, no el único)
     rarity_count = {}
     for card in inv:
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
     
     rarity_text = ""
     # Se itera en el orden deseado para mostrar el resumen
-    for rarity in ["G", "SP", "UR", "SSR", "SR", "N", "C"]:
+    for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
         if rarity in rarity_count:
             emoji = get_rarity_emoji(rarity)
             rarity_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
@@ -3176,7 +3070,7 @@ async def vender(ctx):
     async def send_card_message(channel, card_idx, view=None):
         card = inventory[card_idx]
         file = discord.File(card["imagen"], filename=f"carta_{card_idx}.png")
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
 
         embed = discord.Embed(
@@ -3268,18 +3162,20 @@ pending_duels = {}  # {duel_id: duel_data}
 
 # Atributos disponibles para duelos
 duel_attributes = {
-    "salto": "🦘 Salto",
-    "remate": "💥 Remate", 
-    "recepcion": "🛡️ Recepción",
-    "bloqueo": "🚧 Bloqueo",
-    "velocidad": "💨 Velocidad",
-    "iq": "🧠 IQ",
-    "carisma": "✨ Carisma",
-    "colocacion": "🎯 Colocación"
+    "Evasion": "👻 Evasion",
+    "Fuerza": "💥 Fuerza", 
+    "Reacción": "🌀 Reacción",
+    "Defensa": "🛡️ Defensa",
+    "Velocidad": "💨 Velocidad",
+    "IQ": "🧠 IQ",
+    "Carisma": "✨ Carisma",
+    "Precisión": "🎯 Precisión",
+    "Energia": "⚡ Energia",
+    "Suerte": "🍀 Suerte",
 }
 
 # Orden de rarezas para filtros
-rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
 
 class DuelAcceptView(View):
     def __init__(self, duel_id, challenger, challenged, duel_type="amistoso", max_rarity=None, timeout=120):
@@ -3401,7 +3297,7 @@ class DuelCardSelectionAmistosoView:
             return
         
         # Ordenar por rareza (de más rara a menos rara)
-        self.sorted_cards = sorted(available_inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
+        self.sorted_cards = sorted(available_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
         
         # Crear embed con la lista de cartas
         embed = discord.Embed(
@@ -3412,7 +3308,7 @@ class DuelCardSelectionAmistosoView:
         
         # Agregar cartas numeradas
         for i, card in enumerate(self.sorted_cards, 1):
-            rarity = card.get("rareza", "C")
+            rarity = card.get("rareza", "N")
             rarity_emoji = get_rarity_emoji(rarity)
             embed.description += f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity})\n"
         
@@ -3614,7 +3510,7 @@ class DuelCardSelectionHonorView:
             instructions = "Selecciona la carta que apostarás en este duelo (puede ser de cualquier rareza):"
             
             # Para la carta apostada, mostrar todo el inventario
-            self.sorted_cards = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
+            self.sorted_cards = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
             
         else:
             # SELECCIÓN DE CARTAS PARA RONDAS: CON FILTRO DE RAREZA Y SIN DUPLICADOS
@@ -3636,7 +3532,7 @@ class DuelCardSelectionHonorView:
             # Filtrar por rareza
             filtered_inventory = [
                 card for card in inventory_without_bet_and_selected 
-                if rarity_order.get(card.get("rareza", "C"), 7) >= max_rarity_value
+                if rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value
             ]
             
             if not filtered_inventory:
@@ -3645,7 +3541,7 @@ class DuelCardSelectionHonorView:
                     del pending_duels[self.duel_id]
                 return
             
-            self.sorted_cards = sorted(filtered_inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
+            self.sorted_cards = sorted(filtered_inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
         
         # Crear embed con la lista de cartas
         embed = discord.Embed(
@@ -3656,7 +3552,7 @@ class DuelCardSelectionHonorView:
         
         # Agregar cartas numeradas
         for i, card in enumerate(self.sorted_cards, 1):
-            rarity = card.get("rareza", "C")
+            rarity = card.get("rareza", "N")
             rarity_emoji = get_rarity_emoji(rarity)
             embed.description += f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity})\n"
         
@@ -3971,7 +3867,7 @@ async def dueloamistoso(ctx, member: discord.Member):
 async def duelohonor(ctx, member: discord.Member, max_rarity: str = "UR"):
     """Retar a otro usuario a un duelo de honor de 5 rondas con apuesta de cartas"""
     # Validar rareza máxima
-    valid_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     max_rarity = max_rarity.upper()
     
     if max_rarity not in valid_rarities:
@@ -4002,8 +3898,8 @@ async def duelohonor(ctx, member: discord.Member, max_rarity: str = "UR"):
     # Verificar que ambos tienen cartas de la rareza especificada o superior
     max_rarity_value = rarity_order.get(max_rarity, 6)
     
-    author_has_rarity = any(rarity_order.get(card.get("rareza", "C"), 7) >= max_rarity_value for card in author_inv)
-    member_has_rarity = any(rarity_order.get(card.get("rareza", "C"), 7) >= max_rarity_value for card in member_inv)
+    author_has_rarity = any(rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value for card in author_inv)
+    member_has_rarity = any(rarity_order.get(card.get("rareza", "N"), 6) >= max_rarity_value for card in member_inv)
     
     if not author_has_rarity:
         await ctx.send(f"❌ No tienes cartas con rareza {max_rarity} o superior para el duelo.")
@@ -4217,9 +4113,9 @@ def get_rarity_emoji(rarity):
     """Devuelve el emoji correspondiente a la rareza"""
     emoji_map = {
         "G": "💎", "SP": "✨", "UR": "🔥", 
-        "SSR": "⭐", "SR": "🌟", "N": "🟢", "C": "⚪"
+        "SSR": "⭐", "R": "🌟", "N": "🟢"
     }
-    return emoji_map.get(rarity.upper(), "⚪")
+    return emoji_map.get(rarity.upper(), "🟢")
 
 # ----------------------------
 # COMANDO INVENTARIO PERSONAL (MD)
@@ -4248,9 +4144,9 @@ async def inventario_personal(ctx):
             await ctx.send("❌ No puedo enviarte mensajes directos. Por favor, habilita los MDs y usa el comando nuevamente.")
         return
     
-    # Ordenar inventario por rareza (L, SP, UR, SSR, SR, N, C)
-    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
-    sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
+    # Ordenar inventario por rareza (L, SP, UR, SSR, R, N, C)
+    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
+    sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
     
     # Dividir en chunks para evitar límites de Discord
     chunk_size = 10  # Número de cartas por mensaje
@@ -4264,7 +4160,7 @@ async def inventario_personal(ctx):
         # Contar cartas por rareza
         rarity_count = {}
         for card in inventory:
-            rarity = card.get("rareza", "C")
+            rarity = card.get("rareza", "N")
             rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
         
         # Crear embed de resumen
@@ -4276,7 +4172,7 @@ async def inventario_personal(ctx):
         
         # Agregar conteo por rareza
         rarity_text = ""
-        for rarity in ["G", "SP", "UR", "SSR", "SR", "N", "C"]:
+        for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
             if rarity in rarity_count:
                 emoji = get_rarity_emoji(rarity)
                 rarity_text += f"{emoji} **{rarity}**: {rarity_count[rarity]}\n"
@@ -4295,7 +4191,7 @@ async def inventario_personal(ctx):
             )
             
             for i, card in enumerate(chunk, 1):
-                rarity = card.get("rareza", "C")
+                rarity = card.get("rareza", "N")
                 rarity_emoji = get_rarity_emoji(rarity)
                 card_value = format_gems(card.get('valor', 0))
                 
@@ -4305,14 +4201,16 @@ async def inventario_personal(ctx):
                 for stat_name, stat_value in stats.items():
                     if stat_value > 1:  # Solo mostrar stats que no sean el valor por defecto (1)
                         stat_display = {
-                            "salto": "🦘 Salto",
-                            "remate": "💥 Remate", 
-                            "recepcion": "🛡️ Recep",
-                            "bloqueo": "🚧 Blq",
-                            "velocidad": "💨 Vel",
-                            "iq": "🧠 IQ",
-                            "carisma": "✨ Car",
-                            "colocacion": "🎯 Col"
+                            "Evasion": "👻 Eva",
+                            "Fuerza": "💥 Fuer", 
+                            "Reacción": "🌀 Reacción",
+                            "Defensa": "🛡️ Def",
+                            "Velocidad": "💨 Vel",
+                            "IQ": "🧠 IQ",
+                            "Carisma": "✨ Car",
+                            "Precisión": "🎯 Prec",
+                            "Energia": "⚡ Ener",
+                            "Suerte": "🍀 Suer",
                         }.get(stat_name, stat_name)
                         stats_text += f"{stat_display}: {stat_value} "
                 
@@ -4359,7 +4257,7 @@ async def vender_mayoreo(ctx):
     total_valor = 0
     
     for i, card in enumerate(inventory, 1):
-        rarity = card.get("rareza", "C")
+        rarity = card.get("rareza", "N")
         rarity_emoji = get_rarity_emoji(rarity)
         valor = card.get('valor', 0)
         total_valor += valor
@@ -4624,14 +4522,14 @@ async def vender_rareza(ctx, rareza: str):
     
     # Validar y normalizar la rareza
     rareza = rareza.upper()
-    valid_rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    valid_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     
     if rareza not in valid_rarities:
         await ctx.send(f"❌ Rareza inválida. Usa: {', '.join(valid_rarities)}")
         return
     
     # Filtrar cartas de la rareza especificada
-    cartas_a_vender = [card for card in inventory if card.get("rareza", "C") == rareza]
+    cartas_a_vender = [card for card in inventory if card.get("rareza", "N") == rareza]
     
     if not cartas_a_vender:
         await ctx.send(f"❌ No tienes cartas de rareza **{rareza}** en tu inventario.")
@@ -4694,7 +4592,7 @@ async def vender_rareza(ctx, rareza: str):
             
             # Eliminar las cartas del inventario
             user_inv = get_inventory(ctx.author.id)
-            nuevas_cartas = [card for card in user_inv if card.get("rareza", "C") != self.rareza]
+            nuevas_cartas = [card for card in user_inv if card.get("rareza", "N") != self.rareza]
             user_inventories[str(ctx.author.id)] = nuevas_cartas
             
             # Añadir las gemas ganadas
@@ -4777,7 +4675,7 @@ import asyncio
 # ----------------------------
 # SISTEMA DE PING AL DASHBOARD (Keep Alive)
 # ----------------------------
-import aiohttp
+
 
 
 @bot.command()
@@ -4851,764 +4749,6 @@ async def status(ctx):
     
     await ctx.send(embed=embed)
 
-
-# ----------------------------
-# SISTEMA DE TORRE DE RETOS - VERSIÓN CORREGIDA
-# ----------------------------
-
-# Configuración de la torre - 10 niveles con bosses progresivos
-torre_config = {
-    1: {
-        "nombre": "Piso 1 - Puerta de Entrada",
-        "boss": "Koji Sekimukai (Yukigaoka)",
-        "boss_card_id": "C001",
-        "dificultad": "Muy Fácil",
-        "recompensa_gemas": 40,  # Mitad de 80
-        "recompensa_carta": None,
-        "descripcion": "Un desafío suave para calentar"
-    },
-    2: {
-        "nombre": "Piso 2 - Sala de Entrenamiento", 
-        "boss": "Tatsuya Mori (Yukigaoka)",
-        "boss_card_id": "C002",
-        "dificultad": "Fácil",
-        "recompensa_gemas": 60,  # Mitad de 120
-        "recompensa_carta": "C",  # Carta aleatoria C
-        "descripcion": "Comienza el verdadero entrenamiento"
-    },
-    3: {
-        "nombre": "Piso 3 - Cancha de Pruebas",
-        "boss": "Yutaro Kindaichi (Kitagawa)", 
-        "boss_card_id": "N001",
-        "dificultad": "Normal",
-        "recompensa_gemas": 90,  # Mitad de 180
-        "recompensa_carta": "N",  # Carta aleatoria N
-        "descripcion": "Los fundamentos se ponen a prueba"
-    },
-    4: {
-        "nombre": "Piso 4 - Arena Intermedia",
-        "boss": "Yuki Shibayama (Nekoma)",
-        "boss_card_id": "N003", 
-        "dificultad": "Normal+",
-        "recompensa_gemas": 125,  # Mitad de 250
-        "recompensa_carta": "N",  # Carta aleatoria N
-        "descripcion": "La competencia se intensifica"
-    },
-    5: {
-        "nombre": "Piso 5 - Sala de Estrategia",
-        "boss": "Kanji Koganegawa (Dateko)",
-        "boss_card_id": "SR001",
-        "dificultad": "Moderado",
-        "recompensa_gemas": 175,  # Mitad de 350
-        "recompensa_carta": "SR",  # Carta aleatoria SR
-        "descripcion": "La estrategia marca la diferencia"
-    },
-    6: {
-        "nombre": "Piso 6 - Coliseo de Hierro",
-        "boss": "Hajime Iwaizumi (Aoba Johsai)",
-        "boss_card_id": "SR004",
-        "dificultad": "Desafiante",
-        "recompensa_gemas": 250,  # Mitad de 500
-        "recompensa_carta": "SR",  # Carta aleatoria SR
-        "descripcion": "La fuerza bruta se impone"
-    },
-    7: {
-        "nombre": "Piso 7 - Templo del Vuelo",
-        "boss": "Ryunosuke Tanaka (Karasuno)", 
-        "boss_card_id": "SSR001",
-        "dificultad": "Difícil",
-        "recompensa_gemas": 350,  # Mitad de 700
-        "recompensa_carta": "SR",  # Carta aleatoria SR
-        "descripcion": "La agilidad es clave"
-    },
-    8: {
-        "nombre": "Piso 8 - Santuario de la Defensa",
-        "boss": "Kei Tsukishima (Karasuno)",
-        "boss_card_id": "SSR005", 
-        "dificultad": "Muy Difícil",
-        "recompensa_gemas": 450,  # Mitad de 900
-        "recompensa_carta": "SSR",  # Carta aleatoria SSR
-        "descripcion": "Una defensa impenetrable"
-    },
-    9: {
-        "nombre": "Piso 9 - Cúpula Celestial", 
-        "boss": "Tōru Oikawa (Aoba Johsai)",
-        "boss_card_id": "SSR009",
-        "dificultad": "Élite",
-        "recompensa_gemas": 600,  # Mitad de 1200
-        "recompensa_carta": "SSR",  # Carta aleatoria SSR
-        "descripcion": "La genialidad táctica al límite"
-    },
-    10: {
-        "nombre": "Piso 10 - Trono del Rey",
-        "boss": "Wakatoshi Ushijima (Shiratorizawa)",
-        "boss_card_id": "UR001", 
-        "dificultad": "Legendario",
-        "recompensa_gemas": 1000,  # Mitad de 2000
-        "recompensa_carta": "UR",  # Carta aleatoria UR
-        "descripcion": "El desafío definitivo"
-    }
-}
-
-# Progreso de los usuarios en la torre
-user_torre_progress = {}
-
-class TorreDuelView:
-    def __init__(self, user, piso):
-        self.user = user
-        self.piso = piso
-        self.user_cards = []
-        self.boss_card = None
-        self.user_wins = 0
-        self.boss_wins = 0
-        self.paginated_cards = []
-        self.current_page = 0
-        self.all_sorted_cards = []
-        
-    async def iniciar_duelo(self, ctx):
-        """Inicia el duelo de la torre"""
-        # Cargar carta del boss
-        boss_config = torre_config[self.piso]
-        self.boss_card = next((card for card in catalog_cards if card["id"] == boss_config["boss_card_id"]), None)
-        
-        if not self.boss_card:
-            await ctx.send("❌ Error: No se encontró la carta del boss.")
-            return
-        
-        # Mostrar información del duelo
-        embed = discord.Embed(
-            title=f"🏰 {boss_config['nombre']}",
-            description=f"**Desafío de la Torre - Piso {self.piso}**",
-            color=discord.Color.gold()
-        )
-        
-        embed.add_field(
-            name="👑 Boss",
-            value=f"**{boss_config['boss']}**\nDificultad: {boss_config['dificultad']}",
-            inline=True
-        )
-        
-        embed.add_field(
-            name="🎯 Recompensas",
-            value=(
-                f"💎 {boss_config['recompensa_gemas']} gemas\n"
-                f"{'🎴 Carta especial' if boss_config['recompensa_carta'] else '⭐ Experiencia'}"
-            ),
-            inline=True
-        )
-        
-        embed.add_field(
-            name="📖 Descripción",
-            value=boss_config['descripcion'],
-            inline=False
-        )
-        
-        embed.set_footer(text="Selecciona 5 cartas para el duelo (5 rondas)")
-        
-        await ctx.send(embed=embed)
-        await self.pedir_seleccion_cartas(ctx)
-    
-    async def pedir_seleccion_cartas(self, ctx):
-        """Pide al usuario que seleccione 5 cartas para el duelo - MEJORADO"""
-        inventory = get_inventory(self.user.id)
-        
-        if len(inventory) < 5:
-            await ctx.send("❌ Necesitas al menos 5 cartas en tu inventario para desafiar la torre.")
-            return
-        
-        # Ordenar cartas por rareza (de mayor a menor)
-        rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
-        sorted_inventory = sorted(inventory, key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
-        
-        # Dividir en páginas de 10 cartas
-        self.paginated_cards = [sorted_inventory[i:i + 10] for i in range(0, len(sorted_inventory), 10)]
-        self.current_page = 0
-        self.all_sorted_cards = sorted_inventory  # Guardar referencia a todas las cartas ordenadas
-        
-        await self.mostrar_pagina_cartas(ctx)
-
-    async def mostrar_pagina_cartas(self, ctx):
-        """Muestra una página de cartas con botones de navegación"""
-        if self.current_page >= len(self.paginated_cards):
-            return
-        
-        current_cards = self.paginated_cards[self.current_page]
-        
-        # Crear lista numerada de cartas
-        cartas_texto = ""
-        start_index = self.current_page * 10
-        
-        for i, card in enumerate(current_cards, start_index + 1):
-            rarity = card.get("rareza", "C")
-            rarity_emoji = get_rarity_emoji(rarity)
-            
-            # Obtener stats más relevantes (las 3 más altas)
-            stats = card.get("stats", {})
-            top_stats = sorted(stats.items(), key=lambda x: x[1], reverse=True)[:3]
-            stats_text = " | ".join([f"{v}" for k, v in top_stats])
-            
-            cartas_texto += f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity}) - {stats_text}\n"
-        
-        embed = discord.Embed(
-            title="🎴 Selección de Cartas para la Torre",
-            description=f"**Página {self.current_page + 1}/{len(self.paginated_cards)}**\n\nResponde con 5 números separados por comas (ej: `1,3,5,7,9`)\n\n" + cartas_texto,
-            color=discord.Color.blue()
-        )
-        
-        embed.add_field(
-            name="📝 Instrucciones",
-            value=(
-                "Selecciona 5 cartas diferentes para las 5 rondas del duelo\n"
-                f"**Total de cartas disponibles:** {len(self.all_sorted_cards)}\n"
-                f"**Cartas mostradas:** {start_index + 1}-{start_index + len(current_cards)}"
-            ),
-            inline=False
-        )
-        
-        # Solo mostrar botones de navegación si hay múltiples páginas
-        if len(self.paginated_cards) > 1:
-            view = PaginacionCartasView(self, ctx)
-            await ctx.send(embed=embed, view=view)
-        else:
-            embed.set_footer(text="Tienes 3 minutos para seleccionar")
-            await ctx.send(embed=embed)
-            await self.esperar_seleccion(ctx)
-
-    async def esperar_seleccion(self, ctx):
-        """Espera la selección del usuario"""
-        def check(m):
-            return m.author == self.user and m.channel == ctx.channel
-        
-        try:
-            msg = await bot.wait_for('message', timeout=180.0, check=check)
-            await self.procesar_seleccion(ctx, msg.content.strip())
-        except asyncio.TimeoutError:
-            await ctx.send("⏰ Tiempo agotado. El duelo ha sido cancelado.")
-
-    async def procesar_seleccion(self, ctx, seleccion):
-        """Procesa la selección del usuario"""
-        try:
-            indices = [int(x.strip()) - 1 for x in seleccion.split(',')]
-            
-            # Validar selección
-            if len(indices) != 5:
-                await ctx.send("❌ Debes seleccionar exactamente 5 cartas.")
-                return await self.mostrar_pagina_cartas(ctx)
-            
-            if len(set(indices)) != 5:
-                await ctx.send("❌ No puedes seleccionar la misma carta múltiples veces.")
-                return await self.mostrar_pagina_cartas(ctx)
-            
-            max_index = len(self.all_sorted_cards) - 1
-            if any(idx < 0 or idx > max_index for idx in indices):
-                await ctx.send(f"❌ Números fuera de rango. El rango válido es 1-{max_index + 1}.")
-                return await self.mostrar_pagina_cartas(ctx)
-            
-            # Obtener cartas seleccionadas
-            self.user_cards = [self.all_sorted_cards[idx] for idx in indices]
-            
-            # Mostrar confirmación
-            await self.mostrar_confirmacion_seleccion(ctx)
-            
-        except ValueError:
-            await ctx.send("❌ Formato inválido. Usa números separados por comas (ej: 1,3,5,7,9).")
-            return await self.mostrar_pagina_cartas(ctx)
-
-    async def mostrar_confirmacion_seleccion(self, ctx):
-        """Muestra las cartas seleccionadas para confirmación"""
-        embed = discord.Embed(
-            title="✅ Cartas Seleccionadas para la Torre",
-            description="**Estas son las cartas que usarás en el duelo:**",
-            color=discord.Color.green()
-        )
-        
-        for i, card in enumerate(self.user_cards, 1):
-            rarity = card.get("rareza", "C")
-            rarity_emoji = get_rarity_emoji(rarity)
-            
-            # Mostrar stats principales
-            stats = card.get("stats", {})
-            top_stats = sorted(stats.items(), key=lambda x: x[1], reverse=True)[:2]
-            stats_text = " | ".join([f"{duel_attributes.get(k, k)}: {v}" for k, v in top_stats])
-            
-            embed.add_field(
-                name=f"Ronda {i}: {rarity_emoji} {card['nombre']} ({rarity})",
-                value=stats_text,
-                inline=False
-            )
-        
-        embed.set_footer(text="El duelo comenzará en 5 segundos...")
-        
-        await ctx.send(embed=embed)
-        await asyncio.sleep(5)
-        await self.iniciar_rondas(ctx)
-
-        
-
-    async def iniciar_rondas(self, ctx):
-        """Ejecuta las 5 rondas del duelo"""
-        resultados = []
-        
-        for round_num in range(5):
-            user_card = self.user_cards[round_num]
-            
-            # Seleccionar atributo aleatorio
-            selected_attribute = random.choice(list(duel_attributes.keys()))
-            attribute_display = duel_attributes[selected_attribute]
-            
-            # Obtener valores
-            user_value = user_card.get("stats", {}).get(selected_attribute, 1)
-            boss_value = self.boss_card.get("stats", {}).get(selected_attribute, 1)
-            
-            # Determinar ganador de la ronda
-            if user_value > boss_value:
-                round_winner = "user"
-                self.user_wins += 1
-                resultado = "✅ **VICTORIA**"
-            elif boss_value > user_value:
-                round_winner = "boss" 
-                self.boss_wins += 1
-                resultado = "❌ **DERROTA**"
-            else:
-                round_winner = "empate"
-                resultado = "⚔️ **EMPATE**"
-            
-            resultados.append({
-                'ronda': round_num + 1,
-                'atributo': attribute_display,
-                'user_card': user_card,
-                'user_value': user_value,
-                'boss_value': boss_value,
-                'resultado': resultado
-            })
-            
-            # Enviar resultado de la ronda
-            embed = discord.Embed(
-                title=f"🎯 Ronda {round_num + 1} - {attribute_display}",
-                color=discord.Color.blue()
-            )
-            
-            embed.add_field(
-                name="🎴 Tu Carta",
-                value=f"**{user_card['nombre']}**\n{attribute_display}: **{user_value}**",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="👑 Boss",
-                value=f"**{self.boss_card['nombre']}**\n{attribute_display}: **{boss_value}**", 
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🏆 Resultado",
-                value=resultado,
-                inline=False
-            )
-            
-            embed.add_field(
-                name="📊 Marcador",
-                value=f"**Tú:** {self.user_wins} - **Boss:** {self.boss_wins}",
-                inline=False
-            )
-            
-            await ctx.send(embed=embed)
-            
-            # Pequeña pausa entre rondas
-            await asyncio.sleep(2)
-        
-        # Determinar resultado final
-        await self.mostrar_resultado_final(ctx, resultados)
-
-    async def mostrar_resultado_final(self, ctx, resultados):
-        """Muestra el resultado final del duelo y entrega recompensas"""
-        boss_config = torre_config[self.piso]
-        
-        if self.user_wins > self.boss_wins:
-            # VICTORIA
-            await self.entregar_recompensa(ctx, boss_config, True)
-            
-            # Actualizar progreso
-            user_id_str = str(self.user.id)
-            current_max = user_torre_progress.get(user_id_str, 0)
-            if self.piso > current_max:
-                user_torre_progress[user_id_str] = self.piso
-                guardar_progreso_torre()  # Guardar inmediatamente
-            
-            embed = discord.Embed(
-                title="🎉 ¡VICTORIA EN LA TORRE!",
-                description=f"Has derrotado a **{boss_config['boss']}** en el piso {self.piso}!",
-                color=discord.Color.green()
-            )
-            
-            # Mostrar progreso actualizado
-            embed.add_field(
-                name="📈 Progreso Actualizado",
-                value=f"**Piso máximo alcanzado:** {self.piso}/10",
-                inline=True
-            )
-            
-        else:
-            # DERROTA
-            await self.entregar_recompensa(ctx, boss_config, False)
-            
-            embed = discord.Embed(
-                title="💀 Derrota en la Torre",
-                description=f"**{boss_config['boss']}** te ha derrotado en el piso {self.piso}.",
-                color=discord.Color.red()
-            )
-        
-        embed.add_field(
-            name="📊 Resultado Final",
-            value=f"**Tú:** {self.user_wins} - **Boss:** {self.boss_wins}",
-            inline=False
-        )
-        
-        embed.add_field(
-            name="🎯 Resumen por Rondas",
-            value="\n".join([
-                f"Ronda {r['ronda']} ({r['atributo']}): {r['resultado']}"
-                for r in resultados
-            ]),
-            inline=False
-        )
-        
-        # Mostrar siguiente piso disponible
-        siguiente_piso = self.piso + 1
-        if siguiente_piso <= 10 and self.user_wins > self.boss_wins:
-            next_boss = torre_config[siguiente_piso]
-            embed.add_field(
-                name="⬆️ Siguiente Desafío",
-                value=f"**Piso {siguiente_piso}**: {next_boss['nombre']}\nDificultad: {next_boss['dificultad']}",
-                inline=False
-            )
-        
-        await ctx.send(embed=embed)
-
-    async def entregar_recompensa(self, ctx, boss_config, victoria):
-        """Entrega las recompensas al usuario SOLO si es la primera vez que pasa el piso"""
-        user_id_str = str(self.user.id)
-        
-        # Verificar si ya completó este piso
-        if user_id_str not in user_completed_floors:
-            user_completed_floors[user_id_str] = []
-        
-        already_completed = self.piso in user_completed_floors[user_id_str]
-        
-        if victoria and not already_completed:
-            # PRIMERA VEZ que pasa el piso - Dar recompensas completas
-            add_balance(self.user.id, boss_config["recompensa_gemas"])
-            
-            if boss_config["recompensa_carta"]:
-                # Si la recompensa es una rareza específica (C, N, SR, SSR, UR)
-                if boss_config["recompensa_carta"] in ["C", "N", "SR", "SSR", "UR"]:
-                    rareza = boss_config["recompensa_carta"]
-                    carta_obtenida = obtener_carta_aleatoria_por_rareza(rareza)
-                    
-                    if carta_obtenida:
-                        add_to_inventory(self.user.id, carta_obtenida.copy())
-                        
-                        embed = discord.Embed(
-                            title=f"🎴 ¡Carta {rareza} Obtenida!",
-                            description=f"Has obtenido: **{carta_obtenida['nombre']}**",
-                            color=get_rarity_color(rareza)
-                        )
-                        
-                        try:
-                            file = discord.File(carta_obtenida["imagen"], filename="carta_recompensa.png")
-                            embed.set_image(url="attachment://carta_recompensa.png")
-                            await ctx.send(embed=embed, file=file)
-                        except:
-                            await ctx.send(embed=embed)
-                    else:
-                        await ctx.send(f"❌ Error: No hay cartas de rareza {rareza} disponibles en el catálogo.")
-            
-            # Mensaje de gemas
-            embed_gemas = discord.Embed(
-                title="💰 Recompensa de Gemas",
-                description=f"Has recibido {format_gems(boss_config['recompensa_gemas'])}",
-                color=discord.Color.gold()
-            )
-            await ctx.send(embed=embed_gemas)
-            
-            # Marcar piso como completado
-            user_completed_floors[user_id_str].append(self.piso)
-            
-            # Actualizar progreso máximo
-            current_max = user_torre_progress.get(user_id_str, 0)
-            if self.piso > current_max:
-                user_torre_progress[user_id_str] = self.piso
-            
-            # GUARDAR INMEDIATAMENTE
-            save_data()
-            
-            print(f"✅ Piso {self.piso} marcado como completado para usuario {user_id_str}")
-            print(f"📊 Pisos completados: {user_completed_floors[user_id_str]}")
-            print(f"📈 Progreso máximo: {user_torre_progress[user_id_str]}")
-            
-        elif victoria and already_completed:
-            # Ya había completado este piso - Solo mensaje de victoria
-            embed = discord.Embed(
-                title="✅ Piso Completado Anteriormente",
-                description=f"Ya habías superado el Piso {self.piso}. No se otorgan recompensas adicionales.",
-                color=discord.Color.blue()
-            )
-            await ctx.send(embed=embed)
-            
-        else:
-            # Derrota - Recompensa de consuelo reducida (solo 10 gemas)
-            consuelo_gemas = 10
-            add_balance(self.user.id, consuelo_gemas)
-            
-            embed = discord.Embed(
-                title="💎 Recompensa de Consuelo",
-                description=f"Recibes {format_gems(consuelo_gemas)} por tu esfuerzo",
-                color=discord.Color.orange()
-            )
-            await ctx.send(embed=embed)    
-
-
-class PaginacionCartasView(View):
-    def __init__(self, torre_view, ctx, timeout=120):
-        super().__init__(timeout=timeout)
-        self.torre_view = torre_view
-        self.ctx = ctx
-        
-        # Configurar estado inicial de botones
-        self.children[0].disabled = torre_view.current_page == 0
-        self.children[1].disabled = torre_view.current_page == len(torre_view.paginated_cards) - 1
-    
-    @discord.ui.button(label="⬅️ Anterior", style=discord.ButtonStyle.blurple)
-    async def prev_callback(self, interaction, button):
-        if interaction.user.id != self.torre_view.user.id:
-            await interaction.response.send_message("❌ Solo puedes navegar tu propia selección.", ephemeral=True)
-            return
-        
-        self.torre_view.current_page -= 1
-        
-        # Actualizar estado de botones
-        self.children[0].disabled = self.torre_view.current_page == 0
-        self.children[1].disabled = self.torre_view.current_page == len(self.torre_view.paginated_cards) - 1
-        
-        await interaction.response.defer()
-        await interaction.message.delete()
-        await self.torre_view.mostrar_pagina_cartas(self.ctx)
-    
-    @discord.ui.button(label="Siguiente ➡️", style=discord.ButtonStyle.blurple)
-    async def next_callback(self, interaction, button):
-        if interaction.user.id != self.torre_view.user.id:
-            await interaction.response.send_message("❌ Solo puedes navegar tu propia selección.", ephemeral=True)
-            return
-        
-        self.torre_view.current_page += 1
-        
-        # Actualizar estado de botones
-        self.children[0].disabled = self.torre_view.current_page == 0
-        self.children[1].disabled = self.torre_view.current_page == len(self.torre_view.paginated_cards) - 1
-        
-        await interaction.response.defer()
-        await interaction.message.delete()
-        await self.torre_view.mostrar_pagina_cartas(self.ctx)
-    
-    @discord.ui.button(label="📝 Seleccionar", style=discord.ButtonStyle.green)
-    async def select_callback(self, interaction, button):
-        if interaction.user.id != self.torre_view.user.id:
-            await interaction.response.send_message("❌ Solo puedes seleccionar en tu propia torre.", ephemeral=True)
-            return
-        
-        # Deshabilitar todos los botones
-        for item in self.children:
-            item.disabled = True
-        
-        await interaction.response.edit_message(view=self)
-        
-        # Pedir selección
-        embed = discord.Embed(
-            title="🎯 Ingresa tu selección",
-            description="**Escribe 5 números separados por comas**\nEjemplo: `1,3,5,7,9`\n\nTienes 3 minutos para responder.",
-            color=discord.Color.blue()
-        )
-        await self.ctx.send(embed=embed)
-        await self.torre_view.esperar_seleccion(self.ctx)
-
-
-
-# ----------------------------
-# FUNCIONES AUXILIARES PARA LA TORRE
-# ----------------------------
-
-async def mostrar_torre_info(ctx):
-    """Muestra información general sobre la torre"""
-    user_id_str = str(ctx.author.id)
-    max_piso = user_torre_progress.get(user_id_str, 0)
-    completed = get_completed_floors(ctx.author.id)
-    
-    embed = discord.Embed(
-        title="🏰 Torre de Retos Project-KC",
-        description="Enfréntate a 10 pisos de dificultad creciente y gana recompensas exclusivas **una vez por piso**!",
-        color=discord.Color.gold()
-    )
-    
-    # Progreso del usuario
-    embed.add_field(
-        name="📊 Tu Progreso",
-        value=f"**Pisos completados:** {len(completed)}/10\n**Piso máximo alcanzado:** {max_piso}/10",
-        inline=False
-    )
-    
-    # Sistema de recompensas
-    embed.add_field(
-        name="💰 Sistema de Recompensas",
-        value=(
-            "• **Recompensas únicas** por piso\n"
-            "• **No se puede farmear** pisos repetidos\n" 
-            "• **Derrota:** 10💎 de consuelo\n"
-            "• Usa `!mis_pisos` para ver tu progreso detallado"
-        ),
-        inline=False
-    )
-    
-    # Lista de pisos
-    for piso in range(1, 11):
-        boss_config = torre_config[piso]
-        estado = "✅ Completado" if piso in completed else "🔒 Disponible" if piso <= max_piso + 1 else "🔒 Bloqueado"
-        
-        embed.add_field(
-            name=f"🏁 Piso {piso} - {boss_config['nombre']}",
-            value=(
-                f"**Boss:** {boss_config['boss']}\n"
-                f"**Dificultad:** {boss_config['dificultad']}\n"
-                f"**Recompensa:** {boss_config['recompensa_gemas']}💎 + {'Carta ' + boss_config['recompensa_carta'] if boss_config['recompensa_carta'] else 'Nada'}\n"
-                f"**Estado:** {estado}"
-            ),
-            inline=True
-        )
-    
-    embed.add_field(
-        name="🎯 Cómo Jugar",
-        value=(
-            "Usa `!torre [número]` para desafiar un piso\n"
-            "• **5 rondas** por duelo\n" 
-            "• **1 carta** por ronda\n"
-            "• Atributos **aleatorios** cada ronda\n"
-            "• Gana **3+ rondas** para vencer\n"
-            "• **Recompensas solo la primera vez**"
-        ),
-        inline=False
-    )
-    
-    embed.set_footer(text="¡Completa todos los pisos para obtener recompensas únicas!")
-    
-    await ctx.send(embed=embed)
-
-def guardar_progreso_torre():
-    """Guarda el progreso de la torre en el archivo de datos"""
-    # Cargar datos existentes primero
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-    else:
-        data = {}
-    
-    # Actualizar solo la parte de torre_progress
-    data["torre_progress"] = user_torre_progress
-    
-    # Guardar el archivo completo
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-
-def cargar_progreso_torre():
-    """Carga el progreso de la torre desde el archivo de datos"""
-    global user_torre_progress
-    
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            user_torre_progress = data.get("torre_progress", {})
-    else:
-        user_torre_progress = {}
-
-# ----------------------------
-# COMANDOS DE TORRE
-# ----------------------------
-
-@bot.command()
-async def torre(ctx, piso: int = None):
-    """Sistema de Torre de Retos - Enfréntate a bosses progresivos"""
-    
-    if piso is None:
-        # Mostrar información general de la torre
-        await mostrar_torre_info(ctx)
-        return
-    
-    # Validar piso
-    if piso < 1 or piso > 10:
-        await ctx.send("❌ El piso debe estar entre 1 y 10.")
-        return
-    
-    # Verificar progreso del usuario
-    user_id_str = str(ctx.author.id)
-    max_piso = user_torre_progress.get(user_id_str, 0)
-    
-    if piso > max_piso + 1:
-        await ctx.send(f"❌ Debes completar el piso {max_piso + 1} antes de intentar el piso {piso}.")
-        return
-    
-    # Verificar que tenga al menos 5 cartas
-    inventory = get_inventory(ctx.author.id)
-    if len(inventory) < 5:
-        await ctx.send("❌ Necesitas al menos 5 cartas en tu inventario para desafiar la torre.")
-        return
-    
-    # Iniciar duelo
-    view = TorreDuelView(ctx.author, piso)
-    await view.iniciar_duelo(ctx)
-
-@bot.command()
-async def progreso_torre(ctx):
-    """Muestra tu progreso actual en la torre"""
-    user_id_str = str(ctx.author.id)
-    max_piso = user_torre_progress.get(user_id_str, 0)
-    
-    embed = discord.Embed(
-        title="📊 Tu Progreso en la Torre",
-        description=f"**{ctx.author.display_name}** - Piso máximo: **{max_piso}/10**",
-        color=discord.Color.blue()
-    )
-    
-    if max_piso == 0:
-        embed.add_field(
-            name="🎯 Comienza tu aventura",
-            value="Usa `!torre 1` para enfrentarte al primer boss y ganar 80💎",
-            inline=False
-        )
-    elif max_piso == 10:
-        embed.add_field(
-            name="🏆 ¡Galaxia de la Torre!",
-            value="Has completado todos los pisos. ¡Eres un verdadero maestro!",
-            inline=False
-        )
-    else:
-        siguiente_piso = max_piso + 1
-        next_boss = torre_config[siguiente_piso]
-        
-        embed.add_field(
-            name="⬆️ Siguiente Desafío",
-            value=(
-                f"**Piso {siguiente_piso}:** {next_boss['nombre']}\n"
-                f"**Boss:** {next_boss['boss']}\n"
-                f"**Dificultad:** {next_boss['dificultad']}\n"
-                f"**Recompensa:** {next_boss['recompensa_gemas']}💎 + {'Carta' if next_boss['recompensa_carta'] else 'Exp'}"
-            ),
-            inline=False
-        )
-    
-    await ctx.send(embed=embed)
-
-# Cargar progreso al inicio
-cargar_progreso_torre()
-
-
 # ----------------------------
 # COMANDO ALBUM
 # ----------------------------
@@ -5628,7 +4768,7 @@ async def album(ctx):
         return
     
     # Eliminar duplicados (usando el ID de la carta) y ordenar por rareza
-    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "SR": 4, "N": 5, "C": 6}
+    rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
     
     # Crear diccionario para eliminar duplicados
     unique_cards = {}
@@ -5639,7 +4779,7 @@ async def album(ctx):
     
     # Convertir a lista y ordenar por rareza
     unique_cards_list = list(unique_cards.values())
-    unique_cards_list.sort(key=lambda x: rarity_order.get(x.get("rareza", "C"), 7))
+    unique_cards_list.sort(key=lambda x: rarity_order.get(x.get("rareza", "N"), 6))
     
     # Estadísticas
     total_cards = len(inventory)
@@ -5688,7 +4828,7 @@ async def album(ctx):
                 index = row * grid_size + col
                 if index < len(page_cards):
                     card = page_cards[index]
-                    rarity = card.get("rareza", "C")
+                    rarity = card.get("rareza", "N")
                     rarity_emoji = get_rarity_emoji(rarity)
                     row_text += f"{rarity_emoji} "
                 else:
@@ -5708,7 +4848,7 @@ async def album(ctx):
             f"{get_rarity_emoji('SP')} Special | "
             f"{get_rarity_emoji('UR')} Ultra Raro\n"
             f"{get_rarity_emoji('SSR')} SSR | "
-            f"{get_rarity_emoji('SR')} SR | "
+            f"{get_rarity_emoji('R')} R | "
             f"{get_rarity_emoji('N')} Normal | "
             f"{get_rarity_emoji('C')} Común"
         )
@@ -5855,7 +4995,7 @@ async def darcarta(ctx, member: discord.Member, card_id: str):
 
     add_to_inventory(member.id, found_card)
 
-    rarity = found_card.get("rareza", "C")
+    rarity = found_card.get("rareza", "N")
     rarity_emoji = get_rarity_emoji(rarity)
     
     file = discord.File(found_card["imagen"], filename="carta.png")
@@ -6242,33 +5382,6 @@ async def clear(ctx, amount: int = 10):
     await ctx.channel.purge(limit=amount + 1)
     await ctx.send(f"🧹 Se borraron {amount} mensajes.", delete_after=5)
 
-#  Debbug torre
-@bot.command()
-async def debug_torre(ctx):
-    """Comando de debug para ver el estado de la torre"""
-    user_id_str = str(ctx.author.id)
-    completed = get_completed_floors(ctx.author.id)
-    max_piso = user_torre_progress.get(user_id_str, 0)
-    
-    embed = discord.Embed(
-        title="🐛 DEBUG Torre",
-        description=f"Estado interno para {ctx.author.display_name}",
-        color=discord.Color.orange()
-    )
-    
-    embed.add_field(
-        name="📊 Datos Internos",
-        value=(
-            f"**user_id_str:** {user_id_str}\n"
-            f"**completed_floors:** {completed}\n"
-            f"**max_piso:** {max_piso}\n"
-            f"**user_completed_floors dict:** {user_completed_floors.get(user_id_str, [])}"
-        ),
-        inline=False
-    )
-    
-    await ctx.send(embed=embed)
-
 # ----------------------------
 # INICIAR SERVIDOR WEB (AL FINAL, ANTES DEL bot.run)
 # ----------------------------
@@ -6550,7 +5663,7 @@ async def modificar_rates(ctx):
         return rarity_callback
     
     # Crear botones para cada rareza
-    rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    rarities = ["G", "SP", "UR", "SSR", "R", "N"]
     for rarity in rarities:
         emoji = get_rarity_emoji(rarity)
         btn = Button(label=f"Modificar {rarity}", style=discord.ButtonStyle.blurple, emoji=emoji)
@@ -6566,13 +5679,12 @@ async def modificar_rates(ctx):
         # Restablecer probabilidades por defecto
         global rarity_probabilities
         rarity_probabilities = {
-            "G": 0.005,   # Galaxia (0.5%)
-            "SP": 0.010,  # Special (1%)
-            "UR": 0.015,  # Ultra Raro (1.5%)
-            "SSR": 0.030, # Super Super Raro (3%)
-            "SR": 0.060,  # Super Raro (6%)
-            "N": 0.200,   # Normal (20%)
-            "C": 0.680    # Común (68%)
+            "G": 0.010,   # Galaxia (1%) - aumentado de 0.5%
+            "SP": 0.020,  # Special (2%) - aumentado de 1%
+            "UR": 0.035,  # Ultra Raro (3.5%) - aumentado de 1.5%
+            "SSR": 0.065, # Super Super Raro (6.5%) - aumentado de 3%
+            "R": 0.100,  # Super Raro (10%) - aumentado de 6%
+            "N": 0.770,   # Normal (77%) - aumentado de 20%
         }
         
         embed = discord.Embed(
@@ -6641,15 +5753,15 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
             diferencia = nueva_probabilidad - prob_anterior
             
             # Ajustar automáticamente la rareza C para mantener el total en 100%
-            if self.rarity != "C":
-                rarity_probabilities["C"] -= diferencia
+            if self.rarity != "N":
+                rarity_probabilities["N"] -= diferencia
             
             # Verificar que el total sea 100%
             total = sum(rarity_probabilities.values())
             
             if abs(total - 1.0) > 0.001:  # Permitir pequeña tolerancia
                 # Si no suma 100%, ajustar la rareza C
-                rarity_probabilities["C"] += (1.0 - total)
+                rarity_probabilities["N"] += (1.0 - total)
             
             # Verificar que todas las probabilidades sean válidas
             for rarity, prob in rarity_probabilities.items():
@@ -6662,7 +5774,7 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
                     # Revertir cambios
                     rarity_probabilities[self.rarity] = prob_anterior
                     # Restaurar probabilidades por defecto para C temporalmente
-                    rarity_probabilities["C"] = 0.680
+                    rarity_probabilities["N"] = 0.770
                     return
             
             # Crear embed de confirmación
@@ -6742,7 +5854,7 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
                 
                 return rarity_callback
             
-            rarities = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+            rarities = ["G", "SP", "UR", "SSR", "R", "N"]
             for rarity in rarities:
                 emoji = get_rarity_emoji(rarity)
                 btn = Button(label=f"Modificar {rarity}", style=discord.ButtonStyle.blurple, emoji=emoji)
@@ -6756,8 +5868,8 @@ class ModificarRateModal(discord.ui.Modal, title='🎰 Modificar Probabilidad'):
                 
                 global rarity_probabilities
                 rarity_probabilities = {
-                    "G": 0.005, "SP": 0.010, "UR": 0.015, "SSR": 0.030,
-                    "SR": 0.060, "N": 0.200, "C": 0.680
+                    "G": 0.010, "SP": 0.020, "UR": 0.035, "SSR": 0.065,
+                    "R": 0.100, "N": 0.770
                 }
                 
                 embed = discord.Embed(
@@ -7112,7 +6224,7 @@ async def rates(ctx):
     )
     
     # Mostrar probabilidades en orden de rareza
-    rarities_order = ["G", "SP", "UR", "SSR", "SR", "N", "C"]
+    rarities_order = ["G", "SP", "UR", "SSR", "R", "N"]
     
     for rarity in rarities_order:
         prob = rarity_probabilities.get(rarity, 0)
@@ -7211,6 +6323,72 @@ async def estado_gemas_fijas(ctx):
         f"⏰ **Tiempo restante:** {restante} minutos\n"
         f"👥 **Usuarios que reclamaron:** {len(active_gem_reward['claimed_users'])}"
     )
+
+    # ----------------------------
+# COMANDO PARA CANCELAR RECOMPENSA FIJA DE GEMAS
+# ----------------------------
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def cancelar_gemas_fijas(ctx):
+    """Cancela la recompensa fija de gemas activa (solo admins)"""
+    global active_gem_reward
+    
+    # Verificar si hay una recompensa activa
+    if active_gem_reward.get("amount", 0) == 0:
+        await ctx.send("❌ No hay ninguna recompensa fija de gemas activa.")
+        return
+    
+    # Guardar información de la recompensa cancelada para el mensaje
+    cantidad = active_gem_reward["amount"]
+    expira_en = active_gem_reward["expires_at"]
+    ahora = time.time()
+    
+    # Calcular tiempo restante
+    if expira_en > ahora:
+        tiempo_restante = expira_en - ahora
+        horas = int(tiempo_restante // 3600)
+        minutos = int((tiempo_restante % 3600) // 60)
+        tiempo_texto = f"{horas}h {minutos}m restantes"
+    else:
+        tiempo_texto = "Ya expirada"
+    
+    # Cancelar la recompensa
+    usuarios_que_reclamaron = len(active_gem_reward.get("claimed_users", set()))
+    
+    # Resetear la recompensa
+    active_gem_reward = {
+        "amount": 0,
+        "expires_at": 0,
+        "claimed_users": set()
+    }
+    
+    # Crear embed de confirmación
+    embed = discord.Embed(
+        title="❌ Recompensa Fija Cancelada",
+        description=f"Se ha cancelado la recompensa fija de {cantidad} gemas.",
+        color=discord.Color.red()
+    )
+    
+    embed.add_field(
+        name="📊 Estadísticas",
+        value=(
+            f"**Cantidad:** {cantidad} gemas\n"
+            f"**Tiempo restante:** {tiempo_texto}\n"
+            f"**Usuarios que reclamaron:** {usuarios_que_reclamaron}"
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="⚠️ Efecto",
+        value="Los usuarios ya no podrán reclamar esta recompensa con `!reward_gemas`",
+        inline=False
+    )
+    
+    embed.set_footer(text=f"Cancelada por {ctx.author.display_name}")
+    
+    await ctx.send(embed=embed) 
+
 
 
 # ----------------------------
@@ -7327,8 +6505,8 @@ class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
     """Modal para recoger la rareza y cantidad de cartas a vender."""
     
     rarity = discord.ui.TextInput(
-        label="Rareza de la Carta (Ej: C, N, SR)",
-        placeholder="Solo la letra de la rareza (Ej: C, N, SR)",
+        label="Rareza de la Carta (Ej: C, N, R)",
+        placeholder="Solo la letra de la rareza (Ej: C, N, R)",
         required=True,
         max_length=3
     )
@@ -7345,9 +6523,9 @@ class CardSellModal(discord.ui.Modal, title="💰 Vender Cartas Duplicadas"):
         rarity_input = self.rarity.value.upper()
         amount_input = self.amount.value.lower()
         
-        # Validar la rareza rápidamente (C, N, SR, etc.)
-        if rarity_input not in ['C', 'N', 'SR', 'SSR', 'UR', 'SP', 'G']: 
-            await interaction.response.send_message("❌ Rareza no reconocida. Usa C, N, SR, SSR, UR, SP o G.", ephemeral=True)
+        # Validar la rareza rápidamente (C, N, R, etc.)
+        if rarity_input not in ['N', 'R', 'SSR', 'UR', 'SP', 'G']: 
+            await interaction.response.send_message("❌ Rareza no reconocida. Usa N, R, SSR, UR, SP o G.", ephemeral=True)
             return
 
         # El comando !vender debe manejar la lógica de 'all' y la validación numérica
@@ -7395,10 +6573,6 @@ class GachaMenuView(View):
     async def pesca_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await invoke_command_from_interaction(interaction.client, interaction, "pesca")
 
-    # 🎯 EJECUCIÓN DIRECTA: !remate
-    @discord.ui.button(label="🏐 Remate", style=discord.ButtonStyle.secondary, emoji="🏐", row=0)
-    async def remate_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await invoke_command_from_interaction(interaction.client, interaction, "remate") 
 
     # --- FILA 2: INVENTARIO Y ECONOMÍA ---
     
@@ -7465,84 +6639,24 @@ async def menu_principal(ctx):
     view = GachaMenuView(ctx.author.id)
     await ctx.send(embed=embed, view=view)
 
-    
-    
-# ----------------------------
-# COMANDO !REMATE CORREGIDO
-# ----------------------------
-@bot.command(aliases=['spike'])
-async def remate(ctx):
-    """Permite al usuario realizar un remate de voleibol para ganar gemas."""
-    user_id = str(ctx.author.id)
-    now = time.time()
-
-    # 1. Verificar Cooldown
-    last_remate = user_last_remate.get(user_id, 0)
-    if now - last_remate < COOLDOWN_REMATE:
-        time_remaining = COOLDOWN_REMATE - (now - last_remate)
-        await ctx.send(f"❌ ¡Estás agotado! Debes esperar **{format_cooldown(time_remaining)}** para tu próximo salto y remate. 🏐")
-        return
-
-    # 2. Inicializar balance del usuario si no existe
-    if user_id not in user_balances:
-        user_balances[user_id] = 0
-
-    # 3. Simulación de la jugada
-    message = await ctx.send("🚀 ¡Preparando el salto y el ataque! ¿Será un punto o un bloqueo? (3 segundos)")
-    await asyncio.sleep(3)
-    
-    # Probabilidades: Punto Directo (55%), Bloqueado (30%), Fuera/Fallo (15%)
-    roll = random.random() 
-    
-    winnings = 0
-    outcome_message = ""
-
-    if roll < 0.55:  # 55% de probabilidad de Punto Directo
-        winnings = random.randint(30, 45)
-        user_balances[user_id] += winnings
-        
-        outcome_message = (
-            f"💥 **¡PUNTO DIRECTO!** Tu remate fue imparable, la pelota golpeó el suelo. "
-            f"Ganas **💎 {winnings}**."
-        )
-        
-    elif roll < 0.85:  # 30% de probabilidad de Bloqueo (0.55 a 0.85)
-        winnings = random.randint(5, 15) # Recompensa de consolación por forzar un error
-        user_balances[user_id] += winnings
-        
-        outcome_message = (
-            f"✋ El bloqueo fue sólido, pero la pelota se fue por la banda. ¡Punto para ti! "
-            f"Ganas una recompensa menor de **💎 {winnings}**."
-        )
-        
-    else:  # 15% de probabilidad de Fuera/Fallo (0.85 a 1.0)
-        
-        outcome_message = (
-            "😫 ¡Oh no! Le pegaste con mucha fuerza y el balón se fue **fuera** de la cancha. "
-            "Punto perdido, no ganas gemas esta vez."
-        )
-        
-    # 4. Actualizar Cooldown y Guardar Datos
-    user_last_remate[user_id] = now
-    save_data()
-    
-    await message.edit(content=f"🏐 {outcome_message}")
 
 # ----------------------------
 # COMANDO !PESCA CORREGIDO
 # ----------------------------
-@bot.command(aliases=['fish'])
+@bot.command()
 async def pesca(ctx):
     """Permite al usuario intentar pescar y ganar gemas."""
-    user_id = str(ctx.author.id)
+    user_id = ctx.author.id
     now = time.time()
-
-    # 1. Verificar Cooldown
-    last_fished = user_last_pesca.get(user_id, 0)
-    if now - last_fished < COOLDOWN_PESCA:
-        time_remaining = COOLDOWN_PESCA - (now - last_fished)
+    
+    # 1. Verificar Cooldown (Lógica idéntica a !casino)
+    if user_id in user_last_pesca and now - user_last_pesca[user_id] < COOLDOWN_PESCA:
+        time_remaining = COOLDOWN_PESCA - (now - user_last_pesca[user_id])
         await ctx.send(f"❌ ¡Aún no pican! Debes esperar **{format_cooldown(time_remaining)}** para volver a pescar.")
         return
+
+    # IMPORTANTE: Registramos el uso AQUÍ, justo después de la verificación.
+    user_last_pesca[user_id] = now  # <--- Registro de Cooldown (COMO EN !CASINO)
 
     # 2. Inicializar balance del usuario si no existe
     if user_id not in user_balances:
@@ -7583,9 +6697,401 @@ async def pesca(ctx):
 
         await message.edit(content=f"🎉 ¡Felicidades! {random.choice(success_messages)}")
         
-    # 4. Actualizar Cooldown y Guardar Datos
-    user_last_pesca[user_id] = now
+    # 4. Guardar Datos (Aseguramos que el balance se guarde)
+    # El registro del cooldown ya se hizo arriba, antes de la lógica de pesca.
     save_data()
+
+
+# ----------------------------
+# COMANDO !MINAR
+# ----------------------------
+
+@bot.command()
+async def minar(ctx):
+    """
+    Intenta minar gemas. 
+    1% de éxito (40 gemas) y 99% de fallo (1 gema), con cooldown de 1 minuto.
+    """
+    user_id = ctx.author.id
+    now = time.time()
+    
+    # Cooldown de 1 minuto (60 segundos) - Usa la constante definida arriba
+    COOLDOWN = COOLDOWN_MINAR 
+    
+    # 1. Verificar cooldown
+    if user_id in user_last_minar and now - user_last_minar[user_id] < COOLDOWN:
+        time_remaining = COOLDOWN - (now - user_last_minar[user_id])
+        await ctx.send(f"⛏️ **¡Espera!** Debes esperar {format_cooldown(time_remaining)} antes de volver a minar.")
+        return
+
+    # Actualizar el tiempo de uso
+    user_last_minar[user_id] = now
+    
+    # 2. Determinar el resultado
+    # 1% de probabilidad de éxito (0.01)
+    if random.random() <= 0.01:
+        # Éxito (1% de probabilidad)
+        reward_amount = 40
+        
+        add_balance(user_id, reward_amount)
+        save_data() # Guardar datos
+        
+        embed = discord.Embed(
+            title="💎 ¡ÉXITO! ¡VETA DE CRISTAL RARO!",
+            description=f"{ctx.author.mention} ha picado con éxito y encontrado **{format_gems(reward_amount)}**!",
+            color=discord.Color.green()
+        )
+        embed.add_field(name="Ganancia", value=f"+ {format_gems(reward_amount)}", inline=True)
+        embed.add_field(name="Balance Actual", value=format_gems(get_balance(user_id)), inline=True)
+        embed.set_footer(text=f"Próximo !minar en {format_cooldown(COOLDOWN)}")
+        await ctx.send(embed=embed)
+        
+    else:
+        # Fallo (99% de probabilidad)
+        reward_amount = 1 # 1 gema por intento fallido
+        
+        add_balance(user_id, reward_amount)
+        save_data() # Guardar datos
+        
+        fail_messages = [
+            "Solo encontraste algo de grava.",
+            "La roca estaba muy dura, pero al menos tienes una gema por el esfuerzo.",
+            "Tu pico se rompió, pero lograste recuperar una pequeña gema.",
+            "No encontraste nada valioso, solo una gema por la suerte."
+        ]
+        
+        embed = discord.Embed(
+            title="⛏️ Intento Fallido...",
+            description=f"{ctx.author.mention}, {random.choice(fail_messages)}",
+            color=discord.Color.red()
+        )
+        embed.add_field(name="Consuelo", value=f"+ {format_gems(reward_amount)}", inline=True)
+        embed.add_field(name="Balance Actual", value=format_gems(get_balance(user_id)), inline=True)
+        embed.set_footer(text=f"Próximo !minar en {format_cooldown(COOLDOWN)}")
+        await ctx.send(embed=embed)
+
+
+# ----------------------------
+# SISTEMA DE JEFE SEMANAL
+# ----------------------------
+
+# Tiempos / cooldowns
+COOLDOWN_JEFE_VICTORIA = 7 * 24 * 60 * 60  # 7 días en segundos
+COOLDOWN_JEFE_DERROTA = 3 * 60  # 3 minutos en segundos
+
+# Variables globales para el jefe semanal
+user_last_jefe = {}  # user_id -> {'timestamp': tiempo, 'resultado': 'victoria'/'derrota'}
+user_selections = {}
+
+# Lista de atributos para el jefe
+JEFE_ATRIBUTOS = ["Evasion", "Fuerza", "Reacción", "Defensa", "Velocidad", "IQ", "Carisma", "Precisión", "Energia", "Suerte"]
+
+# Diccionario para mapear atributos con/sin acentos
+ATRIBUTO_MAP = {
+    "Reacción": "Reaccion",
+    "Reaccion": "Reacción",
+    "Precisión": "Precision", 
+    "Precision": "Precisión"
+}
+
+# Orden de rareza de mayor a menor
+ORDEN_RAREZA = {
+    'S': 0,     # Sombra (más rara)
+    'E': 1,     # Edición Especial
+    'G': 2,
+    'SP': 3,
+    'UR': 4,
+    'SSR': 5,
+    'R': 6,
+    'N': 7      # Normal (menos rara)
+}
+
+def obtener_valor_atributo(card, atributo):
+    """Obtiene el valor de un atributo de una carta, manejando diferencias de nombres"""
+    stats = card.get("stats", {})
+    
+    # Intentar con el nombre exacto
+    if atributo in stats:
+        return stats[atributo]
+    
+    # Si no está, buscar nombre alternativo
+    nombre_alternativo = ATRIBUTO_MAP.get(atributo)
+    if nombre_alternativo and nombre_alternativo in stats:
+        return stats[nombre_alternativo]
+    
+    # Si no se encuentra, devolver 1 (valor por defecto)
+    return 1
+
+def format_cooldown(seconds):
+    """Formatea un tiempo en segundos a una cadena legible."""
+    if seconds < 60:
+        return f"{int(seconds)} segundos"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        seconds %= 60
+        return f"{int(minutes)} minutos y {int(seconds)} segundos"
+    elif seconds < 86400:
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        return f"{int(hours)} horas y {int(minutes)} minutos"
+    else:
+        days = seconds // 86400
+        hours = (seconds % 86400) // 3600
+        return f"{int(days)} días y {int(hours)} horas"
+
+@bot.command()
+async def jefe_semanal(ctx):
+    """Desafía al jefe semanal con una de tus cartas. ¡Recompensa: 1000 gemas!"""
+    user_id = ctx.author.id
+    now = time.time()
+    
+    # 1. Verificar cooldown
+    if user_id in user_last_jefe:
+        last_data = user_last_jefe[user_id]
+        tiempo_pasado = now - last_data['timestamp']
+        
+        # Determinar el cooldown según el resultado anterior
+        if last_data['resultado'] == 'victoria':
+            cooldown_necesario = COOLDOWN_JEFE_VICTORIA
+        else:  # derrota
+            cooldown_necesario = COOLDOWN_JEFE_DERROTA
+        
+        if tiempo_pasado < cooldown_necesario:
+            tiempo_restante = cooldown_necesario - tiempo_pasado
+            await ctx.send(f"⏳ **¡Debes esperar!** Ya has desafiado al jefe semanal recientemente.\n"
+                          f"Vuelve a intentarlo en **{format_cooldown(tiempo_restante)}**.")
+            return
+    
+    # 2. Verificar que el usuario tenga cartas
+    inventory = get_inventory(user_id)
+    if not inventory:
+        await ctx.send("❌ **No tienes cartas** para enfrentar al jefe semanal.\n"
+                      "Usa `!gacha` para obtener cartas primero.")
+        return
+    
+    # 3. ORDENAR CARTAS POR RAREZA (de más rara a menos rara)
+    for card in inventory:
+        if 'rareza' not in card:
+            card['rareza'] = 'N'
+    
+    inventory_ordenado = sorted(
+        inventory,
+        key=lambda x: ORDEN_RAREZA.get(x['rareza'], 8)
+    )
+    
+    # 4. Mensaje de introducción
+    intro_embed = discord.Embed(
+        title="👑 HAS DECIDIDO DESAFIAR A AQUEL QUE SE ALZA POR ENCIMA DE TODAS LAS RAZAS",
+        description=(
+            "Un silencio sepulcral desciende sobre el campo de batalla. "
+            "El aire se espesa con una energía ancestral mientras una figura monumental emerge de las sombras.\n\n"
+            "**『Yo soy el equilibrio, el juicio final, la prueba definitiva.』**\n"
+            "**『Mi poder trasciende lo concebible... excepto en un único aspecto.』**\n\n"
+            "¿Serás capaz de descubrir su debilidad y reclamar la gloria eterna?"
+        ),
+        color=discord.Color.dark_purple()
+    )
+    intro_embed.set_footer(text="Tienes 2 minutos para seleccionar tu carta")
+    
+    await ctx.send(embed=intro_embed)
+    
+    # 5. Generar jefe con debilidad aleatoria (pero no mostrarla aún)
+    debilidad = random.choice(JEFE_ATRIBUTOS)
+    jefe_stats = {atributo: 99 for atributo in JEFE_ATRIBUTOS}
+    jefe_stats[debilidad] = 1
+    
+    # 6. Mostrar lista de cartas ordenadas por rareza
+    lista_cartas = "**Tus cartas (ordenadas por rareza):**\n"
+    for i, card in enumerate(inventory_ordenado[:25]):
+        nombre = card['nombre']
+        rareza = card.get('rareza', 'N')
+        
+        emoji_rareza = {
+            'S': '👻',
+            'E': '🎃',
+            'G': '💎',
+            'SP': '✨',
+            'UR': '🔥',
+            'SSR': '⭐',
+            'R': '🔹',
+            'N': '⚪'
+        }.get(rareza, '⚪')
+        
+        nombre_display = nombre
+        if len(nombre) > 20:
+            nombre_display = nombre[:17] + "..."
+        
+        lista_cartas += f"**{i+1}.** {emoji_rareza} **{nombre_display}** ({rareza})\n"
+    
+    if len(inventory_ordenado) > 25:
+        lista_cartas += f"\n*(Mostrando 25 de {len(inventory_ordenado)} cartas)*"
+    
+    # 7. Crear embed principal SIN mostrar stats del jefe
+    embed = discord.Embed(
+        title="⚔️ ELECCIÓN DE LA CARTA LEGENDARIA",
+        description=(
+            f"{lista_cartas}\n\n"
+            f"**{ctx.author.display_name}**, para seleccionar una carta, usa:\n"
+            f"```!eleccion_jefe <número>```\n"
+            f"**Ejemplo:** `!eleccion_jefe 1` para seleccionar la primera carta\n\n"
+            f"**El jefe tiene una debilidad oculta, pero la batalla se decidirá por una estadística aleatoria.**\n"
+            f"**Recompensa por victoria:** {format_gems(1000)}\n\n"
+            f"**Cancelar desafío:** `!cancelar_jefe`"
+        ),
+        color=discord.Color.dark_gold()
+    )
+    
+    embed.set_footer(text="Tienes 2 minutos para seleccionar tu carta")
+    
+    await ctx.send(embed=embed)
+    
+    # 8. Guardar información para procesar la elección
+    user_selections[user_id] = {
+        'inventory': inventory_ordenado,
+        'jefe_stats': jefe_stats,
+        'jefe_debilidad': debilidad,
+        'timestamp': now,
+        'channel_id': ctx.channel.id
+    }
+
+@bot.command()
+async def eleccion_jefe(ctx, numero_carta: int):
+    """Selecciona una carta para enfrentar al jefe semanal"""
+    user_id = ctx.author.id
+    
+    # Verificar que el usuario tenga una selección activa
+    if user_id not in user_selections:
+        await ctx.send("❌ No tienes un desafío activo al jefe semanal. Usa `!jefe_semanal` primero.")
+        return
+    
+    selection_data = user_selections[user_id]
+    
+    # Verificar que el canal sea el correcto
+    if selection_data['channel_id'] != ctx.channel.id:
+        await ctx.send(f"❌ Debes seleccionar tu carta en el mismo canal donde iniciaste el desafío.")
+        return
+    
+    # Verificar tiempo (2 minutos)
+    if time.time() - selection_data['timestamp'] > 120:
+        await ctx.send("⏰ ¡Tiempo agotado! El desafío al jefe semanal ha expirado.")
+        del user_selections[user_id]
+        return
+    
+    inventory_ordenado = selection_data['inventory']
+    jefe_stats = selection_data['jefe_stats']
+    debilidad = selection_data['jefe_debilidad']
+    
+    # Verificar que el número sea válido
+    if numero_carta < 1 or numero_carta > len(inventory_ordenado):
+        await ctx.send(f"❌ Número inválido. Debes seleccionar un número entre 1 y {len(inventory_ordenado)}.")
+        return
+    
+    # Obtener la carta seleccionada
+    selected_card = inventory_ordenado[numero_carta - 1]
+    
+    # 1. PRIMERO: Elegir una stat ALEATORIA para la batalla (no siempre la débil)
+    stat_batalla = random.choice(JEFE_ATRIBUTOS)
+    
+    # 2. Obtener valores para la comparación
+    valor_jefe = jefe_stats[stat_batalla]  # Puede ser 99 o 1 (si coincide con la debilidad)
+    valor_carta = obtener_valor_atributo(selected_card, stat_batalla)
+    
+    # 3. Comparación: El jugador gana si su carta tiene MÁS puntos en esa stat
+    gana = valor_carta > valor_jefe
+    
+    # Limpiar la selección
+    del user_selections[user_id]
+    
+    # Crear embed de comparación
+    stats_jefe_str = "\n".join([f"• {atributo}: {valor}" for atributo, valor in jefe_stats.items()])
+    
+    embed_comparacion = discord.Embed(
+        title="⚔️ COMPARACIÓN DE ESTADÍSTICAS",
+        description=(
+            f"**Jefe Semanal - Estadísticas:**\n"
+            f"```\n{stats_jefe_str}\n```\n"
+            f"**Debilidad del jefe:** **{debilidad}** (valor: 1)\n"
+            f"**Stat de batalla (ALEATORIA):** **{stat_batalla}**\n"
+            f"**Valor del jefe en {stat_batalla}:** {valor_jefe}\n\n"
+            f"**Tu carta - {selected_card['nombre']} ({selected_card.get('rareza', 'N')})**\n"
+            f"**Tu valor en {stat_batalla}:** {valor_carta}\n\n"
+        ),
+        color=discord.Color.blue()
+    )
+    
+    await ctx.send(embed=embed_comparacion)
+    
+    # 4. Determinar resultado y aplicar cooldown correspondiente
+    if gana:
+        # VICTORIA - Cooldown: 1 semana
+        recompensa = 1000
+        add_balance(user_id, recompensa)
+        
+        embed_victoria = discord.Embed(
+            title="🎉 ¡VICTORIA CONTRA EL JEFE SEMANAL!",
+            description=(
+                f"**{ctx.author.mention} ha derrotado al jefe supremo!**\n\n"
+                f"Tu carta **{selected_card['nombre']}** ({selected_card.get('rareza', 'N')}) "
+                f"superó al jefe en **{stat_batalla}** ({valor_carta} > {valor_jefe}).\n\n"
+                f"**¡Recompensa obtenida: {format_gems(recompensa)}!**\n"
+                f"Nuevo balance: {format_gems(get_balance(user_id))}\n\n"
+                f"**Cooldown hasta el próximo desafío: 7 días**"
+            ),
+            color=discord.Color.gold()
+        )
+        
+        # Intentar mostrar la imagen de la carta si está disponible
+        try:
+            if "imagen" in selected_card and selected_card["imagen"]:
+                embed_victoria.set_thumbnail(url=selected_card["imagen"])
+        except:
+            pass
+        
+        await ctx.send(embed=embed_victoria)
+        
+        # Guardar resultado con timestamp y cooldown
+        user_last_jefe[user_id] = {
+            'timestamp': time.time(),
+            'resultado': 'victoria'
+        }
+        
+    else:
+        # DERROTA - Cooldown: 3 minutos
+        embed_derrota = discord.Embed(
+            title="💀 Derrota ante el Jefe Semanal",
+            description=(
+                f"**{ctx.author.mention} ha sido derrotado...**\n\n"
+                f"Tu carta **{selected_card['nombre']}** ({selected_card.get('rareza', 'N')}) "
+                f"no pudo superar al jefe en **{stat_batalla}** ({valor_carta} <= {valor_jefe}).\n\n"
+                f"El jefe semanal permanece invicto. ¡Vuelve a intentarlo en **3 minutos**!"
+            ),
+            color=discord.Color.dark_red()
+        )
+        
+        await ctx.send(embed=embed_derrota)
+        
+        # Guardar resultado con timestamp y cooldown
+        user_last_jefe[user_id] = {
+            'timestamp': time.time(),
+            'resultado': 'derrota'
+        }
+
+@bot.command()
+async def cancelar_jefe(ctx):
+    """Cancela el desafío al jefe semanal"""
+    user_id = ctx.author.id
+    
+    if user_id in user_selections:
+        del user_selections[user_id]
+        embed = discord.Embed(
+            title="❌ Desafío Cancelado",
+            description="Has cancelado el desafío al jefe semanal.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("❌ No tienes un desafío activo al jefe semanal.")
+
 
 # ----------------------------
 # EVENTO DE INICIO
@@ -7593,7 +7099,7 @@ async def pesca(ctx):
 @bot.event
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
-    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca, remate')
+    print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca')
     print(f'👑 Comandos de admin: dargemas, quitargemas, limpiar_inventario, quitarcarta, darcarta, reset_data, clear, interfaz')
 
 # ----------------------------
