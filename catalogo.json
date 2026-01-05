@@ -2137,6 +2137,182 @@
         "Energia": 93,
         "Suerte": 92
       }
+    },
+    {
+      "id": "E001",
+      "nombre": "Atsumu Dungeon King",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Atsumu_Dungeon_King_E.png",
+      "descripcion": "Atsumu Dungeon King (E)",
+      "stats": {
+        "Evasion": 82,
+        "Fuerza": 64,
+        "Reaccion": 89,
+        "Defensa": 53,
+        "Velocidad": 84,
+        "IQ": 89,
+        "Carisma": 87,
+        "Precision": 91,
+        "Energia": 83,
+        "Suerte": 76
+      }
+    },
+    {
+      "id": "E002",
+      "nombre": "Sung Jin-Woo",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Sung_Jin_Woo_E.png",
+      "descripcion": "Sung Jin-Woo (E)",
+      "stats": {
+        "Evasion": 72,
+        "Fuerza": 81,
+        "Reaccion": 79,
+        "Defensa": 69,
+        "Velocidad": 76,
+        "IQ": 51,
+        "Carisma": 60,
+        "Precision": 74,
+        "Energia": 78,
+        "Suerte": 62
+      }
+    },
+    {
+      "id": "E003",
+      "nombre": "Rin Itoshi",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Rin_Itoshi_E.png",
+      "descripcion": "Rin Itoshi (E)",
+      "stats": {
+        "Evasion": 82,
+        "Fuerza": 78,
+        "Reaccion": 86,
+        "Defensa": 78,
+        "Velocidad": 84,
+        "IQ": 88,
+        "Carisma": 52,
+        "Precision": 90,
+        "Energia": 80,
+        "Suerte": 66
+      }
+    },
+    {
+      "id": "E004",
+      "nombre": "Shōyō Hinata",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Hinata_E.png",
+      "descripcion": "Shōyō Hinata (E)",
+      "stats": {
+        "Evasion": 75,
+        "Fuerza": 70,
+        "Reaccion": 78,
+        "Defensa": 60,
+        "Velocidad": 79,
+        "IQ": 50,
+        "Carisma": 73,
+        "Precision": 72,
+        "Energia": 77,
+        "Suerte": 64
+      }
+    },
+    {
+      "id": "E005",
+      "nombre": "Rintarō Suna",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Rintaro_Suna_E.png",
+      "descripcion": "Rintarō Suna (E)",
+      "stats": {
+        "Evasion": 70,
+        "Fuerza": 66,
+        "Reaccion": 76,
+        "Defensa": 73,
+        "Velocidad": 67,
+        "IQ": 51,
+        "Carisma": 58,
+        "Precision": 68,
+        "Energia": 69,
+        "Suerte": 60
+      }
+    },
+    {
+      "id": "E006",
+      "nombre": "Rin Itoshi Egoísta Supremo",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Rin_Itoshi_Egoista_Supremo_E.png",
+      "descripcion": "Rin Itoshi Egoísta Supremo (E)",
+      "stats": {
+        "Evasion": 74,
+        "Fuerza": 72,
+        "Reaccion": 80,
+        "Defensa": 64,
+        "Velocidad": 76,
+        "IQ": 78,
+        "Carisma": 51,
+        "Precision": 76,
+        "Energia": 75,
+        "Suerte": 62
+      }
+    },
+    {
+      "id": "E007",
+      "nombre": "Atsumu y Osamu",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Atsumu_y_Osamu_E.png",
+      "descripcion": "Atsumu y Osamu (E)",
+      "stats": {
+        "Evasion": 82,
+        "Fuerza": 64,
+        "Reaccion": 88,
+        "Defensa": 53,
+        "Velocidad": 84,
+        "IQ": 93,
+        "Carisma": 87,
+        "Precision": 92,
+        "Energia": 83,
+        "Suerte": 76
+      }
+    },
+    {
+      "id": "E008",
+      "nombre": "Bokuto y Akaashi",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Bokuto_y_Akaashi_E.png",
+      "descripcion": "Bokuto y Akaashi (E)",
+      "stats": {
+        "Evasion": 78,
+        "Fuerza": 90,
+        "Reaccion": 86,
+        "Defensa": 62,
+        "Velocidad": 84,
+        "IQ": 50,
+        "Carisma": 85,
+        "Precision": 82,
+        "Energia": 88,
+        "Suerte": 70
+      }
     }
   ]
 }
