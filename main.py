@@ -1337,271 +1337,156 @@ class EditarStatModal(discord.ui.Modal, title='✏️ Editar Estadística'):
         )
 
 # ----------------------------
-# COMANDO DE AYUDA (Actualizado)
+# COMANDO DE AYUDA ACTUALIZADO (VERSIÓN SIMPLIFICADA - SIN PAGINACIÓN)
 # ----------------------------
 
 @bot.command()
 async def ayuda(ctx):
-    """Muestra todos los comandos disponibles para usuarios"""
+    """Muestra todos los comandos disponibles para usuarios en una sola lista"""
     
-    class AyudaPaginas(View):
-        def __init__(self):
-            super().__init__(timeout=120)
-            self.current_page = 0
-            self.message = None
-        
-        async def send_page(self, page_num):
-            if page_num == 0:
-                embed = await self.page_economia()
-            elif page_num == 1:
-                embed = await self.page_inventario()
-            elif page_num == 2:
-                embed = await self.page_duelos()
-            elif page_num == 3:
-                embed = await self.page_admin_info()
-            
-            if self.message:
-                await self.message.edit(embed=embed, view=self)
-            else:
-                self.message = await ctx.send(embed=embed, view=self)
-        
-        async def page_economia(self):
-            embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 1/4",
-                description="**Sistema de Economía y Cartas**",
-                color=discord.Color.blue()
-            )
-            
-            embed.add_field(
-                name="🎲 **!gacha**",
-                value="Tirada gratuita cada 4 horas",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="💰 **!gacha_comprar**",
-                value="Compra tiradas (1/5/10)",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="💼 **!trabajar**",
-                value="Gana 20-40 gemas (4h cooldown)",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🎁 **!diaria**",
-                value="80 gemas diarias",
-                inline=True
-            )
-
-            embed.add_field(
-                name="🎰 **!rates**",
-                value="Muestra probabilidades del gacha",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🎴 **Rarezas**",
-                value="G(0.5%) SP(1%) UR(1.5%) SSR(3%) R(6%) N(20%) C(68%)",
-                inline=False
-            )
-            
-            embed.set_footer(text="Página 1/4 - Usa los botones para navegar")
-            return embed
-        
-        async def page_inventario(self):
-            embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 2/4",
-                description="**Gestión de Inventario y Ventas**",
-                color=discord.Color.green()
-            )
-            
-            embed.add_field(
-                name="📦 **!inventario**",
-                value="Cartas en carrusel",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="📋 **!inventario_personal**",
-                value="Lista completa en MD",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="📓 **!album**",
-                value="Cartas únicas 4x4",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🏷️ **!vender**",
-                value="Vende 1 carta",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="💰 **!vender_mayoreo**",
-                value="Vende múltiples cartas",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🎴 **!vender_rareza**",
-                value="Vende por rareza",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🔄 **!intercambio**",
-                value="Intercambia cartas",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="❌ **!cancelar_intercambio**",
-                value="Cancela intercambio",
-                inline=True
-            )
-            
-            embed.set_footer(text="Página 2/4 - Usa los botones para navegar")
-            return embed
-        
-        async def page_duelos(self):
-            embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 3/5",
-                description="**Sistema de Duelos PvP**",
-                color=discord.Color.red()
-            )
-            
-            embed.add_field(
-                name="⚔️ **!dueloamistoso**",
-                value="3 rondas sin apuestas",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="⚔️ **!duelohonor**",
-                value="5 rondas con apuestas",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="✅ **!aceptar_duelo**",
-                value="Acepta duelo pendiente",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="❌ **!rechazar_duelo**",
-                value="Rechaza duelo",
-                inline=True
-            )
-            
-            embed.add_field(
-                name="🚫 **!cancelar_duelo**",
-                value="Cancela duelo",
-                inline=True
-            )
-            
-            embed.set_footer(text="Página 3/4 - Usa los botones para navegar")
-            return embed
-                    
-        async def page_admin_info(self):
-            embed = discord.Embed(
-                title="🎮 **Comandos de Project-KC APP** - Página 4/4",
-                description="**Comandos de Admin e Información**",
-                color=discord.Color.purple()
-            )
-            
-            admin_commands = """
-            **👑 Comandos de Administrador:**
-            • `!interfaz` - Panel admin
-            • `!modificar_rates` - Modificar probabilidades gacha
-            • `!subir_imagen` - Subir imagen carta
-            • `!dargemas` - Dar gemas
-            • `!quitargemas` - Quitar gemas  
-            • `!darcarta` - Regalar carta
-            • `!limpiar_inventario` - Limpiar inventario
-            • `!quitarcarta` - Eliminar carta
-            • `!reset_data` - Resetear datos
-            • `!clear` - Borrar mensajes
-            • `!recompensa_tiempo` - Recompensa temporal
-            • `!backup_now` - Backup manual
-            • `!borrar_backups` - Eliminar backups
-            • `!listar_backups` - Listar backups
-            • `!backup_status` - Estado backup
-            • `!ping_dashboard_cmd` - Probar dashboard
-            """
-            
-            embed.add_field(
-                name="🛠️ **Administración**",
-                value=admin_commands,
-                inline=False
-            )
-
-            embed.add_field(
-                name="🎰 **Comandos de Rates**",
-                value=(
-                    "• `!rates` - Ver probabilidades actuales (Todos)\n"
-                    "• `!modificar_rates` - Modificar probabilidades (Admin)"
-                ),
-                inline=False
-            )
-            
-            embed.add_field(
-                name="💡 **Sistemas Disponibles**",
-                value="Cartas • Intercambios • Duelos PvP • Recompensas • Backup • Dashboard • Álbum • Sistema de Rates",
-                inline=False
-            )
-            
-            embed.add_field(
-                name="❓ **Ayuda**",
-                value="Usa `!ayuda` para ver este menú nuevamente",
-                inline=False
-            )
-            
-            embed.set_footer(text="Página 5/5 - Comandos de administrador requieren permisos")
-            return embed
-
-        @discord.ui.button(label="⬅️ Anterior", style=discord.ButtonStyle.blurple)
-        async def prev_callback(self, interaction, button):
-            if interaction.user.id != ctx.author.id:
-                await interaction.response.send_message("❌ Solo puedes navegar tu propia ayuda.", ephemeral=True)
-                return
-                
-            self.current_page = (self.current_page - 1) % 5
-            await interaction.response.defer()
-            await self.send_page(self.current_page)
-
-        @discord.ui.button(label="Siguiente ➡️", style=discord.ButtonStyle.blurple)
-        async def next_callback(self, interaction, button):
-            if interaction.user.id != ctx.author.id:
-                await interaction.response.send_message("❌ Solo puedes navegar tu propia ayuda.", ephemeral=True)
-                return
-                
-            self.current_page = (self.current_page + 1) % 5
-            await interaction.response.defer()
-            await self.send_page(self.current_page)
-        
-        @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red)
-        async def close_callback(self, interaction, button):
-            if interaction.user.id != ctx.author.id:
-                await interaction.response.send_message("❌ Solo puedes cerrar tu propia ayuda.", ephemeral=True)
-                return
-            
-            for item in self.children:
-                item.disabled = True
-            
-            await interaction.response.edit_message(view=self)
-            self.stop()
-
-    # Iniciar con la primera página
-    view = AyudaPaginas()
-    await view.send_page(0)
-
+    # Determinar si el usuario es administrador
+    es_admin = ctx.author.guild_permissions.administrator
+    
+    embed = discord.Embed(
+        title="🎮 **COMANDOS DISPONIBLES - PROJECT-KC**",
+        description="Lista completa de comandos disponibles. ¡Usa `!ayuda` para ver este menú nuevamente!",
+        color=discord.Color.blue()
+    )
+    
+    # 🔹 ECONOMÍA Y GEMAS
+    embed.add_field(
+        name="💰 **ECONOMÍA Y GEMAS**",
+        value=(
+            "• `!gacha` - Tirada gratuita cada 4 horas\n"
+            "• `!gacha_comprar [1/5/10]` - Compra tiradas con gemas\n"
+            "• `!trabajar` - Gana 20-40 gemas (4h cooldown)\n"
+            "• `!casino` - Tragaperras (1h cooldown)\n"
+            "• `!pesca` - Minijuego de pesca (2h cooldown)\n"
+            "• `!minar` - Minijuego de minería (1min cooldown)\n"
+            "• `!diaria` - Recompensa diaria de 80 gemas\n"
+            "• `!rob @usuario` - Roba gemas a otro usuario (30min cooldown)"
+        ),
+        inline=False
+    )
+    
+    # ⚔️ DUELOS PVP
+    embed.add_field(
+        name="⚔️ **SISTEMA DE DUELOS PVP**",
+        value=(
+            "• `!dueloamistoso @usuario` - Duelo amistoso (3 rondas)\n"
+            "• `!duelohonor @usuario [rareza]` - Duelo con apuestas\n"
+            "• `!aceptar_duelo` - Acepta duelo pendiente\n"
+            "• `!rechazar_duelo` - Rechaza duelo pendiente\n"
+            "• `!cancelar_duelo` - Cancela duelos pendientes"
+        ),
+        inline=False
+    )
+    
+    # 📦 GESTIÓN DE CARTAS
+    embed.add_field(
+        name="📦 **GESTIÓN DE CARTAS**",
+        value=(
+            "• `!inventario` - Cartas en carrusel\n"
+            "• `!inventario_personal` - Lista completa en MD\n"
+            "• `!album` - Cartas únicas en formato 4x4\n"
+            "• `!vender` - Vende cartas una por una\n"
+            "• `!vender_mayoreo` - Vende múltiples cartas\n"
+            "• `!vender_rareza [rareza]` - Vende por rareza\n"
+            "• `!intercambio @usuario` - Intercambia cartas\n"
+            "• `!cancelar_intercambio` - Cancela intercambio"
+        ),
+        inline=False
+    )
+    
+    # 🎮 MINIJUEGOS
+    embed.add_field(
+        name="🎮 **MINIJUEGOS**",
+        value=(
+            "• `!adivina` - Adivina el número (1h cooldown)\n"
+            "• `!jefe_semanal` - Desafía al jefe semanal\n"
+            "• `!eleccion_jefe [número]` - Selecciona carta para jefe\n"
+            "• `!cancelar_jefe` - Cancela desafío al jefe"
+        ),
+        inline=False
+    )
+    
+    # 🎁 RECOMPENSAS
+    embed.add_field(
+        name="🎁 **RECOMPENSAS Y ELECCIONES**",
+        value=(
+            "• `!recibir_recompensa` - Reclama recompensa temporal\n"
+            "• `!estado_recompensa` - Estado de recompensa activa\n"
+            "• `!eleccion_recompensa` - Reclama elección global\n"
+            "• `!recibir_gemas` - Reclama recompensa fija de gemas"
+        ),
+        inline=False
+    )
+    
+    # ℹ️ INFORMACIÓN
+    embed.add_field(
+        name="ℹ️ **INFORMACIÓN Y UTILIDAD**",
+        value=(
+            "• `!espera` / `!cd` - Muestra todos los cooldowns\n"
+            "• `!rates` - Probabilidades del gacha\n"
+            "• `!status` - Estado del bot y servicios\n"
+            "• `!menu_principal` - Menú con botones interactivos"
+        ),
+        inline=False
+    )
+    
+    # 🛠️ COMANDOS DE ADMINISTRADOR (solo si es admin)
+    if es_admin:
+        embed.add_field(
+            name="👑 **COMANDOS DE ADMINISTRADOR**",
+            value=(
+                "• `!pausa` / `!continuar` - Control modo mantenimiento\n"
+                "• `!interfaz` - Panel de gestión de cartas\n"
+                "• `!subir_imagen [id]` - Sube imagen de carta\n"
+                "• `!modificar_rates` - Cambia probabilidades gacha\n"
+                "• `!recompensa_tiempo [id] [min]` - Crea recompensa temporal\n"
+                "• `!cancelar_recompensa` - Cancela recompensa\n"
+                "• `!dargemas @usuario [cantidad]` - Da gemas\n"
+                "• `!quitargemas @usuario [cantidad]` - Quita gemas\n"
+                "• `!darcarta @usuario [id]` - Regala carta\n"
+                "• `!quitarcarta @usuario [id]` - Elimina carta\n"
+                "• `!limpiar_inventario @usuario` - Limpia inventario\n"
+                "• `!clear [cantidad]` - Borra mensajes\n"
+                "• `!reset_data` - Resetea todos los datos\n"
+                "• `!backup_now` - Backup manual\n"
+                "• `!backup_status` - Estado backup\n"
+                "• `!listar_backups` - Lista backups\n"
+                "• `!borrar_backups` - Elimina backups\n"
+                "• `!eleccion_carta [id1] [id2]` - Crea elección global\n"
+                "• `!cancelar_eleccion` - Cancela elección\n"
+                "• `!gemas_fijas [cant] [horas]` - Recompensa fija gemas\n"
+                "• `!cancelar_gemas_fijas` - Cancela recompensa fija\n"
+                "• `!estado_gemas_fijas` - Estado recompensa fija"
+            ),
+            inline=False
+        )
+    
+    # 📊 SISTEMA DE RATES
+    embed.add_field(
+        name="🎰 **PROBABILIDADES ACTUALES DEL GACHA**",
+        value=(
+            "• **G (Galaxia)**: 1.0%\n"
+            "• **SP (Special)**: 2.0%\n"
+            "• **UR (Ultra Raro)**: 3.5%\n"
+            "• **SSR (SSR)**: 6.5%\n"
+            "• **R (Raro)**: 10.0%\n"
+            "• **N (Normal)**: 77.0%"
+        ),
+        inline=False
+    )
+    
+    # 📝 NOTAS FINALES
+    footer_text = "¡Usa !ayuda para ver este menú nuevamente!"
+    if es_admin:
+        footer_text += " | Eres administrador 👑"
+    
+    embed.set_footer(text=footer_text)
+    
+    await ctx.send(embed=embed)
     
 # ----------------------------
 # SISTEMA DE INTERCAMBIO CORREGIDO
