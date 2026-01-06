@@ -32,12 +32,12 @@ for card in catalog_cards:
 
 # Nuevas probabilidades que incluyen UR, SP y L
 rarity_probabilities = {
-    "G": 0.010,   # Galaxia (1%) - Aumentado de 0.5%
-    "SP": 0.020,  # Special (2%) - Aumentado de 1%
-    "UR": 0.030,  # Ultra Raro (3%) - Aumentado de 1.5%
-    "SSR": 0.060, # Super Super Raro (6%) - Aumentado de 3%
-    "R": 0.120,  # Super Raro (12%) - Aumentado de 6%
-    "N": 0.400,   # Normal (40%) - Aumentado de 20%
+    "G": 0.0033,   # Galaxia (0.33%) - reducida a 1/3 de 1%
+    "SP": 0.0067,  # Special (0.67%) - reducida a 1/3 de 2%
+    "UR": 0.0117,  # Ultra Raro (1.17%) - reducida a 1/3 de 3.5%
+    "SSR": 0.0680, # Super Super Raro (6.80%) - aumentada de 6.5%
+    "R": 0.1046,   # Super Raro (10.46%) - aumentada de 10%
+    "N": 0.8057,   # Normal (80.57%) - aumentada de 77%
 }
 
 # ----------------------------
@@ -1468,12 +1468,12 @@ async def ayuda(ctx):
     embed.add_field(
         name="🎰 **PROBABILIDADES ACTUALES DEL GACHA**",
         value=(
-            "• **G (Galaxia)**: 1.0%\n"
-            "• **SP (Special)**: 2.0%\n"
-            "• **UR (Ultra Raro)**: 3.5%\n"
-            "• **SSR (SSR)**: 6.5%\n"
-            "• **R (Raro)**: 10.0%\n"
-            "• **N (Normal)**: 77.0%"
+            "• **G (Galaxia)**: 0.33%\n"
+            "• **SP (Special)**: 0.67%\n"
+            "• **UR (Ultra Raro)**: 1.17%\n"
+            "• **SSR (SSR)**: 6.8%\n"
+            "• **R (Raro)**: 10.46%\n"
+            "• **N (Normal)**: 80.57%"
         ),
         inline=False
     )
@@ -2347,12 +2347,12 @@ async def cancelar_recompensa(ctx):
 
 # Nuevas probabilidades que incluyen todas las rarezas del gacha
 rarity_probabilities = {
-    "G": 0.010,   # Galaxia (1%) - aumentado de 0.5%
-    "SP": 0.020,  # Special (2%) - aumentado de 1%
-    "UR": 0.035,  # Ultra Raro (3.5%) - aumentado de 1.5%
-    "SSR": 0.065, # Super Super Raro (6.5%) - aumentado de 3%
-    "R": 0.100,  # Super Raro (10%) - aumentado de 6%
-    "N": 0.770,   # Normal (77%) - aumentado de 20%
+    "G": 0.0033,   # Galaxia (0.33%) - reducida a 1/3 de 1%
+    "SP": 0.0067,  # Special (0.67%) - reducida a 1/3 de 2%
+    "UR": 0.0117,  # Ultra Raro (1.17%) - reducida a 1/3 de 3.5%
+    "SSR": 0.0680, # Super Super Raro (6.80%) - aumentada de 6.5%
+    "R": 0.1046,   # Super Raro (10.46%) - aumentada de 10%
+    "N": 0.8057,   # Normal (80.57%) - aumentada de 77%
 }
 
 # 🎲 Gacha gratuita
