@@ -142,7 +142,7 @@ COOLDOWN_TRABAJAR = 4 * 3600   # !trabajar (4 horas)
 COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
 COOLDOWN_MINAR = 60            # !minar (1 minuto)
-COOLDOWN_JEFE = 7 * 24 * 3600 
+
 
 def format_cooldown(seconds):
     """Convierte segundos en un formato de horas, minutos y segundos (Ej: 1h 30m 5s)."""
@@ -183,7 +183,6 @@ async def espera(ctx):
         ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), 
         ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA),
         ("⛏️ Minar", user_last_minar, COOLDOWN_MINAR),
-        ("👑 Jefe Semanal", user_last_jefe, COOLDOWN_JEFE),
     ]
     
     cooldowns_text = []
