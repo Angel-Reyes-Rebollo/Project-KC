@@ -6843,22 +6843,20 @@ async def jefe_semanal(ctx):
 async def eleccion_jefe(ctx, numero_carta: int):
     """Selecciona una carta para enfrentar al jefe semanal"""
     user_id = ctx.author.id
+    now = time.time() # Usamos una variable de tiempo actual
     
-    # Verificar que el usuario tenga una selección activa
     if user_id not in user_selections:
-        await ctx.send("❌ No tienes un desafío activo al jefe semanal. Usa `!jefe_semanal` primero.")
+        await ctx.send("❌ No tienes un desafío activo. Usa `!jefe_semanal` primero.")
         return
     
     selection_data = user_selections[user_id]
     
-    # Verificar que el canal sea el correcto
     if selection_data['channel_id'] != ctx.channel.id:
-        await ctx.send(f"❌ Debes seleccionar tu carta en el mismo canal donde iniciaste el desafío.")
+        await ctx.send(f"❌ Debes seleccionar tu carta en el mismo canal.")
         return
     
-    # Verificar tiempo (2 minutos)
-    if time.time() - selection_data['timestamp'] > 120:
-        await ctx.send("⏰ ¡Tiempo agotado! El desafío al jefe semanal ha expirado.")
+    if now - selection_data['timestamp'] > 120:
+        await ctx.send("⏰ ¡Tiempo agotado!")
         del user_selections[user_id]
         return
     
@@ -6866,100 +6864,83 @@ async def eleccion_jefe(ctx, numero_carta: int):
     jefe_stats = selection_data['jefe_stats']
     debilidad = selection_data['jefe_debilidad']
     
-    # Verificar que el número sea válido
     if numero_carta < 1 or numero_carta > len(inventory_ordenado):
-        await ctx.send(f"❌ Número inválido. Debes seleccionar un número entre 1 y {len(inventory_ordenado)}.")
+        await ctx.send(f"❌ Número inválido (1-{len(inventory_ordenado)}).")
         return
     
-    # Obtener la carta seleccionada
     selected_card = inventory_ordenado[numero_carta - 1]
-    
-    # 1. PRIMERO: Elegir una stat ALEATORIA para la batalla (no siempre la débil)
     stat_batalla = random.choice(JEFE_ATRIBUTOS)
-    
-    # 2. Obtener valores para la comparación
-    valor_jefe = jefe_stats[stat_batalla]  # Puede ser 99 o 1 (si coincide con la debilidad)
+    valor_jefe = jefe_stats[stat_batalla]
     valor_carta = obtener_valor_atributo(selected_card, stat_batalla)
     
-    # 3. Comparación: El jugador gana si su carta tiene MÁS puntos en esa stat
     gana = valor_carta > valor_jefe
-    
-    # Limpiar la selección
+
+    # --- CAMBIO CRÍTICO: GUARDAR COOLDOWN ANTES DEL ENVÍO ---
+    # Registramos el resultado de inmediato para bloquear el re-intento
+    resultado_str = 'victoria' if gana else 'derrota'
+    user_last_jefe[user_id] = {
+        'timestamp': now,
+        'resultado': resultado_str
+    }
+
+    # Limpiar la selección temporal
     del user_selections[user_id]
+    # -------------------------------------------------------
     
-    # Crear embed de comparación
+    # 1. Enviar comparación (Esto siempre debería salir)
     stats_jefe_str = "\n".join([f"• {atributo}: {valor}" for atributo, valor in jefe_stats.items()])
-    
     embed_comparacion = discord.Embed(
         title="⚔️ COMPARACIÓN DE ESTADÍSTICAS",
         description=(
-            f"**Jefe Semanal - Estadísticas:**\n"
-            f"```\n{stats_jefe_str}\n```\n"
-            f"**Debilidad del jefe:** **{debilidad}** (valor: 1)\n"
-            f"**Stat de batalla (ALEATORIA):** **{stat_batalla}**\n"
-            f"**Valor del jefe en {stat_batalla}:** {valor_jefe}\n\n"
-            f"**Tu carta - {selected_card['nombre']} ({selected_card.get('rareza', 'N')})**\n"
-            f"**Tu valor en {stat_batalla}:** {valor_carta}\n\n"
+            f"**Stat de batalla:** **{stat_batalla}**\n"
+            f"**Jefe:** {valor_jefe} vs **Tú:** {valor_carta}\n\n"
+            f"**Debilidad real del jefe era:** {debilidad}"
         ),
         color=discord.Color.blue()
     )
-    
     await ctx.send(embed=embed_comparacion)
     
-    # 4. Determinar resultado y aplicar cooldown correspondiente
+    # 2. Procesar Victoria o Derrota
     if gana:
-        # VICTORIA - Cooldown: 1 semana
+        # 1. Dar la recompensa (Ya sabemos que esto funciona)
         recompensa = 1000
         add_balance(user_id, recompensa)
         
+        # 2. Intentar obtener el saldo, si falla usamos "---"
+        try:
+            nuevo_saldo = get_balance(user_id)
+        except:
+            nuevo_saldo = "Actualizado"
+
+        # 3. Mensaje de Victoria Súper Simple (Evita errores de formato)
         embed_victoria = discord.Embed(
-            title="🎉 ¡VICTORIA CONTRA EL JEFE SEMANAL!",
+            title="🎉 ¡VICTORIA CONTRA EL JEFE!",
             description=(
-                f"**{ctx.author.mention} ha derrotado al jefe supremo!**\n\n"
-                f"Tu carta **{selected_card['nombre']}** ({selected_card.get('rareza', 'N')}) "
-                f"superó al jefe en **{stat_batalla}** ({valor_carta} > {valor_jefe}).\n\n"
-                f"**¡Recompensa obtenida: {format_gems(recompensa)}!**\n"
-                f"Nuevo balance: {format_gems(get_balance(user_id))}\n\n"
-                f"**Cooldown hasta el próximo desafío: 7 días**"
+                f"**{ctx.author.display_name}**, ¡has ganado!\n\n"
+                f"Tu carta **{selected_card['nombre']}** fue superior.\n"
+                f"**Premio:** +{recompensa} gemas.\n"
+                f"**Saldo:** {nuevo_saldo}\n\n"
+                f"📅 Vuelve en 7 días."
             ),
-            color=discord.Color.gold()
+            color=0xFFD700 # Color Dorado
         )
         
-        # Intentar mostrar la imagen de la carta si está disponible
-        try:
-            if "imagen" in selected_card and selected_card["imagen"]:
-                embed_victoria.set_thumbnail(url=selected_card["imagen"])
-        except:
-            pass
-        
+        # Solo intentamos poner la imagen si existe y es un texto válido
+        if selected_card.get("imagen"):
+            img_url = str(selected_card["imagen"])
+            if img_url.startswith("http"):
+                embed_victoria.set_thumbnail(url=img_url)
+
+        # 4. Enviar el mensaje final
         await ctx.send(embed=embed_victoria)
-        
-        # Guardar resultado con timestamp y cooldown
-        user_last_jefe[user_id] = {
-            'timestamp': time.time(),
-            'resultado': 'victoria'
-        }
-        
+            
     else:
-        # DERROTA - Cooldown: 3 minutos
         embed_derrota = discord.Embed(
             title="💀 Derrota ante el Jefe Semanal",
-            description=(
-                f"**{ctx.author.mention} ha sido derrotado...**\n\n"
-                f"Tu carta **{selected_card['nombre']}** ({selected_card.get('rareza', 'N')}) "
-                f"no pudo superar al jefe en **{stat_batalla}** ({valor_carta} <= {valor_jefe}).\n\n"
-                f"El jefe semanal permanece invicto. ¡Vuelve a intentarlo en **3 minutos**!"
-            ),
+            description=f"No pudiste superar al jefe en **{stat_batalla}**. Reintento en 3 min.",
             color=discord.Color.dark_red()
         )
-        
         await ctx.send(embed=embed_derrota)
-        
-        # Guardar resultado con timestamp y cooldown
-        user_last_jefe[user_id] = {
-            'timestamp': time.time(),
-            'resultado': 'derrota'
-        }
 
 @bot.command()
 async def cancelar_jefe(ctx):
@@ -6976,6 +6957,9 @@ async def cancelar_jefe(ctx):
         await ctx.send(embed=embed)
     else:
         await ctx.send("❌ No tienes un desafío activo al jefe semanal.")
+
+
+
 
 # ----------------------------
 # EVENTO DE INICIO
