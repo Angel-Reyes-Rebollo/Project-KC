@@ -2103,16 +2103,16 @@
       "imagen": "images/Sae_Itoshi_G.png",
       "descripcion": "Sae Itoshi (G)",
       "stats": {
-        "Evasion": 98,
-        "Fuerza": 88,
-        "Reaccion": 97,
-        "Defensa": 75,
-        "Velocidad": 95,
-        "IQ": 54,
-        "Carisma": 86,
-        "Precision": 96,
-        "Energia": 93,
-        "Suerte": 92
+        "Evasion": 54,
+        "Fuerza": 72,
+        "Reaccion": 95,
+        "Defensa": 78,
+        "Velocidad": 90,
+        "IQ": 99,
+        "Carisma": 84,
+        "Precision": 98,
+        "Energia": 89,
+        "Suerte": 91
       }
     }
     ,
@@ -2126,16 +2126,16 @@
       "imagen": "images/Shouei_Barou_G.png",
       "descripcion": "Shouei Barou (G)",
       "stats": {
-        "Evasion": 98,
-        "Fuerza": 88,
-        "Reaccion": 97,
-        "Defensa": 75,
-        "Velocidad": 95,
+        "Evasion": 86,
+        "Fuerza": 96,
+        "Reaccion": 91,
+        "Defensa": 76,
+        "Velocidad": 90,
         "IQ": 54,
-        "Carisma": 86,
-        "Precision": 96,
-        "Energia": 93,
-        "Suerte": 92
+        "Carisma": 93,
+        "Precision": 94,
+        "Energia": 92,
+        "Suerte": 88
       }
     },
     {
@@ -2312,6 +2312,119 @@
         "Precision": 82,
         "Energia": 88,
         "Suerte": 70
+      }
+      
+    },
+    {
+      "id": "E009",
+      "nombre": "All Might (STAFF)",
+      "rareza": "E",
+      "valor": 300,
+      "stock": "Unlimited",
+      "max_per_user": 200,
+      "imagen": "images/E009.png",
+      "descripcion": "All Might (STAFF)",
+      "stats": {
+        "Evasion": 88,
+        "Fuerza": 1,
+        "Reacción": 79,
+        "Defensa": 89,
+        "Velocidad": 90,
+        "IQ": 84,
+        "Carisma ": 1,
+        "Precisión": 90,
+        "Energia": 1,
+        "Suerte": 1,
+        "Carisma": 89
+      }
+    },
+    {
+      "id": "E0010",
+      "nombre": "All Might (ADMIN)",
+      "rareza": "E",
+      "valor": 600,
+      "stock": "Unlimited",
+      "max_per_user": 1,
+      "imagen": "images/E0010.png",
+      "descripcion": "All Might (ADMIN)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 1,
+        "Reacción": 90,
+        "Defensa": 90,
+        "Velocidad": 89,
+        "IQ": 89,
+        "Carisma ": 1,
+        "Precisión": 96,
+        "Energia": 1,
+        "Suerte": 1,
+        "Carisma": 90
+      }
+    },
+    {
+      "id": "E011",
+      "nombre": "Kuroo x Kenma ADN",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Kuroo_Kenma_ADN_E.png",
+      "descripcion": "Kuroo x Kenma ADN (E)",
+      "stats": {
+        "Evasion": 88,
+        "Fuerza": 91,
+        "Reaccion": 94,
+        "Defensa": 52,
+        "Velocidad": 92,
+        "IQ": 100,
+        "Carisma": 49,
+        "Precision": 100,
+        "Energia": 92,
+        "Suerte": 90
+      }
+    },
+    {
+      "id": "E012",
+      "nombre": "Bakugo x Deku ADN",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Bakugo_Deku_ADN_E.png",
+      "descripcion": "Bakugo x Deku ADN (E)",
+      "stats": {
+        "Evasion": 92,
+        "Fuerza": 91,
+        "Reaccion": 100,
+        "Defensa": 49,
+        "Velocidad": 100,
+        "IQ": 90,
+        "Carisma": 40,
+        "Precision": 93,
+        "Energia": 91,
+        "Suerte": 88
+      }
+    },
+    {
+      "id": "E013",
+      "nombre": "Bachira x Isagi ADN",
+      "rareza": "E",
+      "valor": 75,
+      "stock": "Limited",
+      "max_per_user": 200,
+      "imagen": "images/Bachira_Isagi_ADN_E.png",
+      "descripcion": "Bachira x Isagi ADN (E)",
+      "stats": {
+        "Evasion": 89,
+        "Fuerza": 100,
+        "Reaccion": 94,
+        "Defensa": 90,
+        "Velocidad": 93,
+        "IQ": 48,
+        "Carisma": 51,
+        "Precision": 89,
+        "Energia": 100,
+        "Suerte": 88
       }
     }
   ]

@@ -818,7 +818,7 @@ class AgregarCartaModalInicial(discord.ui.Modal, title='➕ Agregar Nueva Carta'
         ))
         self.add_item(discord.ui.TextInput(
             label='Rareza',
-            placeholder='C, N, R, SSR, UR, SP, L',
+            placeholder='N, R, SSR, UR, SP, G',
             required=True
         ))
         self.add_item(discord.ui.TextInput(
@@ -1201,9 +1201,9 @@ class EditarStatsFormView(View):
         modal = EditarStatModal(self.carta, "Evasion")
         await interaction.response.send_modal(modal)
     
-    @discord.ui.button(label="✏️ Editar Ataque", style=discord.ButtonStyle.blurple)
-    async def editar_ataque_callback(self, interaction, button):
-        modal = EditarStatModal(self.carta, "ataque")
+    @discord.ui.button(label="✏️ Editar Fuerza", style=discord.ButtonStyle.blurple)
+    async def editar_Fuerza_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Fuerza")
         await interaction.response.send_modal(modal)
     
     @discord.ui.button(label="✏️ Editar Reacción", style=discord.ButtonStyle.blurple)
@@ -1231,10 +1231,21 @@ class EditarStatsFormView(View):
         modal = EditarStatModal(self.carta, "Carisma")
         await interaction.response.send_modal(modal)
 
+    @discord.ui.button(label="✏️ Editar Energia", style=discord.ButtonStyle.blurple)
+    async def editar_Energia_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Energia")
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(label="✏️ Editar Suerte", style=discord.ButtonStyle.blurple)
+    async def editar_Suerte_callback(self, interaction, button):
+        modal = EditarStatModal(self.carta, "Suerte")
+        await interaction.response.send_modal(modal)
+
+
     @discord.ui.button(label="✏️ Editar Precisión", style=discord.ButtonStyle.blurple)
     async def editar_Precisión_callback(self, interaction, button):
         modal = EditarStatModal(self.carta, "Precisión")
-        await interaction.response.send_modal(modal)        
+        await interaction.response.send_modal(modal)                
     
     @discord.ui.button(label="💾 Guardar Cambios", style=discord.ButtonStyle.green)
     async def guardar_callback(self, interaction, button):
@@ -1247,13 +1258,15 @@ class EditarStatsFormView(View):
         
         stats = self.carta.get("stats", {})
         embed.add_field(name="Evasion", value=stats.get("Evasion", 1), inline=True)
-        embed.add_field(name="Ataque", value=stats.get("Ataque", 1), inline=True)
+        embed.add_field(name="Fuerza", value=stats.get("Fuerza", 1), inline=True)
         embed.add_field(name="Reacción", value=stats.get("Reacción", 1), inline=True)
         embed.add_field(name="Defensa", value=stats.get("Defensa", 1), inline=True)
         embed.add_field(name="Velocidad", value=stats.get("Velocidad", 1), inline=True)
         embed.add_field(name="IQ", value=stats.get("IQ", 1), inline=True)
         embed.add_field(name="Carisma", value=stats.get("Carisma", 1), inline=True)
         embed.add_field(name="Precisión", value=stats.get("Precisión", 1), inline=True)
+        embed.add_field(name="Energia", value=stats.get("Energia", 1), inline=True)
+        embed.add_field(name="Suerte", value=stats.get("Suerte", 1), inline=True)
         
         # Deshabilitar botones
         for item in self.children:
@@ -1321,13 +1334,15 @@ class EditarStatModal(discord.ui.Modal, title='✏️ Editar Estadística'):
         
         stat_names = {
             "Evasion": "Evasion",
-            "Ataque": "Ataque",
-            "Reacción": "Reacción", 
+            "Fuerza": "Fuerza", 
+            "Reacción": "Reacción",
             "Defensa": "Defensa",
             "Velocidad": "Velocidad",
             "IQ": "IQ",
             "Carisma": "Carisma",
-            "Precisión": "Precisión"
+            "Precisión": "Precisión",
+            "Energia": "Energia",
+            "Suerte": "Suerte"
         }
         
         await interaction.response.send_message(
@@ -4343,9 +4358,9 @@ async def diaria(ctx):
         restante = int((24 * 3600 - (now - user_last_daily[user_id])) / 3600)
         await ctx.send(f"🎁 Ya reclamaste tu recompensa diaria. Espera {restante} horas.")
         return
-    add_balance(user_id, 80)
+    add_balance(user_id, 160)
     user_last_daily[user_id] = now
-    await ctx.send(f"🎁 {ctx.author.mention} reclamó su recompensa diaria de {format_gems(80)}. Total: {format_gems(get_balance(user_id))}")
+    await ctx.send(f"🎁 {ctx.author.mention} reclamó su recompensa diaria de {format_gems(160)}. Total: {format_gems(get_balance(user_id))}")
 
 # 💎 Dar gemas (admins)
 @bot.command()
@@ -4634,7 +4649,7 @@ async def status(ctx):
     await ctx.send(embed=embed)
 
 # ----------------------------
-# COMANDO ALBUM
+# COMANDO ALBUM (CORREGIDO)
 # ----------------------------
 @bot.command()
 async def album(ctx):
@@ -4651,15 +4666,33 @@ async def album(ctx):
         await ctx.send(embed=embed)
         return
     
-    # Eliminar duplicados (usando el ID de la carta) y ordenar por rareza
+    # Definir orden de rarezas (basado en tu lista)
     rarity_order = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5}
     
-    # Crear diccionario para eliminar duplicados
+    # Función para obtener emoji de rareza (AÑADE ESTA FUNCIÓN SI NO EXISTE)
+    def get_rarity_emoji(rarity):
+        emoji_map = {
+            "G": "🌟",   # Galaxia
+            "SP": "✨",  # Special
+            "UR": "💎",  # Ultra Raro
+            "SSR": "🔥", # SSR
+            "R": "⭐",   # Raro
+            "N": "⚪",   # Normal
+            "C": "⚫"    # Común (por si acaso)
+        }
+        return emoji_map.get(rarity, "⚫")
+    
+    # Crear diccionario para eliminar duplicados (usando ID o nombre + rareza para eventos)
     unique_cards = {}
     for card in inventory:
-        card_id = card.get("id")
-        if card_id not in unique_cards:
-            unique_cards[card_id] = card
+        # Para cartas de evento, necesitas una clave única que incluya el evento
+        if card.get("evento"):  # Si es carta de evento
+            card_key = f"{card.get('id', '')}_{card.get('nombre', '')}_{card.get('evento', '')}"
+        else:
+            card_key = card.get("id", "")  # ID único para cartas normales
+        
+        if card_key not in unique_cards:
+            unique_cards[card_key] = card
     
     # Convertir a lista y ordenar por rareza
     unique_cards_list = list(unique_cards.values())
@@ -4670,104 +4703,24 @@ async def album(ctx):
     unique_cards_count = len(unique_cards_list)
     duplicates_count = total_cards - unique_cards_count
     
+    # Contar cartas por rareza
+    rarity_counts = {}
+    for card in unique_cards_list:
+        rarity = card.get("rareza", "N")
+        rarity_counts[rarity] = rarity_counts.get(rarity, 0) + 1
+    
     # Crear páginas de 4x4 (16 cartas por página)
     cards_per_page = 16
     pages = [unique_cards_list[i:i + cards_per_page] for i in range(0, len(unique_cards_list), cards_per_page)]
     
-    current_page = 0
-    
-    async def send_album_page(page_num):
-        """Envía una página específica del álbum"""
-        if page_num >= len(pages) or page_num < 0:
-            return None
-            
-        page_cards = pages[page_num]
-        
-        # Crear embed para la página
+    if not pages:  # Si no hay páginas (lista vacía)
         embed = discord.Embed(
-            title=f"📓 Colección de {ctx.author.display_name}",
-            description=f"Página {page_num + 1}/{len(pages)} | Cartas únicas: {unique_cards_count}/{total_cards}",
-            color=discord.Color.purple()
+            title="📓 Colección Vacía",
+            description="No tienes cartas únicas en tu colección.",
+            color=discord.Color.blue()
         )
-        
-        # Agregar estadísticas en la primera página
-        if page_num == 0:
-            embed.add_field(
-                name="📊 Estadísticas",
-                value=(
-                    f"• **Cartas totales:** {total_cards}\n"
-                    f"• **Cartas únicas:** {unique_cards_count}\n"
-                    f"• **Duplicados:** {duplicates_count}"
-                ),
-                inline=False
-            )
-        
-        # Crear grid 4x4 con imágenes
-        grid_size = 4
-        grid_text = ""
-        
-        for row in range(grid_size):
-            row_text = ""
-            for col in range(grid_size):
-                index = row * grid_size + col
-                if index < len(page_cards):
-                    card = page_cards[index]
-                    rarity = card.get("rareza", "N")
-                    rarity_emoji = get_rarity_emoji(rarity)
-                    row_text += f"{rarity_emoji} "
-                else:
-                    row_text += "⚫ "  # Espacio vacío
-            
-            grid_text += row_text + "\n"
-        
-        embed.add_field(
-            name=f"🎴 Cartas Únicas ({len(page_cards)} en esta página)",
-            value=grid_text,
-            inline=False
-        )
-        
-        # Agregar leyenda de rarezas
-        legend_text = (
-            f"{get_rarity_emoji('L')} Galaxia | "
-            f"{get_rarity_emoji('SP')} Special | "
-            f"{get_rarity_emoji('UR')} Ultra Raro\n"
-            f"{get_rarity_emoji('SSR')} SSR | "
-            f"{get_rarity_emoji('R')} R | "
-            f"{get_rarity_emoji('N')} Normal | "
-            f"{get_rarity_emoji('C')} Común"
-        )
-        embed.add_field(name="📖 Galaxia", value=legend_text, inline=False)
-        
-        # Mostrar miniaturas de las primeras 4 cartas de la página
-        if page_cards:
-            # Tomar hasta 4 cartas para mostrar como miniaturas
-            preview_cards = page_cards[:4]
-            for i, card in enumerate(preview_cards):
-                try:
-                    if os.path.exists(card.get("imagen", "")):
-                        file = discord.File(card["imagen"], filename=f"preview_{i}.png")
-                        embed.set_thumbnail(url=f"attachment://preview_{i}.png")
-                        # Solo mostrar una miniatura
-                        break
-                except:
-                    pass
-        
-        # Agregar lista de cartas en esta página (solo nombres)
-        if len(page_cards) <= 12:  # Mostrar lista si hay pocas cartas
-            cards_list = "\n".join([
-                f"{get_rarity_emoji(card.get('rareza', 'C'))} **{card['nombre']}**"
-                for card in page_cards
-            ])
-            if cards_list:
-                embed.add_field(
-                    name=f"📋 Cartas en esta página",
-                    value=cards_list,
-                    inline=False
-                )
-        
-        embed.set_footer(text=f"Página {page_num + 1}/{len(pages)} • Usa los botones para navegar")
-        
-        return embed
+        await ctx.send(embed=embed)
+        return
     
     # View para navegar el álbum
     class AlbumView(View):
@@ -4775,75 +4728,184 @@ async def album(ctx):
             super().__init__(timeout=180)
             self.current_page = 0
             self.message = None
+            self.pages = pages
             
         async def update_message(self):
-            embed = await send_album_page(self.current_page)
-            if embed and self.message:
-                # Intentar cargar imagen para la miniatura
-                page_cards = pages[self.current_page]
-                if page_cards:
-                    try:
-                        # Tomar la primera carta de la página para la miniatura
-                        first_card = page_cards[0]
-                        if os.path.exists(first_card.get("imagen", "")):
-                            file = discord.File(first_card["imagen"], filename="album_thumbnail.png")
-                            embed.set_thumbnail(url="attachment://album_thumbnail.png")
-                            await self.message.edit(embed=embed, view=self, attachments=[file])
-                            return
-                    except:
-                        pass
+            if self.current_page >= len(self.pages):
+                self.current_page = len(self.pages) - 1
+            if self.current_page < 0:
+                self.current_page = 0
+            
+            page_cards = self.pages[self.current_page]
+            
+            # Crear embed para la página
+            embed = discord.Embed(
+                title=f"📓 Colección de {ctx.author.display_name}",
+                description=f"Página {self.current_page + 1}/{len(self.pages)} | Cartas únicas: {unique_cards_count}/{total_cards}",
+                color=discord.Color.purple()
+            )
+            
+            # Agregar estadísticas en la primera página
+            if self.current_page == 0:
+                stats_text = (
+                    f"• **Cartas totales:** {total_cards}\n"
+                    f"• **Cartas únicas:** {unique_cards_count}\n"
+                    f"• **Duplicados:** {duplicates_count}\n\n"
+                    f"**Por rareza:**\n"
+                )
                 
+                # Agregar conteo por rareza
+                for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
+                    if rarity in rarity_counts:
+                        emoji = get_rarity_emoji(rarity)
+                        stats_text += f"{emoji} {rarity}: {rarity_counts[rarity]}\n"
+                
+                embed.add_field(
+                    name="📊 Estadísticas",
+                    value=stats_text,
+                    inline=False
+                )
+            
+            # Crear grid 4x4 con emojis
+            grid_size = 4
+            grid_text = ""
+            
+            for row in range(grid_size):
+                row_text = ""
+                for col in range(grid_size):
+                    index = row * grid_size + col
+                    if index < len(page_cards):
+                        card = page_cards[index]
+                        rarity = card.get("rareza", "N")
+                        rarity_emoji = get_rarity_emoji(rarity)
+                        
+                        # Marcar cartas de evento con diferente emoji
+                        if card.get("evento"):
+                            row_text += f"🎪 "  # Emoji especial para eventos
+                        else:
+                            row_text += f"{rarity_emoji} "
+                    else:
+                        row_text += "⬛ "  # Espacio vacío
+                
+                grid_text += row_text + "\n"
+            
+            embed.add_field(
+                name=f"🎴 Cartas Únicas ({len(page_cards)} en esta página)",
+                value=grid_text,
+                inline=False
+            )
+            
+            # Agregar lista de cartas en esta página
+            if page_cards:
+                cards_list = ""
+                for i, card in enumerate(page_cards):
+                    rarity = card.get("rareza", "N")
+                    emoji = get_rarity_emoji(rarity)
+                    
+                    # Marcar cartas de evento
+                    if card.get("evento"):
+                        cards_list += f"{emoji} **{card['nombre']}** 🎪 *({card.get('evento', 'Evento')})*\n"
+                    else:
+                        cards_list += f"{emoji} **{card['nombre']}**\n"
+                    
+                    # Limitar a 10 cartas en la lista para no hacerlo muy largo
+                    if i >= 9 and len(page_cards) > 10:
+                        cards_list += f"... y {len(page_cards) - 10} más"
+                        break
+                
+                if cards_list:
+                    embed.add_field(
+                        name="📋 Cartas en esta página:",
+                        value=cards_list,
+                        inline=False
+                    )
+            
+            # Leyenda de rarezas actualizada
+            legend_text = (
+                f"{get_rarity_emoji('G')} Galaxia | "
+                f"{get_rarity_emoji('SP')} Special | "
+                f"{get_rarity_emoji('UR')} Ultra Raro\n"
+                f"{get_rarity_emoji('SSR')} SSR | "
+                f"{get_rarity_emoji('R')} R | "
+                f"{get_rarity_emoji('N')} Normal"
+            )
+            
+            # Agregar leyenda de eventos si hay cartas de evento
+            event_cards = [c for c in page_cards if c.get("evento")]
+            if event_cards:
+                legend_text += f"\n🎪 = Carta de Evento"
+            
+            embed.add_field(name="📖 Leyenda", value=legend_text, inline=False)
+            
+            embed.set_footer(text=f"Página {self.current_page + 1}/{len(self.pages)} • Usa los botones para navegar")
+            
+            # Actualizar los botones
+            self.prev_button.disabled = (self.current_page == 0)
+            self.next_button.disabled = (self.current_page == len(self.pages) - 1)
+            
+            if self.message:
                 await self.message.edit(embed=embed, view=self)
-            elif embed:
-                # Para el primer mensaje, intentar incluir imagen
-                page_cards = pages[self.current_page]
-                if page_cards:
-                    try:
-                        first_card = page_cards[0]
-                        if os.path.exists(first_card.get("imagen", "")):
-                            file = discord.File(first_card["imagen"], filename="album_thumbnail.png")
-                            embed.set_thumbnail(url="attachment://album_thumbnail.png")
-                            self.message = await ctx.send(embed=embed, file=file, view=self)
-                            return
-                    except:
-                        pass
-                
+            else:
                 self.message = await ctx.send(embed=embed, view=self)
         
-        @discord.ui.button(label="⬅️ Anterior", style=discord.ButtonStyle.blurple)
+        @discord.ui.button(label="⬅️ Anterior", style=discord.ButtonStyle.blurple, custom_id="prev")
         async def prev_callback(self, interaction, button):
             if interaction.user.id != ctx.author.id:
                 await interaction.response.send_message("❌ Solo puedes navegar tu propia colección.", ephemeral=True)
                 return
-                
-            self.current_page = (self.current_page - 1) % len(pages)
-            await interaction.response.defer()
-            await self.update_message()
+            
+            if self.current_page > 0:
+                self.current_page -= 1
+                await interaction.response.defer()
+                await self.update_message()
         
-        @discord.ui.button(label="Siguiente ➡️", style=discord.ButtonStyle.blurple)
+        @discord.ui.button(label="Siguiente ➡️", style=discord.ButtonStyle.blurple, custom_id="next")
         async def next_callback(self, interaction, button):
             if interaction.user.id != ctx.author.id:
                 await interaction.response.send_message("❌ Solo puedes navegar tu propia colección.", ephemeral=True)
                 return
-                
-            self.current_page = (self.current_page + 1) % len(pages)
-            await interaction.response.defer()
-            await self.update_message()
+            
+            if self.current_page < len(self.pages) - 1:
+                self.current_page += 1
+                await interaction.response.defer()
+                await self.update_message()
         
-        @discord.ui.button(label="🖼️ Ver Cartas", style=discord.ButtonStyle.green)
+        @discord.ui.button(label="🖼️ Ver Cartas", style=discord.ButtonStyle.green, custom_id="view")
         async def view_cards_callback(self, interaction, button):
             if interaction.user.id != ctx.author.id:
                 await interaction.response.send_message("❌ Solo puedes ver tus propias cartas.", ephemeral=True)
                 return
             
-            # Mostrar las cartas de esta página en formato carrusel
-            page_cards = pages[self.current_page]
+            page_cards = self.pages[self.current_page]
             if page_cards:
-                await show_cards_carousel(interaction, page_cards, title=f"🎴 Cartas - Página {self.current_page + 1}")
+                # Mostrar las cartas de esta página
+                cards_text = "**Cartas en esta página:**\n\n"
+                for card in page_cards:
+                    rarity = card.get("rareza", "N")
+                    emoji = get_rarity_emoji(rarity)
+                    
+                    if card.get("evento"):
+                        cards_text += f"{emoji} **{card['nombre']}** 🎪\n"
+                        cards_text += f"   *Evento: {card.get('evento', 'Desconocido')}*\n"
+                    else:
+                        cards_text += f"{emoji} **{card['nombre']}**\n"
+                    
+                    # Información adicional si está disponible
+                    if card.get("descripcion"):
+                        cards_text += f"   {card['descripcion'][:50]}...\n"
+                    
+                    cards_text += "\n"
+                
+                embed = discord.Embed(
+                    title=f"🎴 Detalles - Página {self.current_page + 1}",
+                    description=cards_text[:4000],  # Limitar a 4000 caracteres
+                    color=discord.Color.green()
+                )
+                await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
                 await interaction.response.send_message("❌ No hay cartas en esta página.", ephemeral=True)
         
-        @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red)
+        @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red, custom_id="close")
         async def close_callback(self, interaction, button):
             if interaction.user.id != ctx.author.id:
                 await interaction.response.send_message("❌ Solo puedes cerrar tu propia colección.", ephemeral=True)
@@ -4856,9 +4918,10 @@ async def album(ctx):
             await interaction.response.edit_message(view=self)
             self.stop()
     
-    # Mostrar el álbum
+    # Crear instancia y mostrar
     view = AlbumView()
-    await view.update_message()    
+    await view.update_message()
+
 
 # 💝 Regalar carta (admins)
 @bot.command()
@@ -6523,68 +6586,70 @@ async def menu_principal(ctx):
     view = GachaMenuView(ctx.author.id)
     await ctx.send(embed=embed, view=view)
 
-
 # ----------------------------
-# COMANDO !PESCA CORREGIDO
+# COMANDO !PESCA (MINIJUEGO DE PESCA) - VERSIÓN CORREGIDA
 # ----------------------------
 @bot.command()
 async def pesca(ctx):
-    """Permite al usuario intentar pescar y ganar gemas."""
+    """🎣 Minijuego de pesca con 70% de éxito y 30% de fallo (cooldown 2 horas)"""
     user_id = ctx.author.id
     now = time.time()
     
-    # 1. Verificar Cooldown (Lógica idéntica a !casino)
+    # 1. Verificar cooldown (2 horas)
     if user_id in user_last_pesca and now - user_last_pesca[user_id] < COOLDOWN_PESCA:
         time_remaining = COOLDOWN_PESCA - (now - user_last_pesca[user_id])
         await ctx.send(f"❌ ¡Aún no pican! Debes esperar **{format_cooldown(time_remaining)}** para volver a pescar.")
         return
-
-    # IMPORTANTE: Registramos el uso AQUÍ, justo después de la verificación.
-    user_last_pesca[user_id] = now  # <--- Registro de Cooldown (COMO EN !CASINO)
-
-    # 2. Inicializar balance del usuario si no existe
-    if user_id not in user_balances:
-        user_balances[user_id] = 0
-
-    # 3. Lógica de Pesca (30% de Error)
     
-    # Simula un pequeño tiempo de espera (para darle emoción)
-    message = await ctx.send("🎣 Lanzando la caña... esperando que piquen... (2 segundos)")
+    # 2. Registrar el uso del comando
+    user_last_pesca[user_id] = now
+    
+    # 3. Mensaje inicial con animación
+    message = await ctx.send("🎣 **Lanzando la caña...** esperando que piquen...")
     await asyncio.sleep(2)
     
-    success_roll = random.random() # Número entre 0.0 y 1.0
-
+    # 4. Lógica de pesca (70% éxito, 30% fallo)
+    success_roll = random.random()
+    
     if success_roll < 0.30:  # 30% de probabilidad de fallo
-        
         fail_messages = [
-            "El pez era demasiado rápido y se escapó. 😭",
-            "Tu sedal se rompió. ¡Qué frustración! 💢",
+            "¡El pez era demasiado rápido y se escapó! 😭",
+            "¡Tu sedal se rompió! Mejor suerte la próxima vez. 💢",
             "Solo sacaste una bota vieja y con algas. 🥾",
             "Un pájaro se llevó tu carnada. 🐦",
-            "El río está vacío. Vuelve más tarde.",
+            "El río está vacío. Vuelve más tarde. 🌊",
         ]
         
-        await message.edit(content=f"🎣 ¡Oh no! {random.choice(fail_messages)}")
+        await message.edit(content=f"🎣 **¡Oh no!** {random.choice(fail_messages)}\n\n**Próxima pesca disponible en:** {format_cooldown(COOLDOWN_PESCA)}")
         
-    else: # 70% de probabilidad de éxito
-        
+    else:  # 70% de probabilidad de éxito
         # Recompensa entre 15 y 25 gemas
         winnings = random.randint(15, 25)
-        user_balances[user_id] += winnings
-
-        success_messages = [
-            f"¡Woooow! Sacaste un **salmón gigante** y ganas **💎 {winnings}**.",
-            f"¡Picó! Pescaste una **trucha brillante** y ganas **💎 {winnings}**.",
-            f"¡Éxito! Lograste atrapar un **pez dorado** y ganas **💎 {winnings}**.",
-            f"Tu caña se dobló. Pescaste algo valioso y ganas **💎 {winnings}**.",
-        ]
-
-        await message.edit(content=f"🎉 ¡Felicidades! {random.choice(success_messages)}")
         
-    # 4. Guardar Datos (Aseguramos que el balance se guarde)
-    # El registro del cooldown ya se hizo arriba, antes de la lógica de pesca.
+        # Usar la función add_balance para sumar las gemas correctamente
+        add_balance(user_id, winnings)
+        
+        success_messages = [
+            f"¡Woooow! Sacaste un **salmón gigante** y ganas {format_gems(winnings)}! 🐟",
+            f"¡Picó! Pescaste una **trucha brillante** y ganas {format_gems(winnings)}! ✨",
+            f"¡Éxito! Lograste atrapar un **pez dorado** y ganas {format_gems(winnings)}! 🎣",
+            f"Tu caña se dobló. ¡Pescaste algo valioso y ganas {format_gems(winnings)}! 💰",
+        ]
+        
+        # Obtener el nuevo balance después de añadir las gemas
+        new_balance = get_balance(user_id)
+        
+        # Mensaje de éxito con el nuevo balance
+        await message.edit(
+            content=(
+                f"🎉 **¡Felicidades!** {random.choice(success_messages)}\n\n"
+                f"**💰 Nuevo balance:** {format_gems(new_balance)}\n"
+                f"**⏰ Próxima pesca:** {format_cooldown(COOLDOWN_PESCA)}"
+            )
+        )
+    
+    # 5. Guardar los datos (las funciones add_balance y user_last_pesca ya actualizan, pero por seguridad)
     save_data()
-
 
 # ----------------------------
 # COMANDO !MINAR
@@ -6956,6 +7021,36 @@ async def cancelar_jefe(ctx):
         await ctx.send(embed=embed)
     else:
         await ctx.send("❌ No tienes un desafío activo al jefe semanal.")
+
+
+# ----------------------------
+# COMANDO !APOYO - Donación voluntaria
+# ----------------------------
+@bot.command()
+async def apoyo(ctx):
+    """Muestra información sobre cómo apoyar el proyecto con una donación voluntaria"""
+    
+    embed = discord.Embed(
+        title="💎 Donación de Apoyo al Proyecto",
+        description=(
+            "Este comando permite realizar una donación voluntaria para apoyar el desarrollo y mantenimiento "
+            "del gacha y el trabajo de Cosmic, el programador del proyecto.\n\n"
+            "🎁 **Como agradecimiento por tu apoyo, recibirás un contenido digital exclusivo dentro del juego:**\n\n"
+            "• 🧬 3 Cartas ADN (rareza especial)\n"
+            "• ✨ Arte completamente exclusivo\n"
+            "• 📊 2 stats al máximo (100)\n"
+            "• 🤝 Cartas de doble jugador\n"
+            "• 💎 3200 Gemas\n\n"
+            "💵 **Monto sugerido de donación:** 3 USD\n"
+            "📌 **Importante:** Esta donación es opcional, no reembolsable y no constituye una compra de bienes o servicios.\n\n"
+            "**Para realizar la donación, envía un mensaje privado a:** `Cosmic21`"
+        ),
+        color=discord.Color.gold()
+    )
+    
+    embed.set_footer(text="¡Gracias por apoyar el desarrollo del proyecto!")
+    
+    await ctx.send(embed=embed)
 
 
 
