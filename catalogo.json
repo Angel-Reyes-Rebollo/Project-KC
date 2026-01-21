@@ -331,6 +331,116 @@
       }
     },
     {
+      "id": "N016",
+      "nombre": "Mashirao Ojiro",
+      "rareza": "N",
+      "valor": 25,
+      "stock": "Unlimited",
+      "max_per_user": 1000,
+      "imagen": "images/Mashirao_Ojiro_N.png",
+      "descripcion": "Mashirao Ojiro (N)",
+      "stats": {
+        "Evasion": 56,
+        "Fuerza": 58,
+        "Reaccion": 55,
+        "Defensa": 57,
+        "Velocidad": 55,
+        "IQ": 52,
+        "Carisma": 50,
+        "Precision": 54,
+        "Energia": 54,
+        "Suerte": 52
+      }
+    },
+    {
+      "id": "N017",
+      "nombre": "Koji Koda",
+      "rareza": "N",
+      "valor": 25,
+      "stock": "Unlimited",
+      "max_per_user": 1000,
+      "imagen": "images/Koji_Koda_N.png",
+      "descripcion": "Koji Koda (N)",
+      "stats": {
+        "Evasion": 54,
+        "Fuerza": 52,
+        "Reaccion": 54,
+        "Defensa": 56,
+        "Velocidad": 53,
+        "IQ": 58,
+        "Carisma": 50,
+        "Precision": 52,
+        "Energia": 55,
+        "Suerte": 54
+      }
+    },
+    {
+      "id": "N018",
+      "nombre": "Mezo Shoji",
+      "rareza": "N",
+      "valor": 25,
+      "stock": "Unlimited",
+      "max_per_user": 1000,
+      "imagen": "images/Mezo_Shoji_N.png",
+      "descripcion": "Mezo Shoji (N)",
+      "stats": {
+        "Evasion": 55,
+        "Fuerza": 57,
+        "Reaccion": 56,
+        "Defensa": 58,
+        "Velocidad": 54,
+        "IQ": 55,
+        "Carisma": 50,
+        "Precision": 54,
+        "Energia": 56,
+        "Suerte": 53
+      }
+    },
+    {
+      "id": "N019",
+      "nombre": "Tetsutetsu",
+      "rareza": "N",
+      "valor": 25,
+      "stock": "Unlimited",
+      "max_per_user": 1000,
+      "imagen": "images/Tetsutetsu_N.png",
+      "descripcion": "Tetsutetsu (N)",
+      "stats": {
+        "Evasion": 52,
+        "Fuerza": 59,
+        "Reaccion": 54,
+        "Defensa": 56,
+        "Velocidad": 53,
+        "IQ": 50,
+        "Carisma": 54,
+        "Precision": 52,
+        "Energia": 58,
+        "Suerte": 52
+      }
+    },
+    {
+      "id": "N020",
+      "nombre": "Pony Tsunotori",
+      "rareza": "N",
+      "valor": 25,
+      "stock": "Unlimited",
+      "max_per_user": 1000,
+      "imagen": "images/Pony_Tsunotori_N.png",
+      "descripcion": "Pony Tsunotori (N)",
+      "stats": {
+        "Evasion": 55,
+        "Fuerza": 54,
+        "Reaccion": 58,
+        "Defensa": 52,
+        "Velocidad": 56,
+        "IQ": 53,
+        "Carisma": 50,
+        "Precision": 59,
+        "Energia": 57,
+        "Suerte": 55
+      }
+    },
+    {
       "id": "R001",
       "nombre": "Morisuke Yaku",
       "rareza": "R",
@@ -616,7 +726,6 @@
         "Suerte": 58
       }
     },
-    
     {
       "id": "R014",
       "nombre": "Kanji Koganegawa",
@@ -639,7 +748,6 @@
         "Suerte": 58
       }
     },
-    
     {
       "id": "R015",
       "nombre": "Tetsuro Kuroo",
@@ -660,6 +768,116 @@
         "Precision": 58,
         "Energia": 61,
         "Suerte": 57
+      }
+    },
+    {
+      "id": "R016",
+      "nombre": "Denki Kaminari",
+      "rareza": "R",
+      "valor": 35,
+      "stock": "Unlimited",
+      "max_per_user": 500,
+      "imagen": "images/Denki_Kaminari_R.png",
+      "descripcion": "Denki Kaminari (R)",
+      "stats": {
+        "Evasion": 60,
+        "Fuerza": 56,
+        "Reaccion": 61,
+        "Defensa": 57,
+        "Velocidad": 62,
+        "IQ": 51,
+        "Carisma": 59,
+        "Precision": 63,
+        "Energia": 68,
+        "Suerte": 58
+      }
+    },
+    {
+      "id": "R017",
+      "nombre": "Minoru Mineta",
+      "rareza": "R",
+      "valor": 35,
+      "stock": "Unlimited",
+      "max_per_user": 500,
+      "imagen": "images/Minoru_Mineta_R.png",
+      "descripcion": "Minoru Mineta (R)",
+      "stats": {
+        "Evasion": 56,
+        "Fuerza": 50,
+        "Reaccion": 59,
+        "Defensa": 55,
+        "Velocidad": 58,
+        "IQ": 62,
+        "Carisma": 52,
+        "Precision": 61,
+        "Energia": 57,
+        "Suerte": 60
+      }
+    },
+    {
+      "id": "R018",
+      "nombre": "Hanta Sero",
+      "rareza": "R",
+      "valor": 35,
+      "stock": "Unlimited",
+      "max_per_user": 500,
+      "imagen": "images/Hanta_Sero_R.png",
+      "descripcion": "Hanta Sero (R)",
+      "stats": {
+        "Evasion": 60,
+        "Fuerza": 58,
+        "Reaccion": 63,
+        "Defensa": 56,
+        "Velocidad": 64,
+        "IQ": 47,
+        "Carisma": 61,
+        "Precision": 65,
+        "Energia": 66,
+        "Suerte": 57
+      }
+    },
+    {
+      "id": "R019",
+      "nombre": "Kyoka Jiro",
+      "rareza": "R",
+      "valor": 35,
+      "stock": "Unlimited",
+      "max_per_user": 500,
+      "imagen": "images/Kyoka_Jiro_R.png",
+      "descripcion": "Kyoka Jiro (R)",
+      "stats": {
+        "Evasion": 56,
+        "Fuerza": 57,
+        "Reaccion": 66,
+        "Defensa": 55,
+        "Velocidad": 60,
+        "IQ": 49,
+        "Carisma": 62,
+        "Precision": 68,
+        "Energia": 64,
+        "Suerte": 58
+      }
+    },
+    {
+      "id": "R020",
+      "nombre": "Toru Hagakure",
+      "rareza": "R",
+      "valor": 35,
+      "stock": "Unlimited",
+      "max_per_user": 500,
+      "imagen": "images/Toru_Hagakure_R.png",
+      "descripcion": "Toru Hagakure (R)",
+      "stats": {
+        "Evasion": 70,
+        "Fuerza": 56,
+        "Reaccion": 69,
+        "Defensa": 55,
+        "Velocidad": 67,
+        "IQ": 54,
+        "Carisma": 66,
+        "Precision": 64,
+        "Energia": 63,
+        "Suerte": 61
       }
     },
     {
@@ -1125,6 +1343,116 @@
       }
     },
     {
+      "id": "SSR022",
+      "nombre": "Mt. Lady",
+      "rareza": "SSR",
+      "valor": 60,
+      "stock": "Unlimited",
+      "max_per_user": 100,
+      "imagen": "images/Mt_Lady_SSR.png",
+      "descripcion": "Mt. Lady (SSR)",
+      "stats": {
+        "Evasion": 64,
+        "Fuerza": 80,
+        "Reaccion": 70,
+        "Defensa": 74,
+        "Velocidad": 66,
+        "IQ": 50,
+        "Carisma": 77,
+        "Precision": 68,
+        "Energia": 78,
+        "Suerte": 62
+      }
+    },
+    {
+      "id": "SSR023",
+      "nombre": "Kamui Woods",
+      "rareza": "SSR",
+      "valor": 60,
+      "stock": "Unlimited",
+      "max_per_user": 100,
+      "imagen": "images/Kamui_Woods_SSR.png",
+      "descripcion": "Kamui Woods (SSR)",
+      "stats": {
+        "Evasion": 64,
+        "Fuerza": 74,
+        "Reaccion": 72,
+        "Defensa": 79,
+        "Velocidad": 66,
+        "IQ": 51,
+        "Carisma": 68,
+        "Precision": 70,
+        "Energia": 77,
+        "Suerte": 60
+      }
+    },
+    {
+      "id": "SSR024",
+      "nombre": "Edgeshot",
+      "rareza": "SSR",
+      "valor": 60,
+      "stock": "Unlimited",
+      "max_per_user": 100,
+      "imagen": "images/Edgeshot_SSR.png",
+      "descripcion": "Edgeshot (SSR)",
+      "stats": {
+        "Evasion": 78,
+        "Fuerza": 70,
+        "Reaccion": 77,
+        "Defensa": 66,
+        "Velocidad": 79,
+        "IQ": 49,
+        "Carisma": 62,
+        "Precision": 74,
+        "Energia": 72,
+        "Suerte": 61
+      }
+    },
+    {
+      "id": "SSR025",
+      "nombre": "Best Jeanist",
+      "rareza": "SSR",
+      "valor": 60,
+      "stock": "Unlimited",
+      "max_per_user": 100,
+      "imagen": "images/Best_Jeanist_SSR.png",
+      "descripcion": "Best Jeanist (SSR)",
+      "stats": {
+        "Evasion": 64,
+        "Fuerza": 74,
+        "Reaccion": 73,
+        "Defensa": 80,
+        "Velocidad": 66,
+        "IQ": 51,
+        "Carisma": 79,
+        "Precision": 72,
+        "Energia": 78,
+        "Suerte": 60
+      }
+    },
+    {
+      "id": "SSR026",
+      "nombre": "Ryukyu",
+      "rareza": "SSR",
+      "valor": 60,
+      "stock": "Unlimited",
+      "max_per_user": 100,
+      "imagen": "images/Ryukyu_SSR.png",
+      "descripcion": "Ryukyu (SSR)",
+      "stats": {
+        "Evasion": 65,
+        "Fuerza": 78,
+        "Reaccion": 70,
+        "Defensa": 74,
+        "Velocidad": 67,
+        "IQ": 50,
+        "Carisma": 68,
+        "Precision": 66,
+        "Energia": 77,
+        "Suerte": 61
+      }
+    },
+    {
       "id": "UR001",
       "nombre": "Wakatoshi Ushijima",
       "rareza": "UR",
@@ -1411,6 +1739,116 @@
       }
     },
     {
+      "id": "UR014",
+      "nombre": "Keigo Takami",
+      "rareza": "UR",
+      "valor": 145,
+      "stock": "Unlimited",
+      "max_per_user": 50,
+      "imagen": "images/Keigo_Takami_UR.png",
+      "descripcion": "Keigo Takami (UR)",
+      "stats": {
+        "Evasion": 89,
+        "Fuerza": 70,
+        "Reaccion": 88,
+        "Defensa": 62,
+        "Velocidad": 90,
+        "IQ": 47,
+        "Carisma": 78,
+        "Precision": 86,
+        "Energia": 84,
+        "Suerte": 66
+      }
+    },
+    {
+      "id": "UR015",
+      "nombre": "Endeavor",
+      "rareza": "UR",
+      "valor": 145,
+      "stock": "Unlimited",
+      "max_per_user": 50,
+      "imagen": "images/Endeavor_UR.png",
+      "descripcion": "Endeavor (UR)",
+      "stats": {
+        "Evasion": 72,
+        "Fuerza": 91,
+        "Reaccion": 82,
+        "Defensa": 85,
+        "Velocidad": 78,
+        "IQ": 51,
+        "Carisma": 74,
+        "Precision": 80,
+        "Energia": 89,
+        "Suerte": 64
+      }
+    },
+    {
+      "id": "UR016",
+      "nombre": "Mirko",
+      "rareza": "UR",
+      "valor": 145,
+      "stock": "Unlimited",
+      "max_per_user": 50,
+      "imagen": "images/Mirko_UR.png",
+      "descripcion": "Mirko (UR)",
+      "stats": {
+        "Evasion": 86,
+        "Fuerza": 88,
+        "Reaccion": 85,
+        "Defensa": 72,
+        "Velocidad": 89,
+        "IQ": 48,
+        "Carisma": 70,
+        "Precision": 78,
+        "Energia": 87,
+        "Suerte": 65
+      }
+    },
+    {
+      "id": "UR017",
+      "nombre": "Dabi",
+      "rareza": "UR",
+      "valor": 145,
+      "stock": "Unlimited",
+      "max_per_user": 50,
+      "imagen": "images/Dabi_UR.png",
+      "descripcion": "Dabi (UR)",
+      "stats": {
+        "Evasion": 70,
+        "Fuerza": 86,
+        "Reaccion": 82,
+        "Defensa": 60,
+        "Velocidad": 74,
+        "IQ": 44,
+        "Carisma": 68,
+        "Precision": 84,
+        "Energia": 90,
+        "Suerte": 62
+      }
+    },
+    {
+      "id": "UR018",
+      "nombre": "Shigaraki",
+      "rareza": "UR",
+      "valor": 145,
+      "stock": "Unlimited",
+      "max_per_user": 50,
+      "imagen": "images/Shigaraki_UR.png",
+      "descripcion": "Shigaraki (UR)",
+      "stats": {
+        "Evasion": 72,
+        "Fuerza": 88,
+        "Reaccion": 84,
+        "Defensa": 80,
+        "Velocidad": 76,
+        "IQ": 41,
+        "Carisma": 70,
+        "Precision": 78,
+        "Energia": 91,
+        "Suerte": 64
+      }
+    },
+    {
       "id": "SP001",
       "nombre": "Kenma Kozume",
       "rareza": "SP",
@@ -1694,6 +2132,116 @@
         "Precision": 79,
         "Energia": 86,
         "Suerte": 72
+      }
+    },
+    {
+      "id": "SP014",
+      "nombre": "Izuku Midoriya",
+      "rareza": "SP",
+      "valor": 260,
+      "stock": "Unlimited",
+      "max_per_user": 10,
+      "imagen": "images/Izuku_Midoriya_SP.png",
+      "descripcion": "Izuku Midoriya (SP)",
+      "stats": {
+        "Evasion": 88,
+        "Fuerza": 90,
+        "Reaccion": 94,
+        "Defensa": 70,
+        "Velocidad": 92,
+        "IQ": 47,
+        "Carisma": 78,
+        "Precision": 85,
+        "Energia": 86,
+        "Suerte": 74
+      }
+    },
+    {
+      "id": "SP015",
+      "nombre": "Katsuki Bakugo",
+      "rareza": "SP",
+      "valor": 260,
+      "stock": "Unlimited",
+      "max_per_user": 10,
+      "imagen": "images/Katsuki_Bakugo_SP.png",
+      "descripcion": "Katsuki Bakugo (SP)",
+      "stats": {
+        "Evasion": 88,
+        "Fuerza": 94,
+        "Reaccion": 92,
+        "Defensa": 68,
+        "Velocidad": 91,
+        "IQ": 51,
+        "Carisma": 82,
+        "Precision": 84,
+        "Energia": 86,
+        "Suerte": 72
+      }
+    },
+    {
+      "id": "SP016",
+      "nombre": "Shoto Todoroki",
+      "rareza": "SP",
+      "valor": 260,
+      "stock": "Unlimited",
+      "max_per_user": 10,
+      "imagen": "images/Shoto_Todoroki_SP.png",
+      "descripcion": "Shoto Todoroki (SP)",
+      "stats": {
+        "Evasion": 82,
+        "Fuerza": 86,
+        "Reaccion": 88,
+        "Defensa": 80,
+        "Velocidad": 84,
+        "IQ": 48,
+        "Carisma": 76,
+        "Precision": 85,
+        "Energia": 94,
+        "Suerte": 73
+      }
+    },
+    {
+      "id": "SP017",
+      "nombre": "Himiko Toga",
+      "rareza": "SP",
+      "valor": 260,
+      "stock": "Unlimited",
+      "max_per_user": 10,
+      "imagen": "images/Himiko_Toga_SP.png",
+      "descripcion": "Himiko Toga (SP)",
+      "stats": {
+        "Evasion": 92,
+        "Fuerza": 64,
+        "Reaccion": 90,
+        "Defensa": 58,
+        "Velocidad": 88,
+        "IQ": 46,
+        "Carisma": 80,
+        "Precision": 78,
+        "Energia": 82,
+        "Suerte": 76
+      }
+    },
+    {
+      "id": "SP018",
+      "nombre": "Mirio Togata",
+      "rareza": "SP",
+      "valor": 260,
+      "stock": "Unlimited",
+      "max_per_user": 10,
+      "imagen": "images/Mirio_Togata_SP.png",
+      "descripcion": "Mirio Togata (SP)",
+      "stats": {
+        "Evasion": 94,
+        "Fuerza": 86,
+        "Reaccion": 92,
+        "Defensa": 62,
+        "Velocidad": 90,
+        "IQ": 48,
+        "Carisma": 88,
+        "Precision": 82,
+        "Energia": 84,
+        "Suerte": 74
       }
     },
     {
@@ -2091,8 +2639,7 @@
         "Energia": 93,
         "Suerte": 92
       }
-    }
-    ,
+    },
     {
       "id": "G019",
       "nombre": "Sae Itoshi",
@@ -2114,8 +2661,7 @@
         "Energia": 89,
         "Suerte": 91
       }
-    }
-    ,
+    },
     {
       "id": "G020",
       "nombre": "Shouei Barou",
@@ -2136,6 +2682,182 @@
         "Precision": 94,
         "Energia": 92,
         "Suerte": 88
+      }
+    },
+    {
+      "id": "G021",
+      "nombre": "Shigaraki King of the Galaxy",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/Shigaraki_King_of_the_Galaxy_G.png",
+      "descripcion": "Shigaraki King of the Galaxy (G)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 96,
+        "Reaccion": 96,
+        "Defensa": 96,
+        "Velocidad": 94,
+        "IQ": 49,
+        "Carisma": 48,
+        "Precision": 93,
+        "Energia": 100,
+        "Suerte": 92
+      }
+    },
+    {
+      "id": "G022",
+      "nombre": "All For One",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/All_For_One_G.png",
+      "descripcion": "All For One (G)",
+      "stats": {
+        "Evasion": 91,
+        "Fuerza": 94,
+        "Reaccion": 94,
+        "Defensa": 95,
+        "Velocidad": 92,
+        "IQ": 97,
+        "Carisma": 50,
+        "Precision": 93,
+        "Energia": 79,
+        "Suerte": 90
+      }
+    },
+    {
+      "id": "G023",
+      "nombre": "All Might",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/All_Might_G.png",
+      "descripcion": "All Might (G)",
+      "stats": {
+        "Evasion": 79,
+        "Fuerza": 100,
+        "Reaccion": 95,
+        "Defensa": 94,
+        "Velocidad": 92,
+        "IQ": 53,
+        "Carisma": 93,
+        "Precision": 91,
+        "Energia": 96,
+        "Suerte": 84
+      }
+    },
+    {
+      "id": "G024",
+      "nombre": "Lonely Battle Deku",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/Lonely_Battle_Deku_G.png",
+      "descripcion": "Lonely Battle Deku (G)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 54,
+        "Reaccion": 95,
+        "Defensa": 76,
+        "Velocidad": 94,
+        "IQ": 91,
+        "Carisma": 70,
+        "Precision": 88,
+        "Energia": 92,
+        "Suerte": 86
+      }
+    },
+    {
+      "id": "G025",
+      "nombre": "Dabi Burn Everything",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/Dabi_Burn_Everything_G.png",
+      "descripcion": "Dabi Burn Everything (G)",
+      "stats": {
+        "Evasion": 72,
+        "Fuerza": 90,
+        "Reaccion": 92,
+        "Defensa": 68,
+        "Velocidad": 78,
+        "IQ": 54,
+        "Carisma": 80,
+        "Precision": 94,
+        "Energia": 97,
+        "Suerte": 84
+      }
+    },
+    {
+      "id": "G026",
+      "nombre": "Shigaraki Annihilator",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/Shigaraki_Annihilator_G.png",
+      "descripcion": "Shigaraki Annihilator (G)",
+      "stats": {
+        "Evasion": 76,
+        "Fuerza": 88,
+        "Reaccion": 94,
+        "Defensa": 82,
+        "Velocidad": 80,
+        "IQ": 54,
+        "Carisma": 60,
+        "Precision": 90,
+        "Energia": 97,
+        "Suerte": 86
+      }
+    },
+    {
+      "id": "G027",
+      "nombre": "Bakugo Power Ascend",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/Bakugo_Power_Ascend_G.png",
+      "descripcion": "Bakugo Power Ascend (G)",
+      "stats": {
+        "Evasion": 86,
+        "Fuerza": 96,
+        "Reaccion": 93,
+        "Defensa": 74,
+        "Velocidad": 92,
+        "IQ": 52,
+        "Carisma": 84,
+        "Precision": 88,
+        "Energia": 90,
+        "Suerte": 88
+      }
+    },
+    {
+      "id": "G028",
+      "nombre": "El poderoso Mineta",
+      "rareza": "G",
+      "valor": 400,
+      "stock": "Unlimited",
+      "max_per_user": 5,
+      "imagen": "images/El_poderoso_Mineta_G.png",
+      "descripcion": "El poderoso Mineta (G)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 48,
+        "Reaccion": 88,
+        "Defensa": 76,
+        "Velocidad": 82,
+        "IQ": 92,
+        "Carisma": 70,
+        "Precision": 94,
+        "Energia": 84,
+        "Suerte": 96
       }
     },
     {
@@ -2313,7 +3035,6 @@
         "Energia": 88,
         "Suerte": 70
       }
-      
     },
     {
       "id": "E009",
@@ -2327,19 +3048,18 @@
       "stats": {
         "Evasion": 88,
         "Fuerza": 1,
-        "Reacción": 79,
+        "Reaccion": 79,
         "Defensa": 89,
         "Velocidad": 90,
         "IQ": 84,
-        "Carisma ": 1,
-        "Precisión": 90,
+        "Carisma": 89,
+        "Precision": 90,
         "Energia": 1,
-        "Suerte": 1,
-        "Carisma": 89
+        "Suerte": 1
       }
     },
     {
-      "id": "E0010",
+      "id": "E010",
       "nombre": "All Might (ADMIN)",
       "rareza": "E",
       "valor": 600,
@@ -2350,15 +3070,14 @@
       "stats": {
         "Evasion": 90,
         "Fuerza": 1,
-        "Reacción": 90,
+        "Reaccion": 90,
         "Defensa": 90,
         "Velocidad": 89,
         "IQ": 89,
-        "Carisma ": 1,
-        "Precisión": 96,
+        "Carisma": 90,
+        "Precision": 96,
         "Energia": 1,
-        "Suerte": 1,
-        "Carisma": 90
+        "Suerte": 1
       }
     },
     {
