@@ -3145,6 +3145,51 @@
         "Energia": 100,
         "Suerte": 88
       }
+    },
+    {
+      "id": "E023",
+      "nombre": "Himiko Toga (Invite Exclusive)",
+      "rareza": "E",
+      "valor": 300,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E023.png",
+      "descripcion": "Himiko Toga Invite Exclusive",
+      "stats": {
+        "Evasion": 81,
+        "Fuerza": 80,
+        "Reacción": 1,
+        "Defensa": 1,
+        "Velocidad": 78,
+        "IQ": 54,
+        "Carisma ": 1,
+        "Precisión": 1,
+        "Energia": 1,
+        "Suerte": 1
+      }
+    },
+    {
+      "id": "E024",
+      "nombre": "Fumikage Tokoyami",
+      "rareza": "E",
+      "valor": 300,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E024.png",
+      "descripcion": "Fumikage Tokoyami (Booster Edition)",
+      "stats": {
+        "Evasion": 59,
+        "Fuerza": 95,
+        "Reacción": 96,
+        "Defensa": 94,
+        "Velocidad": 97,
+        "IQ": 90,
+        "Carisma ": 1,
+        "Precisión": 92,
+        "Energia": 95,
+        "Suerte": 88,
+        "Carisma": 54
+      }
     }
   ]
 }
