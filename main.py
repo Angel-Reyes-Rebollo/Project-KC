@@ -2951,35 +2951,105 @@ class InventoryView(View):
 
 # --- La función de comando principal ---
 
-# En tu archivo de funciones de inventario, modifica estas funciones:
-
-def add_to_inventory(user_id, card, card_id=None):
-    """Añade una carta al inventario del usuario"""
-    if user_id not in user_data:
-        user_data[user_id] = {"inventory": [], "balance": 0}
+@bot.command()
+async def inventario(ctx):
+    """Muestra el inventario del usuario con carrusel de cartas únicas, ordenadas por rareza."""
+    user_id = ctx.author.id
+    inv = get_inventory(user_id)  # Inventario completo, con duplicados
+    gems = get_balance(user_id)
     
-    # Si se proporciona un card_id, usarlo. Si no, generar uno nuevo
-    if card_id is None:
-        # Generar nuevo ID único
-        import uuid
-        card_id = str(uuid.uuid4())[:8]
+    # 1. Manejo de Inventario Vacío
+    if not inv:
+        embed = discord.Embed(
+            title="📦 Inventario Vacío",
+            description="No tienes cartas todavía. ¡Usa `!gacha` para obtener algunas!",
+            color=discord.Color.blue()
+        )
+        embed.add_field(name="💎 Gemas actuales", value=format_gems(gems))
+        await ctx.send(embed=embed)
+        return
+        
+    # 2. **CONTAR DUPLICADOS POR NOMBRE**
+    card_counts = {}
+    for card in inv:
+        name = card['nombre']
+        if name not in card_counts:
+            card_counts[name] = {
+                'card': card,  # Usamos la primera carta como representante
+                'count': 1,
+                'ids': [card.get('id', '')]  # Guardar IDs para referencia
+            }
+        else:
+            card_counts[name]['count'] += 1
+            card_counts[name]['ids'].append(card.get('id', ''))
     
-    # Crear copia de la carta con el ID preservado o nuevo
-    card_copy = card.copy()
-    card_copy['id'] = card_id
+    # 3. Crear lista única para el carrusel
+    unique_inv = []
+    for name, data in card_counts.items():
+        unique_card = data['card'].copy()
+        # Añadir información de duplicados
+        unique_card['duplicates_count'] = data['count']
+        unique_card['duplicate_ids'] = data['ids']
+        unique_inv.append(unique_card)
     
-    user_data[user_id]["inventory"].append(card_copy)
-    save_data()  # Guardar cambios
-    return card_copy
+    # 4. **ORDENAR POR RAREZA (Mayor a Menor)**
+    unique_inv.sort(key=get_rarity_sort_key)
+    
+    # 5. Mostrar información básica (Resumen)
+    embed = discord.Embed(
+        title=f"📦 Inventario de {ctx.author.display_name}",
+        description=f"Tienes **{len(inv)}** cartas en total (**{len(unique_inv)}** tipos diferentes).",
+        color=discord.Color.gold()
+    )
+    embed.add_field(name="💎 Gemas", value=format_gems(gems), inline=True)
+    embed.add_field(name="📊 Cartas totales", value=str(len(inv)), inline=True)
+    embed.add_field(name="🎴 Tipos únicos", value=str(len(unique_inv)), inline=True)
+    
+    # Contar por rareza (usando el inventario completo)
+    rarity_count = {}
+    for card in inv:
+        rarity = card.get("rareza", "N")
+        rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
+    
+    rarity_text = ""
+    for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
+        if rarity in rarity_count:
+            emoji = get_rarity_emoji(rarity)
+            count = rarity_count[rarity]
+            unique_count = len(set([c['nombre'] for c in inv if c.get('rareza') == rarity]))
+            rarity_text += f"{emoji} {rarity}: {count} ({unique_count} únicas)\n"
+    
+    if rarity_text:
+        embed.add_field(name="📊 Cartas por rareza (total / únicas)", value=rarity_text, inline=False)
+    
+    # 6. Información sobre intercambios
+    if any([data['count'] > 1 for data in card_counts.values()]):
+        duplicate_info = []
+        for name, data in card_counts.items():
+            if data['count'] > 1:
+                duplicate_info.append(f"• {name}: {data['count']} copias")
+        
+        if duplicate_info:
+            duplicates_text = "\n".join(duplicate_info[:5])  # Mostrar solo las primeras 5
+            if len(duplicate_info) > 5:
+                duplicates_text += f"\n... y {len(duplicate_info) - 5} más"
+            
+            embed.add_field(
+                name="🔄 Cartas duplicadas",
+                value=duplicates_text,
+                inline=False
+            )
+    
+    # Envía el resumen y luego el carrusel
+    await ctx.send(embed=embed)
+    
+    # 7. Mostrar el carrusel de cartas únicas y ordenadas
+    view = InventoryView(ctx, unique_inv, len(inv), gems)
+    
+    # No es necesario deshabilitar los botones si len(unique_inv) <= 1, el View lo hará.
+    await view.update_message()
 
-def remove_from_inventory_by_index(user_id, index):
-    """Elimina una carta del inventario por índice y devuelve la carta eliminada"""
-    if user_id in user_data and 0 <= index < len(user_data[user_id]["inventory"]):
-        card = user_data[user_id]["inventory"].pop(index)
-        save_data()
-        return card
-    return None
-
+    
 # ----------------------------
 # COMANDO VENDER EN CARRUSEL (se cierra tras vender 1 carta)
 # ----------------------------
