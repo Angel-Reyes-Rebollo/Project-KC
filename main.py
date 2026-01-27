@@ -576,12 +576,17 @@ class FinalTradeView(View):
         # Realizar el intercambio
         try:
             # Remover cartas de los inventarios originales
+            user1_removed_cards = []
+            user2_removed_cards = []
+            
             for card in user1_cards:
                 card_id = card.get('id')
                 inv = get_inventory(self.user1.id)
                 for i, c in enumerate(inv):
                     if c.get('id') == card_id:
-                        remove_from_inventory_by_index(self.user1.id, i)
+                        removed_card = remove_from_inventory_by_index(self.user1.id, i)
+                        if removed_card:
+                            user1_removed_cards.append(removed_card)
                         break
             
             for card in user2_cards:
@@ -589,15 +594,19 @@ class FinalTradeView(View):
                 inv = get_inventory(self.user2.id)
                 for i, c in enumerate(inv):
                     if c.get('id') == card_id:
-                        remove_from_inventory_by_index(self.user2.id, i)
+                        removed_card = remove_from_inventory_by_index(self.user2.id, i)
+                        if removed_card:
+                            user2_removed_cards.append(removed_card)
                         break
 
-            # Añadir cartas a los nuevos dueños
-            for card in user1_cards:
-                add_to_inventory(self.user2.id, card)
+            # Añadir cartas a los nuevos dueños PRESERVANDO LOS IDs
+            for card in user1_removed_cards:  # Cartas que User1 estaba intercambiando
+                # Añadir a User2 con el mismo ID
+                add_to_inventory(self.user2.id, card, card_id=card['id'])
             
-            for card in user2_cards:
-                add_to_inventory(self.user1.id, card)
+            for card in user2_removed_cards:  # Cartas que User2 estaba intercambiando
+                # Añadir a User1 con el mismo ID
+                add_to_inventory(self.user1.id, card, card_id=card['id'])
 
             # Eliminar intercambio
             del pending_trades[self.trade_id]
@@ -609,8 +618,8 @@ class FinalTradeView(View):
                 color=discord.Color.green()
             )
             
-            user1_receives = "\n".join([f"• {card['nombre']}" for card in user2_cards]) if user2_cards else "Nada"
-            user2_receives = "\n".join([f"• {card['nombre']}" for card in user1_cards]) if user1_cards else "Nada"
+            user1_receives = "\n".join([f"• {card['nombre']} ({card.get('rareza', 'C')})" for card in user2_removed_cards]) if user2_removed_cards else "Nada"
+            user2_receives = "\n".join([f"• {card['nombre']} ({card.get('rareza', 'C')})" for card in user1_removed_cards]) if user1_removed_cards else "Nada"
             
             embed.add_field(name=f"🎁 {self.user1.display_name} recibe:", value=user1_receives, inline=False)
             embed.add_field(name=f"🎁 {self.user2.display_name} recibe:", value=user2_receives, inline=False)
@@ -625,7 +634,62 @@ class FinalTradeView(View):
             await interaction.response.edit_message(embed=embed, view=None)
 
         except Exception as e:
+            print(f"❌ Error en intercambio: {e}")
             await interaction.response.send_message("❌ Error al ejecutar el intercambio. Inténtalo de nuevo.", ephemeral=True)
+
+# Comando para iniciar intercambio
+@bot.command()
+async def intercambiar(ctx, usuario: discord.Member):
+    """Inicia un intercambio con otro usuario"""
+    if usuario.id == ctx.author.id:
+        await ctx.send("❌ No puedes intercambiar contigo mismo.")
+        return
+    
+    if usuario.bot:
+        await ctx.send("❌ No puedes intercambiar con bots.")
+        return
+    
+    # Verificar que ambos tengan cartas
+    if not get_inventory(ctx.author.id):
+        await ctx.send("❌ No tienes cartas para intercambiar.")
+        return
+    
+    if not get_inventory(usuario.id):
+        await ctx.send(f"❌ {usuario.mention} no tiene cartas para intercambiar.")
+        return
+    
+    # Crear ID único para el intercambio
+    import uuid
+    trade_id = str(uuid.uuid4())[:8]
+    
+    # Inicializar datos del intercambio
+    pending_trades[trade_id] = {
+        'inviter': ctx.author.id,
+        'invited': usuario.id,
+        'user1_cards': [],
+        'user2_cards': [],
+        'user1_confirmed': False,
+        'user2_confirmed': False,
+        'user1_final_accept': False,
+        'user2_final_accept': False,
+        'accepted': False,
+        'invited_accepted': False
+    }
+    
+    # Crear embed de solicitud
+    embed = discord.Embed(
+        title="🔄 Solicitud de Intercambio",
+        description=f"{ctx.author.mention} quiere intercambiar cartas con {usuario.mention}",
+        color=discord.Color.blue()
+    )
+    embed.add_field(name="Instrucciones", value=f"{usuario.mention} debe aceptar o rechazar esta solicitud en 5 minutos.")
+    embed.add_field(name="Estado", value="🟡 Esperando respuesta...")
+    
+    # Crear vista de aceptación/rechazo
+    view = AcceptRejectView(trade_id, ctx.author, usuario)
+    
+    await ctx.send(f"{usuario.mention}", embed=embed, view=view)
+
 
 # ----------------------------
 # Funciones auxiliares
@@ -2887,69 +2951,34 @@ class InventoryView(View):
 
 # --- La función de comando principal ---
 
-@bot.command()
-async def inventario(ctx):
-    """Muestra el inventario del usuario con carrusel de cartas únicas, ordenadas por rareza."""
-    user_id = ctx.author.id
-    inv = get_inventory(user_id) # Inventario completo, con duplicados
-    gems = get_balance(user_id)
+# En tu archivo de funciones de inventario, modifica estas funciones:
+
+def add_to_inventory(user_id, card, card_id=None):
+    """Añade una carta al inventario del usuario"""
+    if user_id not in user_data:
+        user_data[user_id] = {"inventory": [], "balance": 0}
     
-    # 1. Manejo de Inventario Vacío
-    if not inv:
-        embed = discord.Embed(
-            title="📦 Inventario Vacío",
-            description="No tienes cartas todavía. ¡Usa `!gacha` para obtener algunas!",
-            color=discord.Color.blue()
-        )
-        embed.add_field(name="💎 Gemas actuales", value=format_gems(gems))
-        await ctx.send(embed=embed)
-        return
-        
-    # 2. **FILTRAR REPETIDOS y OBTENER LA LISTA ÚNICA**
-    seen_names = set()
-    unique_inv = []
-    # Usamos el set para garantizar unicidad por nombre
-    for card in inv:
-        if card['nombre'] not in seen_names:
-            unique_inv.append(card)
-            seen_names.add(card['nombre'])
+    # Si se proporciona un card_id, usarlo. Si no, generar uno nuevo
+    if card_id is None:
+        # Generar nuevo ID único
+        import uuid
+        card_id = str(uuid.uuid4())[:8]
     
-    # 3. **ORDENAR POR RAREZA (Mayor a Menor)**
-    unique_inv.sort(key=get_rarity_sort_key)
+    # Crear copia de la carta con el ID preservado o nuevo
+    card_copy = card.copy()
+    card_copy['id'] = card_id
     
-    # 4. Mostrar información básica (Resumen)
-    embed = discord.Embed(
-        title=f"💎 Inventario de {ctx.author.display_name}",
-        description=f"Navega tus **{len(unique_inv)}** cartas únicas a continuación. (Orden: Mayor Rareza a Menor)",
-        color=discord.Color.gold()
-    )
-    embed.add_field(name="Gemas", value=format_gems(gems), inline=True)
-    embed.add_field(name="Total de cartas (incl. duplicados)", value=str(len(inv)), inline=True)
-    
-    # Contar por rareza (usando el inventario completo, no el único)
-    rarity_count = {}
-    for card in inv:
-        rarity = card.get("rareza", "N")
-        rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
-    
-    rarity_text = ""
-    # Se itera en el orden deseado para mostrar el resumen
-    for rarity in ["G", "SP", "UR", "SSR", "R", "N"]:
-        if rarity in rarity_count:
-            emoji = get_rarity_emoji(rarity)
-            rarity_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
-    
-    if rarity_text:
-        embed.add_field(name="📊 Cartas por rareza", value=rarity_text, inline=False)
-    
-    # Envía el resumen y luego el carrusel
-    await ctx.send(embed=embed)
-    
-    # 5. Mostrar el carrusel de cartas únicas y ordenadas
-    view = InventoryView(ctx, unique_inv, len(inv), gems)
-    
-    # No es necesario deshabilitar los botones si len(unique_inv) <= 1, el View lo hará.
-    await view.update_message()
+    user_data[user_id]["inventory"].append(card_copy)
+    save_data()  # Guardar cambios
+    return card_copy
+
+def remove_from_inventory_by_index(user_id, index):
+    """Elimina una carta del inventario por índice y devuelve la carta eliminada"""
+    if user_id in user_data and 0 <= index < len(user_data[user_id]["inventory"]):
+        card = user_data[user_id]["inventory"].pop(index)
+        save_data()
+        return card
+    return None
 
 # ----------------------------
 # COMANDO VENDER EN CARRUSEL (se cierra tras vender 1 carta)
@@ -5358,12 +5387,15 @@ try:
 except Exception as e:
     print(f"⚠️  Servidor web no disponible: {e}")
 
-    # ----------------------------
+    
+import base64
+# ----------------------------
+# SISTEMA DE BACKUP SIMPLIFICADO
+# ----------------------------
 import threading
+import time
 from datetime import datetime
 
-# SISTEMA DE BACKUP AUTOMÁTICO
-# ----------------------------
 import requests
 import schedule
 
@@ -5406,8 +5438,7 @@ def create_github_backup():
         
         for filename, content in backup_files.items():
             try:
-                # Codificar contenido en base64 (GitHub requiere base64)
-                import base64
+                # Codificar contenido en base64
                 content_base64 = base64.b64encode(content.encode('utf-8')).decode('utf-8')
                 
                 # Crear commit en GitHub
@@ -5436,57 +5467,18 @@ def create_github_backup():
     except Exception as e:
         print(f"❌ Error en backup automático: {e}")
 
-def backup_on_user_action():
-    """Backup cuando hay una acción importante de usuario"""
-    try:
-        # Usar un hilo separado para no bloquear el bot
-        thread = threading.Thread(target=create_github_backup, daemon=True)
-        thread.start()
-    except Exception as e:
-        print(f"❌ Error en backup de acción: {e}")
-
-# Guardar referencias a las funciones originales
-original_add_to_inventory = add_to_inventory
-original_add_balance = add_balance
-original_save_data = save_data
-
-# Versiones con backup de las funciones críticas
-def add_to_inventory_with_backup(user_id, card):
-    """Versión con backup de add_to_inventory"""
-    result = original_add_to_inventory(user_id, card)
-    backup_on_user_action()
-    return result
-
-def add_balance_with_backup(user_id, amount):
-    """Versión con backup de add_balance"""
-    result = original_add_balance(user_id, amount)
-    backup_on_user_action()
-    return result
-
-def save_data_with_backup():
-    """Versión con backup de save_data"""
-    result = original_save_data()
-    backup_on_user_action()
-    return result
-
-# Reemplazar las funciones originales con las versiones con backup
-add_to_inventory = add_to_inventory_with_backup
-add_balance = add_balance_with_backup
-save_data = save_data_with_backup
-
-# Backup programado cada 6 horas
+# Backup programado cada 1 hora
 def scheduled_backup():
-    """Backup programado"""
+    """Backup programado cada hora"""
     print("⏰ Ejecutando backup programado...")
     create_github_backup()
 
 def run_scheduled_backups():
     """Ejecutar backups programados en un hilo separado"""
-    # Configurar schedule
-    schedule.every(6).hours.do(scheduled_backup)
-    schedule.every().day.at("00:00").do(scheduled_backup)  # Backup adicional a medianoche
+    # Configurar schedule para backup cada 1 hora
+    schedule.every(1).hours.do(scheduled_backup)
     
-    print("🕒 Programador de backups iniciado")
+    print("🕒 Programador de backups iniciado (cada 1 hora)")
     
     while True:
         try:
@@ -5500,7 +5492,7 @@ def run_scheduled_backups():
 try:
     backup_thread = threading.Thread(target=run_scheduled_backups, daemon=True)
     backup_thread.start()
-    print("✅ Sistema de backup automático iniciado")
+    print("✅ Sistema de backup automático iniciado (cada 1 hora)")
 except Exception as e:
     print(f"❌ No se pudo iniciar el sistema de backup: {e}")
 
@@ -5537,13 +5529,19 @@ async def backup_status(ctx):
     
     embed.add_field(
         name="🕒 Backup Programado",
-        value="Cada 6 horas + acciones de usuarios",
+        value="Cada 1 hora",
         inline=True
     )
     
     embed.add_field(
         name="📁 Rama de Backup",
         value=BACKUP_BRANCH,
+        inline=True
+    )
+    
+    embed.add_field(
+        name="🔄 Backup Manual",
+        value="Usa `/backup_now`",
         inline=True
     )
     
