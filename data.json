@@ -9054,7 +9054,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP010.png",
+                "imagen": "images/Kaiser_SP.png",
                 "descripcion": "Kaiser (SP)",
                 "stats": {
                     "Evasion": 82,
@@ -9076,7 +9076,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP010.png",
+                "imagen": "images/Kaiser_SP.png",
                 "descripcion": "Kaiser (SP)",
                 "stats": {
                     "Evasion": 82,
@@ -9098,7 +9098,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP009.png",
+                "imagen": "images/Aiku_SP.png",
                 "descripcion": "Aiku (SP)",
                 "stats": {
                     "Evasion": 79,
@@ -9120,7 +9120,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP010.png",
+                "imagen": "images/Kaiser_SP.png",
                 "descripcion": "Kaiser (SP)",
                 "stats": {
                     "Evasion": 82,
@@ -25409,7 +25409,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP010.png",
+                "imagen": "images/Kaiser_SP.png",
                 "descripcion": "Kaiser (SP)",
                 "stats": {
                     "Evasion": 82,
@@ -25431,7 +25431,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP011.png",
+                "imagen": "images/Adam_Blake_SP.png",
                 "descripcion": "Adam Blake (SP)",
                 "stats": {
                     "Evasion": 88,
@@ -48868,7 +48868,7 @@
                 "valor": 260,
                 "stock": "Unlimited",
                 "max_per_user": 10,
-                "imagen": "images/SP010.png",
+                "imagen": "images/Kaiser_SP.png",
                 "descripcion": "Kaiser (SP)",
                 "stats": {
                     "Evasion": 82,
