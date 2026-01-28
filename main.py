@@ -1,12 +1,13 @@
 import asyncio
 import json
+import math  # <-- AÑADE ESTA LÍNEA
 import os
 import random
 import time
 
 import aiohttp
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ui import Button, View
 
 # ----------------------------
@@ -7615,10 +7616,12 @@ async def encuentra_gema(ctx):
 
 
 # ----------------------------
-# COMANDO !BLACKJACK
+# BLACKJACK - Sistema por Comandos de Texto
 # ----------------------------
 
+# Diccionarios para el sistema de blackjack
 user_last_blackjack = {}
+active_blackjack_games = {}
 
 class BlackjackGame:
     def __init__(self, bet_amount, difficulty):
@@ -7672,12 +7675,6 @@ class BlackjackGame:
         
         return value
     
-    def format_hand(self, hand, hide_first=False):
-        """Formatea una mano para mostrar"""
-        if hide_first and hand:
-            return f"**{hand[0]}** ? ?"
-        return " ".join([f"**{card}**" for card in hand])
-    
     def get_difficulty_description(self):
         """Devuelve la descripción de la dificultad"""
         descriptions = {
@@ -7721,224 +7718,23 @@ class BlackjackGame:
                 return True
             return False
 
-class BlackjackView(discord.ui.View):
-    def __init__(self, game, user_id, message, timeout=60):
-        super().__init__(timeout=timeout)
-        self.game = game
-        self.user_id = user_id
-        self.message = message
-        self.original_author = user_id
-        
-        # Iniciar el juego
-        self.start_game()
-    
-    def start_game(self):
-        """Inicia el juego repartiendo cartas"""
-        self.game.player_hand = [self.game.deal_card(), self.game.deal_card()]
-        self.game.dealer_hand = [self.game.deal_card(), self.game.deal_card()]
-    
-    async def update_embed(self, interaction=None, final=False, dealer_revealed=False):
-        """Actualiza el embed del juego"""
-        diff_info = self.game.get_difficulty_description()
-        
-        embed = discord.Embed(
-            title=f"♠️ BLACKJACK - {diff_info['name']}",
-            color=diff_info['color']
-        )
-        
-        # Información de la partida
-        embed.add_field(
-            name="🎯 Información",
-            value=f"**Apuesta:** {format_gems(self.game.bet)}\n**Multiplicador:** {diff_info['multiplier']}\n**Dificultad:** {diff_info['name']}",
-            inline=False
-        )
-        
-        # Mano del dealer
-        dealer_display = self.game.format_hand(self.game.dealer_hand, not dealer_revealed)
-        dealer_value = "" if not dealer_revealed else f" ({self.game.calculate_hand_value(self.game.dealer_hand)})"
-        embed.add_field(
-            name=f"🃏 Dealer {dealer_value}",
-            value=dealer_display,
-            inline=False
-        )
-        
-        # Mano del jugador
-        player_value = self.game.calculate_hand_value(self.game.player_hand)
-        embed.add_field(
-            name=f"👤 Tu Mano ({player_value})",
-            value=self.game.format_hand(self.game.player_hand),
-            inline=False
-        )
-        
-        # Estado del juego
-        if final:
-            if self.game.result == "win":
-                winnings = int(self.game.bet * self.game.payout_multiplier[self.game.difficulty])
-                embed.add_field(
-                    name="🎉 ¡GANASTE!",
-                    value=f"Ganas **{format_gems(winnings)}** ({self.game.payout_multiplier[self.game.difficulty]}x)",
-                    inline=False
-                )
-                embed.color = discord.Color.green()
-            elif self.game.result == "lose":
-                embed.add_field(
-                    name="💀 PERDISTE",
-                    value=f"Pierdes **{format_gems(self.game.bet)}**",
-                    inline=False
-                )
-                embed.color = discord.Color.red()
-            elif self.game.result == "push":
-                embed.add_field(
-                    name="🤝 EMPATE",
-                    value="Recuperas tu apuesta",
-                    inline=False
-                )
-                embed.color = discord.Color.blue()
-            
-            # Mostrar estrategia de la IA
-            embed.add_field(
-                name="🤖 Estrategia de la IA",
-                value=diff_info['ai_desc'],
-                inline=False
-            )
-        else:
-            embed.add_field(
-                name="🎮 Acciones",
-                value="Elige una acción:",
-                inline=False
-            )
-        
-        embed.set_footer(text=f"Tienes {self.timeout} segundos para decidir" if not final else "Juego terminado")
-        
-        if interaction:
-            if final:
-                # Deshabilitar botones al final
-                for item in self.children:
-                    item.disabled = True
-                await interaction.response.edit_message(embed=embed, view=self)
-            else:
-                await interaction.response.edit_message(embed=embed)
-        else:
-            # Solo para el mensaje inicial
-            await self.message.edit(embed=embed)
-    
-    @discord.ui.button(label="📥 Pedir Carta", style=discord.ButtonStyle.primary, emoji="🃏")
-    async def hit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
-            return
-        
-        # Dar una carta al jugador
-        self.game.player_hand.append(self.game.deal_card())
-        player_value = self.game.calculate_hand_value(self.game.player_hand)
-        
-        # Verificar si se pasó
-        if player_value > 21:
-            self.game.game_over = True
-            self.game.result = "lose"
-            await self.finish_game(interaction)
-        else:
-            await self.update_embed(interaction)
-    
-    @discord.ui.button(label="✋ Plantarse", style=discord.ButtonStyle.success, emoji="✋")
-    async def stand(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
-            return
-        
-        # Turno del dealer
-        player_value = self.game.calculate_hand_value(self.game.player_hand)
-        
-        # El dealer juega según la dificultad
-        while not self.game.dealer_decision(player_value):
-            self.game.dealer_hand.append(self.game.deal_card())
-        
-        dealer_value = self.game.calculate_hand_value(self.game.dealer_hand)
-        
-        # Determinar resultado
-        if dealer_value > 21:
-            self.game.result = "win"  # Dealer se pasa
-        elif dealer_value > player_value:
-            self.game.result = "lose"  # Dealer gana
-        elif dealer_value < player_value:
-            self.game.result = "win"   # Jugador gana
-        else:
-            self.game.result = "push"  # Empate
-        
-        self.game.game_over = True
-        await self.finish_game(interaction)
-    
-    @discord.ui.button(label="🏃‍♂️ Rendirse", style=discord.ButtonStyle.danger, emoji="🏃‍♂️")
-    async def surrender(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.id != self.user_id:
-            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
-            return
-        
-        # Rendirse = perder la mitad de la apuesta
-        self.game.game_over = True
-        self.game.result = "lose"
-        await self.finish_game(interaction)
-    
-    async def finish_game(self, interaction):
-        """Finaliza el juego y procesa el resultado"""
-        # Deshabilitar todos los botones
-        for item in self.children:
-            item.disabled = True
-        
-        # Obtener resultado y actualizar balance
-        user_id = self.user_id
-        
-        if self.game.result == "win":
-            winnings = int(self.game.bet * self.game.payout_multiplier[self.game.difficulty])
-            add_balance(user_id, winnings)
-        elif self.game.result == "lose":
-            # Ya se restó la apuesta al inicio
-            pass  # No hacer nada, ya se restó
-        elif self.game.result == "push":
-            # Empate: devolver la apuesta
-            add_balance(user_id, self.game.bet)
-        
-        # Mostrar resultado final
-        await self.update_embed(interaction, final=True, dealer_revealed=True)
-        self.stop()
-    
-    async def on_timeout(self):
-        """Manejar timeout del juego"""
-        for item in self.children:
-            item.disabled = True
-        
-        # Si el juego no terminó, se considera rendición
-        if not self.game.game_over:
-            embed = discord.Embed(
-                title="⏰ Tiempo Agotado",
-                description="No respondiste a tiempo. Se considera rendición automática.",
-                color=discord.Color.orange()
-            )
-            
-            try:
-                await self.message.edit(embed=embed, view=self)
-            except:
-                pass
-        
-        self.stop()
-
 @bot.command()
 async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
     """
-    Juega blackjack contra la IA con diferentes dificultades.
+    Inicia un juego de blackjack con comandos de texto.
     
-    Uso:
-    !blackjack <apuesta> <dificultad>
+    Uso: !blackjack <apuesta> <dificultad>
     
     Ejemplos:
-    !blackjack 100 facil      - Apuesta 100 gemas en dificultad fácil (ganas 1.5x)
-    !blackjack 250 normal     - Apuesta 250 gemas en dificultad normal (ganas 2x)
-    !blackjack 500 dificil    - Apuesta 500 gemas en dificultad difícil (ganas 3x)
+    !blackjack 100 facil      - Apuesta 100 gemas en fácil (ganas 1.5x)
+    !blackjack 250 normal     - Apuesta 250 gemas en normal (ganas 2x)
+    !blackjack 500 dificil    - Apuesta 500 gemas en difícil (ganas 3x)
     
-    Dificultades disponibles:
-    • facil   - 1.5x multiplicador (IA conservadora)
-    • normal  - 2.0x multiplicador (IA equilibrada)
-    • dificil - 3.0x multiplicador (IA agresiva)
+    Una vez iniciado el juego, usa:
+    !pedir       - Pedir otra carta
+    !quedarse    - Plantarte y ver el resultado
+    !rendirse    - Rendirte y perder la mitad
+    !cancelar_bj - Cancelar el juego actual
     """
     
     # 1. Verificar cooldown (10 minutos)
@@ -7973,13 +7769,8 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
             inline=False
         )
         embed.add_field(
-            name="⏰ Cooldown",
-            value="10 minutos entre partidas",
-            inline=True
-        )
-        embed.add_field(
-            name="🎮 Cómo jugar",
-            value="1. Elige tu apuesta (1-500)\n2. Elige dificultad\n3. Juega contra la IA\n4. Gana o pierde según el resultado",
+            name="🎮 Comandos durante el juego",
+            value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarse\n• `!rendirse` - Rendirse\n• `!cancelar_bj` - Cancelar",
             inline=False
         )
         await ctx.send(embed=embed)
@@ -8002,51 +7793,379 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
         await ctx.send(f"❌ No tienes suficientes gemas. Necesitas {format_gems(apuesta)} pero tienes {format_gems(user_balance)}.")
         return
     
-    # 6. Restar la apuesta del balance
+    # 6. Verificar que no tenga otro juego activo
+    if user_id in active_blackjack_games:
+        await ctx.send("❌ Ya tienes un juego de blackjack activo. Usa `!cancelar_bj` para cancelarlo o termínalo primero.")
+        return
+    
+    # 7. Restar la apuesta del balance
     add_balance(user_id, -apuesta)
     
-    # 7. Actualizar cooldown
+    # 8. Actualizar cooldown (solo para iniciar nuevo juego)
     user_last_blackjack[user_id] = now
     
-    # 8. Crear y empezar el juego
+    # 9. Crear el juego
     game = BlackjackGame(apuesta, dificultad)
     
-    # Crear embed inicial
+    # Repartir cartas iniciales
+    game.player_hand = [game.deal_card(), game.deal_card()]
+    game.dealer_hand = [game.deal_card(), game.deal_card()]
+    
+    # 10. Guardar juego activo
+    active_blackjack_games[user_id] = {
+        'game': game,
+        'start_time': now,
+        'channel_id': ctx.channel.id
+    }
+    
+    # 11. Mostrar estado inicial
     diff_info = game.get_difficulty_description()
+    player_value = game.calculate_hand_value(game.player_hand)
     
     embed = discord.Embed(
         title=f"♠️ BLACKJACK - {diff_info['name']}",
-        description="¡Comienza el juego! Elige una acción:",
+        description=f"**¡Juego iniciado!** Apuesta: {format_gems(apuesta)} | Multiplicador: {diff_info['multiplier']}",
         color=diff_info['color']
     )
     
     embed.add_field(
-        name="🎯 Información",
-        value=f"**Apuesta:** {format_gems(apuesta)}\n**Multiplicador:** {diff_info['multiplier']}\n**Dificultad:** {diff_info['name']}",
+        name="🃏 Cartas del Dealer",
+        value=f"**{game.dealer_hand[0]}** ? ?",
         inline=False
     )
     
     embed.add_field(
-        name="🃏 Dealer",
-        value=game.format_hand(game.dealer_hand, hide_first=True),
+        name=f"👤 Tus Cartas ({player_value})",
+        value=f"**{game.player_hand[0]}** **{game.player_hand[1]}**",
         inline=False
     )
     
     embed.add_field(
-        name="👤 Tu Mano",
-        value="Preparando cartas...",
+        name="🎮 Comandos Disponibles",
+        value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarte\n• `!rendirse` - Rendirte (pierdes la mitad)\n• `!cancelar_bj` - Cancelar juego",
         inline=False
     )
     
-    embed.set_footer(text="Tienes 60 segundos para cada decisión")
+    embed.set_footer(text="Usa los comandos en los próximos 5 minutos")
     
-    # Enviar mensaje con la vista
-    message = await ctx.send(embed=embed)
-    
-    # Crear y empezar la vista del juego
-    view = BlackjackView(game, user_id, message, timeout=60)
-    await view.update_embed()
+    await ctx.send(embed=embed)
 
+@bot.command()
+async def pedir(ctx):
+    """Pide otra carta en tu juego de blackjack activo"""
+    user_id = ctx.author.id
+    
+    # Verificar si tiene juego activo
+    if user_id not in active_blackjack_games:
+        await ctx.send("❌ No tienes un juego de blackjack activo. Usa `!blackjack` para iniciar uno.")
+        return
+    
+    game_data = active_blackjack_games[user_id]
+    game = game_data['game']
+    
+    # Verificar que el juego no haya terminado
+    if game.game_over:
+        await ctx.send("❌ Este juego ya terminó. Inicia uno nuevo con `!blackjack`.")
+        del active_blackjack_games[user_id]
+        return
+    
+    # Pedir carta
+    game.player_hand.append(game.deal_card())
+    player_value = game.calculate_hand_value(game.player_hand)
+    
+    # Verificar si se pasó de 21
+    if player_value > 21:
+        game.game_over = True
+        game.result = "lose"
+        
+        # Mostrar resultado
+        diff_info = game.get_difficulty_description()
+        embed = discord.Embed(
+            title="💀 ¡Te pasaste de 21!",
+            description=f"Tus cartas suman **{player_value}**. Has perdido **{format_gems(game.bet)}**.",
+            color=discord.Color.red()
+        )
+        
+        embed.add_field(
+            name="🃏 Cartas del Dealer",
+            value=f"**{' '.join(game.dealer_hand)}** ({game.calculate_hand_value(game.dealer_hand)})",
+            inline=False
+        )
+        
+        embed.add_field(
+            name=f"👤 Tus Cartas ({player_value})",
+            value=f"**{' '.join(game.player_hand)}**",
+            inline=False
+        )
+        
+        embed.set_footer(text="¡Mejor suerte la próxima vez!")
+        
+        # Eliminar juego activo
+        del active_blackjack_games[user_id]
+        
+        await ctx.send(embed=embed)
+        return
+    
+    # Si no se pasó, mostrar estado actual
+    diff_info = game.get_difficulty_description()
+    dealer_shown = game.dealer_hand[0]
+    
+    embed = discord.Embed(
+        title=f"♠️ BLACKJACK - {diff_info['name']}",
+        description=f"**Nueva carta repartida** | Apuesta: {format_gems(game.bet)}",
+        color=diff_info['color']
+    )
+    
+    embed.add_field(
+        name="🃏 Cartas del Dealer",
+        value=f"**{dealer_shown}** ? ?",
+        inline=False
+    )
+    
+    embed.add_field(
+        name=f"👤 Tus Cartas ({player_value})",
+        value=f"**{' '.join(game.player_hand)}**",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="🎮 ¿Qué quieres hacer?",
+        value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarte\n• `!rendirse` - Rendirte\n• `!cancelar_bj` - Cancelar",
+        inline=False
+    )
+    
+    embed.set_footer(text=f"Tus cartas suman {player_value}")
+    
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def quedarse(ctx):
+    """Plantarte y ver el resultado del blackjack"""
+    user_id = ctx.author.id
+    
+    # Verificar si tiene juego activo
+    if user_id not in active_blackjack_games:
+        await ctx.send("❌ No tienes un juego de blackjack activo. Usa `!blackjack` para iniciar uno.")
+        return
+    
+    game_data = active_blackjack_games[user_id]
+    game = game_data['game']
+    
+    # Verificar que el juego no haya terminado
+    if game.game_over:
+        await ctx.send("❌ Este juego ya terminó. Inicia uno nuevo con `!blackjack`.")
+        del active_blackjack_games[user_id]
+        return
+    
+    # Calcular valores
+    player_value = game.calculate_hand_value(game.player_hand)
+    
+    # Turno del dealer
+    while not game.dealer_decision(player_value):
+        game.dealer_hand.append(game.deal_card())
+    
+    dealer_value = game.calculate_hand_value(game.dealer_hand)
+    
+    # Determinar resultado
+    if dealer_value > 21:
+        # Dealer se pasó, jugador gana
+        game.result = "win"
+        winnings = int(game.bet * game.payout_multiplier[game.difficulty])
+        add_balance(user_id, winnings)
+        result_text = f"🎉 **¡GANASTE!** El dealer se pasó de 21.\nGanas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
+        color = discord.Color.green()
+        
+    elif dealer_value > player_value:
+        # Dealer gana
+        game.result = "lose"
+        result_text = f"💀 **PERDISTE**. El dealer tiene mejor mano.\nPierdes **{format_gems(game.bet)}**"
+        color = discord.Color.red()
+        
+    elif dealer_value < player_value:
+        # Jugador gana
+        game.result = "win"
+        winnings = int(game.bet * game.payout_multiplier[game.difficulty])
+        add_balance(user_id, winnings)
+        result_text = f"🎉 **¡GANASTE!** Tu mano es mejor.\nGanas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
+        color = discord.Color.green()
+        
+    else:
+        # Empate
+        game.result = "push"
+        add_balance(user_id, game.bet)  # Devolver apuesta
+        result_text = f"🤝 **EMPATE**. Recuperas tu apuesta de **{format_gems(game.bet)}**"
+        color = discord.Color.blue()
+    
+    game.game_over = True
+    
+    # Mostrar resultado final
+    diff_info = game.get_difficulty_description()
+    
+    embed = discord.Embed(
+        title=f"♠️ BLACKJACK - Resultado Final",
+        description=result_text,
+        color=color
+    )
+    
+    embed.add_field(
+        name=f"🃏 Dealer ({dealer_value})",
+        value=f"**{' '.join(game.dealer_hand)}**",
+        inline=False
+    )
+    
+    embed.add_field(
+        name=f"👤 Tu Mano ({player_value})",
+        value=f"**{' '.join(game.player_hand)}**",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="💰 Nuevo Balance",
+        value=format_gems(get_balance(user_id)),
+        inline=True
+    )
+    
+    embed.add_field(
+        name="🎯 Dificultad",
+        value=diff_info['name'],
+        inline=True
+    )
+    
+    embed.set_footer(text=f"Próximo !blackjack en {format_cooldown(COOLDOWN_BLACKJACK)}")
+    
+    # Eliminar juego activo
+    del active_blackjack_games[user_id]
+    
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def rendirse(ctx):
+    """Rendirte en tu juego de blackjack (pierdes la mitad)"""
+    user_id = ctx.author.id
+    
+    # Verificar si tiene juego activo
+    if user_id not in active_blackjack_games:
+        await ctx.send("❌ No tienes un juego de blackjack activo. Usa `!blackjack` para iniciar uno.")
+        return
+    
+    game_data = active_blackjack_games[user_id]
+    game = game_data['game']
+    
+    # Verificar que el juego no haya terminado
+    if game.game_over:
+        await ctx.send("❌ Este juego ya terminó. Inicia uno nuevo con `!blackjack`.")
+        del active_blackjack_games[user_id]
+        return
+    
+    # Calcular pérdida (mitad de la apuesta, redondeando hacia arriba)
+    lost_amount = math.ceil(game.bet / 2)
+    refund_amount = game.bet - lost_amount
+    
+    # Devolver la parte no perdida
+    if refund_amount > 0:
+        add_balance(user_id, refund_amount)
+    
+    game.game_over = True
+    game.result = "surrender"
+    
+    # Mostrar resultado
+    player_value = game.calculate_hand_value(game.player_hand)
+    
+    embed = discord.Embed(
+        title="🏃‍♂️ ¡Te has rendido!",
+        description=f"Has decidido rendirte. Pierdes **{format_gems(lost_amount)}** y recuperas **{format_gems(refund_amount)}**.",
+        color=discord.Color.orange()
+    )
+    
+    embed.add_field(
+        name="🃏 Cartas del Dealer",
+        value=f"**{game.dealer_hand[0]}** ? ?",
+        inline=False
+    )
+    
+    embed.add_field(
+        name=f"👤 Tus Cartas ({player_value})",
+        value=f"**{' '.join(game.player_hand)}**",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="💰 Nuevo Balance",
+        value=format_gems(get_balance(user_id)),
+        inline=True
+    )
+    
+    embed.set_footer(text="A veces es mejor retirarse a tiempo")
+    
+    # Eliminar juego activo
+    del active_blackjack_games[user_id]
+    
+    await ctx.send(embed=embed)
+
+@bot.command()
+async def cancelar_bj(ctx):
+    """Cancela tu juego de blackjack activo (pierdes toda la apuesta)"""
+    user_id = ctx.author.id
+    
+    # Verificar si tiene juego activo
+    if user_id not in active_blackjack_games:
+        await ctx.send("❌ No tienes un juego de blackjack activo para cancelar.")
+        return
+    
+    game_data = active_blackjack_games[user_id]
+    game = game_data['game']
+    
+    # Mostrar confirmación
+    embed = discord.Embed(
+        title="❌ Juego Cancelado",
+        description=f"Has cancelado tu juego de blackjack. Pierdes tu apuesta de **{format_gems(game.bet)}**.",
+        color=discord.Color.red()
+    )
+    
+    embed.add_field(
+        name="🃏 Cartas del Dealer",
+        value=f"**{game.dealer_hand[0]}** ? ?",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="👤 Tus Cartas",
+        value=f"**{' '.join(game.player_hand)}** ({game.calculate_hand_value(game.player_hand)})",
+        inline=False
+    )
+    
+    embed.set_footer(text="Usa !blackjack para jugar de nuevo")
+    
+    # Eliminar juego activo
+    del active_blackjack_games[user_id]
+    
+    await ctx.send(embed=embed)
+
+# Tarea para limpiar juegos abandonados
+import asyncio
+import math
+
+
+@tasks.loop(minutes=5)
+async def cleanup_blackjack_games():
+    """Limpia juegos de blackjack abandonados cada 5 minutos"""
+    now = time.time()
+    expired_users = []
+    
+    for user_id, game_data in active_blackjack_games.items():
+        # Si el juego lleva más de 10 minutos sin actividad
+        if now - game_data['start_time'] > COOLDOWN_BLACKJACK:
+            expired_users.append(user_id)
+    
+    for user_id in expired_users:
+        del active_blackjack_games[user_id]
+        print(f"♠️ Juego de blackjack expirado para usuario {user_id}")
+
+# Iniciar la tarea de limpieza cuando el bot esté listo
+@bot.event
+async def on_ready():
+    cleanup_blackjack_games.start()
+    print(f"✅ Bot conectado como {bot.user}")
 
 # ----------------------------
 # EVENTO DE INICIO
@@ -8054,6 +8173,7 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
 @bot.event
 async def on_ready():
     print(f'✅ {bot.user} está listo!')
+    cleanup_blackjack_games.start()
     print(f'🎮 Comandos cargados: ayuda, gacha, gacha_comprar, trabajar, inventario, vender, intercambio, diaria, adivina, rob, cancelar_intercambio, espera (cd), casino, pesca')
     print(f'👑 Comandos de admin: givegems, removegems, clear_inventory, remove_card, givecard, reset_data, clear, interfaz')
 
