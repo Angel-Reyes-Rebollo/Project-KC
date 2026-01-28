@@ -142,6 +142,9 @@ COOLDOWN_TRABAJAR = 4 * 3600   # !trabajar (4 horas)
 COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
 COOLDOWN_MINAR = 60            # !minar (1 minuto)
+COOLDOWN_ENCUENTRA_GEMA = 2 * 3600  # !encuentra_gema (2 horas)
+COOLDOWN_BLACKJACK = 10 * 60   # !blackjack (10 minutos)
+
 
 
 def format_cooldown(seconds):
@@ -183,6 +186,9 @@ async def espera(ctx):
         ("🎰 Casino", user_last_casino, COOLDOWN_CASINO), 
         ("🎣 Pesca", user_last_pesca, COOLDOWN_PESCA),
         ("⛏️ Minar", user_last_minar, COOLDOWN_MINAR),
+        ("💎 Encuentra Gema", user_last_encuentra_gema, COOLDOWN_ENCUENTRA_GEMA),
+        ("♠️ Blackjack", user_last_blackjack, COOLDOWN_BLACKJACK),
+
     ]
     
     cooldowns_text = []
@@ -1443,6 +1449,9 @@ async def ayuda(ctx):
             "• `!minar` - Minijuego de minería (1min cooldown)\n"
             "• `!diaria` - Recompensa diaria de 80 gemas\n"
             "• `!rob @usuario` - Roba gemas a otro usuario (30min cooldown)"
+            "• `!encuentra_gema` - Juego interactivo de gemas (2h cooldown)"
+            "• `!blackjack <apuesta> <dificultad>` - Juego de blackjack (10min cooldown)"
+
         ),
         inline=False
     )
@@ -1472,6 +1481,8 @@ async def ayuda(ctx):
             "• `!vender_rareza [rareza]` - Vende por rareza\n"
             "• `!intercambio @usuario` - Intercambia cartas\n"
             "• `!cancelar_intercambio` - Cancela intercambio"
+            "• `!mostrar [número]` - Muestra carta específica en el canal"
+
         ),
         inline=False
     )
@@ -7121,6 +7132,920 @@ async def apoyo(ctx):
     await ctx.send(embed=embed)
 
 
+# ----------------------------
+# COMANDO !MOSTRAR - Mostrar carta específica
+# ----------------------------
+@bot.command()
+async def mostrar(ctx, numero: int = None):
+    """
+    Muestra una carta específica de tu inventario en el canal.
+    
+    Uso:
+    !mostrar                  - Te envía por MD la lista numerada de tus cartas
+    !mostrar <número>         - Muestra la carta con ese número en el canal actual
+    
+    Ejemplo:
+    !mostrar                 (recibes lista por MD)
+    !mostrar 3               (muestra la carta #3 en el canal)
+    """
+    user_id = ctx.author.id
+    inventory = get_inventory(user_id)
+    
+    if not inventory:
+        embed = discord.Embed(
+            title="📭 Inventario Vacío",
+            description="No tienes cartas para mostrar.",
+            color=discord.Color.blue()
+        )
+        await ctx.send(embed=embed)
+        return
+    
+    # Ordenar cartas por rareza (de mayor a menor)
+    rarity_order = {"E": 0, "G": 1, "SP": 2, "UR": 3, "SSR": 4, "R": 5, "N": 6}
+    
+    def get_rarity_value(card):
+        rarity = card.get("rareza", "N")
+        return rarity_order.get(rarity, 7)  # Si hay rareza desconocida, va al final
+    
+    # Ordenar por rareza (mayor a menor) y luego por nombre
+    sorted_inventory = sorted(inventory, key=lambda x: (get_rarity_value(x), x.get("nombre", "")))
+    
+    # Si no se proporciona número, enviar lista por MD
+    if numero is None:
+        try:
+            # Crear lista numerada
+            cards_list = []
+            for i, card in enumerate(sorted_inventory, 1):
+                rarity = card.get("rareza", "N")
+                rarity_emoji = get_rarity_emoji(rarity)
+                value = card.get("valor", 0)
+                
+                cards_list.append(f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity}) - Valor: {format_gems(value)}")
+            
+            # Dividir en chunks para evitar límites de Discord
+            chunk_size = 15
+            chunks = [cards_list[i:i + chunk_size] for i in range(0, len(cards_list), chunk_size)]
+            
+            # Enviar mensaje inicial
+            embed = discord.Embed(
+                title=f"📋 Tu Inventario - {len(sorted_inventory)} cartas",
+                description="Lista de tus cartas ordenadas por rareza (de mayor a menor):",
+                color=discord.Color.gold()
+            )
+            
+            # Mostrar estadísticas rápidas
+            rarity_count = {}
+            for card in sorted_inventory:
+                rarity = card.get("rareza", "N")
+                rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
+            
+            stats_text = ""
+            for rarity in ["E", "G", "SP", "UR", "SSR", "R", "N"]:
+                if rarity in rarity_count:
+                    emoji = get_rarity_emoji(rarity)
+                    stats_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
+            
+            if stats_text:
+                embed.add_field(name="📊 Distribución por rareza", value=stats_text, inline=False)
+            
+            embed.add_field(
+                name="🎯 Cómo usar",
+                value="Responde con `!mostrar <número>` en este canal para mostrar una carta específica.\nEjemplo: `!mostrar 5`",
+                inline=False
+            )
+            
+            await ctx.author.send(embed=embed)
+            
+            # Enviar cada chunk de cartas
+            for page_num, chunk in enumerate(chunks, 1):
+                page_embed = discord.Embed(
+                    title=f"📖 Página {page_num}/{len(chunks)}",
+                    color=discord.Color.blue()
+                )
+                
+                page_embed.description = "\n".join(chunk)
+                page_embed.set_footer(text=f"Cartas {((page_num-1)*chunk_size)+1}-{min(page_num*chunk_size, len(sorted_inventory))} de {len(sorted_inventory)}")
+                
+                await ctx.author.send(embed=page_embed)
+            
+            # Confirmación en el canal
+            await ctx.send(f"✅ {ctx.author.mention}, te he enviado la lista de tus cartas por mensaje directo. Usa `!mostrar <número>` para mostrar una carta en este canal.")
+            
+        except discord.Forbidden:
+            await ctx.send("❌ No puedo enviarte mensajes directos. Por favor, habilita los MDs y usa el comando nuevamente.")
+        return
+    
+    # Si se proporciona un número, mostrar esa carta en el canal
+    # Validar número
+    if numero < 1 or numero > len(sorted_inventory):
+        await ctx.send(f"❌ Número inválido. Debe estar entre 1 y {len(sorted_inventory)}.")
+        return
+    
+    # Obtener la carta seleccionada
+    selected_card = sorted_inventory[numero - 1]
+    
+    # Crear embed para mostrar la carta
+    rarity = selected_card.get("rareza", "N")
+    rarity_emoji = get_rarity_emoji(rarity)
+    card_value = selected_card.get("valor", 0)
+    
+    embed = discord.Embed(
+        title=f"{rarity_emoji} {selected_card['nombre']} ({rarity}) {rarity_emoji}",
+        description=f"**{ctx.author.display_name}** muestra su carta:",
+        color=get_rarity_color(rarity)
+    )
+    
+    # Añadir descripción si existe
+    descripcion = selected_card.get("descripcion", "")
+    if descripcion:
+        embed.add_field(name="📝 Descripción", value=descripcion, inline=False)
+    
+    # Añadir valor
+    embed.add_field(name="💰 Valor", value=format_gems(card_value), inline=True)
+    
+    # Añadir stats
+    stats = selected_card.get("stats", {})
+    if stats:
+        # Dividir stats en dos columnas para mejor presentación
+        stats_column1 = ""
+        stats_column2 = ""
+        
+        stat_names = list(stats.keys())
+        half = len(stat_names) // 2
+        
+        for i, stat_name in enumerate(stat_names):
+            stat_value = stats[stat_name]
+            
+            # Mapear nombres de stats a emojis
+            stat_emoji_map = {
+                "Evasion": "👻",
+                "Fuerza": "💥",
+                "Reacción": "🌀",
+                "Defensa": "🛡️",
+                "Velocidad": "💨",
+                "IQ": "🧠",
+                "Carisma": "✨",
+                "Precisión": "🎯",
+                "Energia": "⚡",
+                "Suerte": "🍀"
+            }
+            
+            emoji = stat_emoji_map.get(stat_name, "📊")
+            stat_line = f"{emoji} **{stat_name}:** {stat_value}\n"
+            
+            if i < half:
+                stats_column1 += stat_line
+            else:
+                stats_column2 += stat_line
+        
+        # Añadir columnas al embed
+        embed.add_field(name="📊 Estadísticas", value=stats_column1 if stats_column1 else "N/A", inline=True)
+        if stats_column2:
+            embed.add_field(name="‎", value=stats_column2, inline=True)  # Carácter invisible para alinear
+    
+    # Información adicional
+    card_id = selected_card.get("id", "N/A")
+    embed.add_field(name="🆔 ID", value=card_id, inline=True)
+    
+    # Posición en la lista ordenada
+    embed.add_field(name="🎯 Posición", value=f"#{numero} de {len(sorted_inventory)}", inline=True)
+    
+    # Intentar cargar y mostrar la imagen
+    image_path = selected_card.get("imagen", "")
+    file = None
+    
+    try:
+        if image_path and os.path.exists(image_path):
+            file = discord.File(image_path, filename="carta.png")
+            embed.set_image(url="attachment://carta.png")
+        else:
+            embed.add_field(name="⚠️ Imagen", value="No disponible", inline=False)
+    except Exception as e:
+        print(f"Error cargando imagen: {e}")
+    
+    # Enviar al canal
+    if file:
+        await ctx.send(embed=embed, file=file)
+    else:
+        await ctx.send(embed=embed)
+
+
+
+# ----------------------------
+# COMANDO !ENCUENTRA_GEMA
+# ----------------------------
+
+# Diccionario para almacenar el estado del juego por usuario
+user_last_encuentra_gema = {}
+
+# Diccionario para almacenar los juegos activos
+active_gem_games = {}
+
+class Ronda1View(discord.ui.View):
+    def __init__(self, user_id, game_id, timeout=60):
+        super().__init__(timeout=timeout)
+        self.user_id = user_id
+        self.game_id = game_id
+        self.winning_choice = random.choice(['A', 'B', 'C'])
+
+    @discord.ui.button(label="A", style=discord.ButtonStyle.primary, emoji="🔵")
+    async def choice_a(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'A')
+
+    @discord.ui.button(label="B", style=discord.ButtonStyle.primary, emoji="🟢")
+    async def choice_b(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'B')
+
+    @discord.ui.button(label="C", style=discord.ButtonStyle.primary, emoji="🔴")
+    async def choice_c(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'C')
+
+    async def handle_choice(self, interaction, user_choice):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
+            return
+        
+        # Deshabilitar todos los botones
+        for item in self.children:
+            item.disabled = True
+        
+        game_data = active_gem_games[self.game_id]
+        
+        if user_choice == self.winning_choice:
+            # Ganó la primera ronda
+            embed = discord.Embed(
+                title="🎉 ¡Primera Ronda Ganada!",
+                description=f"Elegiste **{user_choice}** y la gema estaba en **{self.winning_choice}**.\n\n**¿Qué quieres hacer?**",
+                color=discord.Color.green()
+            )
+            embed.add_field(
+                name="💰 Cobrar ahora",
+                value="Recibe 40-80 gemas y termina el juego",
+                inline=False
+            )
+            embed.add_field(
+                name="🎲 Doblar y seguir",
+                value="Arriésgate a la segunda ronda:\n• Ganas: 100-160 gemas\n• Pierdes: 15-30 gemas",
+                inline=False
+            )
+            
+            # Guardar que ganó la primera ronda
+            game_data['won_r1'] = True
+            
+            view = Ronda1DecisionView(self.user_id, self.game_id)
+            await interaction.response.edit_message(embed=embed, view=view)
+        else:
+            # Perdió la primera ronda
+            embed = discord.Embed(
+                title="❌ Primera Ronda Perdida",
+                description=f"Elegiste **{user_choice}** pero la gema estaba en **{self.winning_choice}**.\n\n¡Mejor suerte la próxima vez!",
+                color=discord.Color.red()
+            )
+            embed.set_footer(text=f"Próximo !encuentra_gema en {format_cooldown(COOLDOWN_ENCUENTRA_GEMA)}")
+            
+            # Eliminar el juego activo
+            if self.game_id in active_gem_games:
+                del active_gem_games[self.game_id]
+            
+            await interaction.response.edit_message(embed=embed, view=self)
+            self.stop()
+
+class Ronda1DecisionView(discord.ui.View):
+    def __init__(self, user_id, game_id, timeout=60):
+        super().__init__(timeout=timeout)
+        self.user_id = user_id
+        self.game_id = game_id
+
+    @discord.ui.button(label="💰 Cobrar Ahora", style=discord.ButtonStyle.success, emoji="💎")
+    async def cobrar(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Esta decisión no es para ti.", ephemeral=True)
+            return
+        
+        # Deshabilitar todos los botones
+        for item in self.children:
+            item.disabled = True
+        
+        # Calcular recompensa (40-80)
+        reward = random.randint(40, 80)
+        add_balance(self.user_id, reward)
+        
+        embed = discord.Embed(
+            title="💰 ¡Recompensa Cobrada!",
+            description=f"Has decidido cobrar tu premio de la primera ronda.\n\n**🎁 Recompensa:** {format_gems(reward)}",
+            color=discord.Color.gold()
+        )
+        embed.add_field(name="💰 Nuevo Balance", value=format_gems(get_balance(self.user_id)), inline=True)
+        embed.set_footer(text=f"Próximo !encuentra_gema en {format_cooldown(COOLDOWN_ENCUENTRA_GEMA)}")
+        
+        # Eliminar el juego activo
+        if self.game_id in active_gem_games:
+            del active_gem_games[self.game_id]
+        
+        await interaction.response.edit_message(embed=embed, view=self)
+        self.stop()
+
+    @discord.ui.button(label="🎲 Doblar y Seguir", style=discord.ButtonStyle.danger, emoji="⚡")
+    async def doblar(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Esta decisión no es para ti.", ephemeral=True)
+            return
+        
+        # Deshabilitar todos los botones
+        for item in self.children:
+            item.disabled = True
+        
+        # Mostrar segunda ronda
+        embed = discord.Embed(
+            title="🎲 Segunda Ronda - ¡Todo o Nada!",
+            description="**¡Valiente decisión!**\n\nAhora elige entre **A, B o C** nuevamente.\n\n**Premios:**\n• ✅ Aciertas: **100-160 gemas**\n• ❌ Fallas: **15-30 gemas**",
+            color=discord.Color.purple()
+        )
+        
+        view = Ronda2View(self.user_id, self.game_id)
+        await interaction.response.edit_message(embed=embed, view=view)
+
+class Ronda2View(discord.ui.View):
+    def __init__(self, user_id, game_id, timeout=60):
+        super().__init__(timeout=timeout)
+        self.user_id = user_id
+        self.game_id = game_id
+        self.winning_choice = random.choice(['A', 'B', 'C'])
+
+    @discord.ui.button(label="A", style=discord.ButtonStyle.primary, emoji="🔵")
+    async def choice_a(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'A')
+
+    @discord.ui.button(label="B", style=discord.ButtonStyle.primary, emoji="🟢")
+    async def choice_b(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'B')
+
+    @discord.ui.button(label="C", style=discord.ButtonStyle.primary, emoji="🔴")
+    async def choice_c(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.handle_choice(interaction, 'C')
+
+    async def handle_choice(self, interaction, user_choice):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
+            return
+        
+        # Deshabilitar todos los botones
+        for item in self.children:
+            item.disabled = True
+        
+        # Calcular premio según resultado
+        if user_choice == self.winning_choice:
+            # Ganó la segunda ronda
+            reward = random.randint(100, 160)
+            add_balance(self.user_id, reward)
+            
+            embed = discord.Embed(
+                title="🎉 ¡Doble Victoria!",
+                description=f"Elegiste **{user_choice}** y la gema estaba en **{self.winning_choice}**.\n\n**¡Has ganado el premio máximo!**",
+                color=discord.Color.green()
+            )
+            embed.add_field(name="🎁 Premio Máximo", value=format_gems(reward), inline=True)
+            embed.add_field(name="💰 Nuevo Balance", value=format_gems(get_balance(self.user_id)), inline=True)
+        else:
+            # Perdió la segunda ronda (premio de consolación)
+            consolation = random.randint(15, 30)
+            add_balance(self.user_id, consolation)
+            
+            embed = discord.Embed(
+                title="😅 Premio de Consolación",
+                description=f"Elegiste **{user_choice}** pero la gema estaba en **{self.winning_choice}**.\n\n**No te vayas con las manos vacías.**",
+                color=discord.Color.orange()
+            )
+            embed.add_field(name="🎁 Premio de Consolación", value=format_gems(consolation), inline=True)
+            embed.add_field(name="💰 Nuevo Balance", value=format_gems(get_balance(self.user_id)), inline=True)
+        
+        embed.set_footer(text=f"Próximo !encuentra_gema en {format_cooldown(COOLDOWN_ENCUENTRA_GEMA)}")
+        
+        # Eliminar el juego activo
+        if self.game_id in active_gem_games:
+            del active_gem_games[self.game_id]
+        
+        await interaction.response.edit_message(embed=embed, view=self)
+        self.stop()
+
+@bot.command()
+async def encuentra_gema(ctx):
+    """Juego interactivo de encontrar gemas con dos rondas y decisiones"""
+    user_id = ctx.author.id
+    now = time.time()
+    
+    # 1. Verificar cooldown
+    if user_id in user_last_encuentra_gema and now - user_last_encuentra_gema[user_id] < COOLDOWN_ENCUENTRA_GEMA:
+        time_remaining = COOLDOWN_ENCUENTRA_GEMA - (now - user_last_encuentra_gema[user_id])
+        await ctx.send(f"⏰ **¡Espera!** Debes esperar {format_cooldown(time_remaining)} antes de volver a buscar gemas.")
+        return
+    
+    # Actualizar cooldown
+    user_last_encuentra_gema[user_id] = now
+    
+    # Crear ID único para este juego
+    game_id = f"{user_id}_{int(time.time())}"
+    
+    # Inicializar datos del juego
+    active_gem_games[game_id] = {
+        'user_id': user_id,
+        'won_r1': False,
+        'start_time': now
+    }
+    
+    # Crear embed inicial
+    embed = discord.Embed(
+        title="💎 Encuentra la Gema Escondida",
+        description="**¡Bienvenido al juego de las gemas!**\n\nElige entre **A, B o C** para encontrar la gema escondida.",
+        color=discord.Color.blue()
+    )
+    
+    # Instrucciones
+    embed.add_field(
+        name="🎯 Cómo Jugar",
+        value=(
+            "**Ronda 1:** Elige A, B o C\n"
+            "• ✅ **Aciertas:** Puedes COBRAR (40-80 gemas) o DOBLAR (ir a ronda 2)\n"
+            "• ❌ **Fallas:** Pierdes y termina el juego\n\n"
+            "**Ronda 2 (si doblas):**\n"
+            "• ✅ **Aciertas:** Ganas 100-160 gemas\n"
+            "• ❌ **Fallas:** Ganas 15-30 gemas (consolación)"
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="⏰ Tiempo límite",
+        value="Tienes 60 segundos para cada decisión",
+        inline=True
+    )
+    
+    embed.set_footer(text="¡Buena suerte!")
+    
+    # Crear y enviar vista
+    view = Ronda1View(user_id, game_id)
+    message = await ctx.send(embed=embed, view=view)
+    
+    # Manejar timeout
+    async def on_timeout():
+        if game_id in active_gem_games:
+            # Eliminar juego activo
+            del active_gem_games[game_id]
+            
+            # Crear embed de timeout
+            timeout_embed = discord.Embed(
+                title="⏰ Tiempo Agotado",
+                description="No respondiste a tiempo. El juego ha terminado.",
+                color=discord.Color.red()
+            )
+            timeout_embed.set_footer(text="Usa !encuentra_gema para jugar de nuevo")
+            
+            # Intentar editar el mensaje
+            try:
+                # Deshabilitar botones en la vista
+                for item in view.children:
+                    item.disabled = True
+                await message.edit(embed=timeout_embed, view=view)
+            except:
+                pass
+    
+    # Configurar timeout (60 segundos)
+    view.on_timeout = on_timeout
+
+
+
+# ----------------------------
+# COMANDO !BLACKJACK
+# ----------------------------
+
+user_last_blackjack = {}
+
+class BlackjackGame:
+    def __init__(self, bet_amount, difficulty):
+        self.bet = bet_amount
+        self.difficulty = difficulty  # "facil", "normal", "dificil"
+        self.deck = self.create_deck()
+        self.player_hand = []
+        self.dealer_hand = []
+        self.game_over = False
+        self.result = None
+        self.payout_multiplier = {
+            "facil": 1.5,
+            "normal": 2.0,
+            "dificil": 3.0
+        }
+        
+    def create_deck(self):
+        """Crea una baraja de 52 cartas"""
+        suits = ['♠️', '♥️', '♦️', '♣️']
+        values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        deck = []
+        for suit in suits:
+            for value in values:
+                deck.append(f"{value}{suit}")
+        random.shuffle(deck)
+        return deck
+    
+    def deal_card(self):
+        """Reparte una carta de la baraja"""
+        return self.deck.pop()
+    
+    def calculate_hand_value(self, hand):
+        """Calcula el valor de una mano de blackjack"""
+        value = 0
+        aces = 0
+        
+        for card in hand:
+            card_value = card[:-2]  # Remover el emoji
+            if card_value in ['J', 'Q', 'K']:
+                value += 10
+            elif card_value == 'A':
+                value += 11
+                aces += 1
+            else:
+                value += int(card_value)
+        
+        # Ajustar aces si el valor es mayor a 21
+        while value > 21 and aces > 0:
+            value -= 10
+            aces -= 1
+        
+        return value
+    
+    def format_hand(self, hand, hide_first=False):
+        """Formatea una mano para mostrar"""
+        if hide_first and hand:
+            return f"**{hand[0]}** ? ?"
+        return " ".join([f"**{card}**" for card in hand])
+    
+    def get_difficulty_description(self):
+        """Devuelve la descripción de la dificultad"""
+        descriptions = {
+            "facil": {
+                "name": "Fácil",
+                "multiplier": "1.5x",
+                "color": discord.Color.green(),
+                "ai_desc": "La IA juega conservadoramente, se planta con 16+"
+            },
+            "normal": {
+                "name": "Normal", 
+                "multiplier": "2.0x",
+                "color": discord.Color.blue(),
+                "ai_desc": "La IA usa estrategia básica, se planta con 17+"
+            },
+            "dificil": {
+                "name": "Difícil",
+                "multiplier": "3.0x",
+                "color": discord.Color.red(),
+                "ai_desc": "La IA juega agresivamente, se planta con 18+"
+            }
+        }
+        return descriptions.get(self.difficulty, descriptions["normal"])
+    
+    def dealer_decision(self, player_value):
+        """La IA del dealer decide si pedir carta o plantarse según la dificultad"""
+        dealer_value = self.calculate_hand_value(self.dealer_hand)
+        
+        # Diferentes estrategias según dificultad
+        if self.difficulty == "facil":
+            # Fácil: Se planta en 16 o más
+            return dealer_value >= 16
+        elif self.difficulty == "normal":
+            # Normal: Se planta en 17 o más
+            return dealer_value >= 17
+        else:  # Difícil
+            # Difícil: Se planta en 18 o más, o si el jugador tiene 19+ y el dealer tiene 17+
+            if dealer_value >= 18:
+                return True
+            elif player_value >= 19 and dealer_value >= 17:
+                return True
+            return False
+
+class BlackjackView(discord.ui.View):
+    def __init__(self, game, user_id, message, timeout=60):
+        super().__init__(timeout=timeout)
+        self.game = game
+        self.user_id = user_id
+        self.message = message
+        self.original_author = user_id
+        
+        # Iniciar el juego
+        self.start_game()
+    
+    def start_game(self):
+        """Inicia el juego repartiendo cartas"""
+        self.game.player_hand = [self.game.deal_card(), self.game.deal_card()]
+        self.game.dealer_hand = [self.game.deal_card(), self.game.deal_card()]
+    
+    async def update_embed(self, interaction=None, final=False, dealer_revealed=False):
+        """Actualiza el embed del juego"""
+        diff_info = self.game.get_difficulty_description()
+        
+        embed = discord.Embed(
+            title=f"♠️ BLACKJACK - {diff_info['name']}",
+            color=diff_info['color']
+        )
+        
+        # Información de la partida
+        embed.add_field(
+            name="🎯 Información",
+            value=f"**Apuesta:** {format_gems(self.game.bet)}\n**Multiplicador:** {diff_info['multiplier']}\n**Dificultad:** {diff_info['name']}",
+            inline=False
+        )
+        
+        # Mano del dealer
+        dealer_display = self.game.format_hand(self.game.dealer_hand, not dealer_revealed)
+        dealer_value = "" if not dealer_revealed else f" ({self.game.calculate_hand_value(self.game.dealer_hand)})"
+        embed.add_field(
+            name=f"🃏 Dealer {dealer_value}",
+            value=dealer_display,
+            inline=False
+        )
+        
+        # Mano del jugador
+        player_value = self.game.calculate_hand_value(self.game.player_hand)
+        embed.add_field(
+            name=f"👤 Tu Mano ({player_value})",
+            value=self.game.format_hand(self.game.player_hand),
+            inline=False
+        )
+        
+        # Estado del juego
+        if final:
+            if self.game.result == "win":
+                winnings = int(self.game.bet * self.game.payout_multiplier[self.game.difficulty])
+                embed.add_field(
+                    name="🎉 ¡GANASTE!",
+                    value=f"Ganas **{format_gems(winnings)}** ({self.game.payout_multiplier[self.game.difficulty]}x)",
+                    inline=False
+                )
+                embed.color = discord.Color.green()
+            elif self.game.result == "lose":
+                embed.add_field(
+                    name="💀 PERDISTE",
+                    value=f"Pierdes **{format_gems(self.game.bet)}**",
+                    inline=False
+                )
+                embed.color = discord.Color.red()
+            elif self.game.result == "push":
+                embed.add_field(
+                    name="🤝 EMPATE",
+                    value="Recuperas tu apuesta",
+                    inline=False
+                )
+                embed.color = discord.Color.blue()
+            
+            # Mostrar estrategia de la IA
+            embed.add_field(
+                name="🤖 Estrategia de la IA",
+                value=diff_info['ai_desc'],
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="🎮 Acciones",
+                value="Elige una acción:",
+                inline=False
+            )
+        
+        embed.set_footer(text=f"Tienes {self.timeout} segundos para decidir" if not final else "Juego terminado")
+        
+        if interaction:
+            if final:
+                # Deshabilitar botones al final
+                for item in self.children:
+                    item.disabled = True
+                await interaction.response.edit_message(embed=embed, view=self)
+            else:
+                await interaction.response.edit_message(embed=embed)
+        else:
+            # Solo para el mensaje inicial
+            await self.message.edit(embed=embed)
+    
+    @discord.ui.button(label="📥 Pedir Carta", style=discord.ButtonStyle.primary, emoji="🃏")
+    async def hit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
+            return
+        
+        # Dar una carta al jugador
+        self.game.player_hand.append(self.game.deal_card())
+        player_value = self.game.calculate_hand_value(self.game.player_hand)
+        
+        # Verificar si se pasó
+        if player_value > 21:
+            self.game.game_over = True
+            self.game.result = "lose"
+            await self.finish_game(interaction)
+        else:
+            await self.update_embed(interaction)
+    
+    @discord.ui.button(label="✋ Plantarse", style=discord.ButtonStyle.success, emoji="✋")
+    async def stand(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
+            return
+        
+        # Turno del dealer
+        player_value = self.game.calculate_hand_value(self.game.player_hand)
+        
+        # El dealer juega según la dificultad
+        while not self.game.dealer_decision(player_value):
+            self.game.dealer_hand.append(self.game.deal_card())
+        
+        dealer_value = self.game.calculate_hand_value(self.game.dealer_hand)
+        
+        # Determinar resultado
+        if dealer_value > 21:
+            self.game.result = "win"  # Dealer se pasa
+        elif dealer_value > player_value:
+            self.game.result = "lose"  # Dealer gana
+        elif dealer_value < player_value:
+            self.game.result = "win"   # Jugador gana
+        else:
+            self.game.result = "push"  # Empate
+        
+        self.game.game_over = True
+        await self.finish_game(interaction)
+    
+    @discord.ui.button(label="🏃‍♂️ Rendirse", style=discord.ButtonStyle.danger, emoji="🏃‍♂️")
+    async def surrender(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("❌ Este juego no es para ti.", ephemeral=True)
+            return
+        
+        # Rendirse = perder la mitad de la apuesta
+        self.game.game_over = True
+        self.game.result = "lose"
+        await self.finish_game(interaction)
+    
+    async def finish_game(self, interaction):
+        """Finaliza el juego y procesa el resultado"""
+        # Deshabilitar todos los botones
+        for item in self.children:
+            item.disabled = True
+        
+        # Obtener resultado y actualizar balance
+        user_id = self.user_id
+        
+        if self.game.result == "win":
+            winnings = int(self.game.bet * self.game.payout_multiplier[self.game.difficulty])
+            add_balance(user_id, winnings)
+        elif self.game.result == "lose":
+            # Ya se restó la apuesta al inicio
+            pass  # No hacer nada, ya se restó
+        elif self.game.result == "push":
+            # Empate: devolver la apuesta
+            add_balance(user_id, self.game.bet)
+        
+        # Mostrar resultado final
+        await self.update_embed(interaction, final=True, dealer_revealed=True)
+        self.stop()
+    
+    async def on_timeout(self):
+        """Manejar timeout del juego"""
+        for item in self.children:
+            item.disabled = True
+        
+        # Si el juego no terminó, se considera rendición
+        if not self.game.game_over:
+            embed = discord.Embed(
+                title="⏰ Tiempo Agotado",
+                description="No respondiste a tiempo. Se considera rendición automática.",
+                color=discord.Color.orange()
+            )
+            
+            try:
+                await self.message.edit(embed=embed, view=self)
+            except:
+                pass
+        
+        self.stop()
+
+@bot.command()
+async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
+    """
+    Juega blackjack contra la IA con diferentes dificultades.
+    
+    Uso:
+    !blackjack <apuesta> <dificultad>
+    
+    Ejemplos:
+    !blackjack 100 facil      - Apuesta 100 gemas en dificultad fácil (ganas 1.5x)
+    !blackjack 250 normal     - Apuesta 250 gemas en dificultad normal (ganas 2x)
+    !blackjack 500 dificil    - Apuesta 500 gemas en dificultad difícil (ganas 3x)
+    
+    Dificultades disponibles:
+    • facil   - 1.5x multiplicador (IA conservadora)
+    • normal  - 2.0x multiplicador (IA equilibrada)
+    • dificil - 3.0x multiplicador (IA agresiva)
+    """
+    
+    # 1. Verificar cooldown (10 minutos)
+    user_id = ctx.author.id
+    now = time.time()
+    
+    if user_id in user_last_blackjack and now - user_last_blackjack[user_id] < COOLDOWN_BLACKJACK:
+        time_remaining = COOLDOWN_BLACKJACK - (now - user_last_blackjack[user_id])
+        await ctx.send(f"⏰ **¡Espera!** Debes esperar {format_cooldown(time_remaining)} antes de jugar blackjack nuevamente.")
+        return
+    
+    # 2. Validar argumentos
+    if apuesta is None or dificultad is None:
+        embed = discord.Embed(
+            title="🎰 BLACKJACK - Ayuda",
+            description="**Uso correcto:** `!blackjack <apuesta> <dificultad>`\n\n**Ejemplos:**",
+            color=discord.Color.blue()
+        )
+        embed.add_field(
+            name="💰 Apuestas",
+            value="Puedes apostar hasta 500 gemas",
+            inline=True
+        )
+        embed.add_field(
+            name="🎯 Dificultades",
+            value="`facil` - `normal` - `dificil`",
+            inline=True
+        )
+        embed.add_field(
+            name="📊 Multiplicadores",
+            value="• **Fácil:** 1.5x tu apuesta\n• **Normal:** 2.0x tu apuesta\n• **Difícil:** 3.0x tu apuesta",
+            inline=False
+        )
+        embed.add_field(
+            name="⏰ Cooldown",
+            value="10 minutos entre partidas",
+            inline=True
+        )
+        embed.add_field(
+            name="🎮 Cómo jugar",
+            value="1. Elige tu apuesta (1-500)\n2. Elige dificultad\n3. Juega contra la IA\n4. Gana o pierde según el resultado",
+            inline=False
+        )
+        await ctx.send(embed=embed)
+        return
+    
+    # 3. Validar apuesta
+    if apuesta < 1 or apuesta > 500:
+        await ctx.send("❌ La apuesta debe estar entre 1 y 500 gemas.")
+        return
+    
+    # 4. Validar dificultad
+    dificultad = dificultad.lower()
+    if dificultad not in ["facil", "normal", "dificil"]:
+        await ctx.send("❌ Dificultad no válida. Usa: `facil`, `normal` o `dificil`.")
+        return
+    
+    # 5. Verificar que tenga gemas suficientes
+    user_balance = get_balance(user_id)
+    if user_balance < apuesta:
+        await ctx.send(f"❌ No tienes suficientes gemas. Necesitas {format_gems(apuesta)} pero tienes {format_gems(user_balance)}.")
+        return
+    
+    # 6. Restar la apuesta del balance
+    add_balance(user_id, -apuesta)
+    
+    # 7. Actualizar cooldown
+    user_last_blackjack[user_id] = now
+    
+    # 8. Crear y empezar el juego
+    game = BlackjackGame(apuesta, dificultad)
+    
+    # Crear embed inicial
+    diff_info = game.get_difficulty_description()
+    
+    embed = discord.Embed(
+        title=f"♠️ BLACKJACK - {diff_info['name']}",
+        description="¡Comienza el juego! Elige una acción:",
+        color=diff_info['color']
+    )
+    
+    embed.add_field(
+        name="🎯 Información",
+        value=f"**Apuesta:** {format_gems(apuesta)}\n**Multiplicador:** {diff_info['multiplier']}\n**Dificultad:** {diff_info['name']}",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="🃏 Dealer",
+        value=game.format_hand(game.dealer_hand, hide_first=True),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="👤 Tu Mano",
+        value="Preparando cartas...",
+        inline=False
+    )
+    
+    embed.set_footer(text="Tienes 60 segundos para cada decisión")
+    
+    # Enviar mensaje con la vista
+    message = await ctx.send(embed=embed)
+    
+    # Crear y empezar la vista del juego
+    view = BlackjackView(game, user_id, message, timeout=60)
+    await view.update_embed()
 
 
 # ----------------------------
