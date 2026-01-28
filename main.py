@@ -144,7 +144,7 @@ COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
 COOLDOWN_MINAR = 60            # !minar (1 minuto)
 COOLDOWN_ENCUENTRA_GEMA = 2 * 3600  # !encuentra_gema (2 horas)
-COOLDOWN_BLACKJACK = 10 * 60   # !blackjack (10 minutos)
+COOLDOWN_BLACKJACK = 2 * 3600   # !blackjack (10 minutos)
 
 
 
