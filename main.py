@@ -2585,7 +2585,7 @@ async def gacha_comprar(ctx, cantidad: int = 1):
         return
 
     user_id = ctx.author.id
-    cost = 80 * cantidad
+    cost = 150 * cantidad
     current_gems = get_balance(user_id)
     
     # Verificar si tiene suficientes gemas
@@ -7622,6 +7622,8 @@ async def encuentra_gema(ctx):
 # Diccionarios para el sistema de blackjack
 user_last_blackjack = {}
 active_blackjack_games = {}
+APUESTA_MINIMA = 150
+APUESTA_MAXIMA = 2000
 
 class BlackjackGame:
     def __init__(self, bet_amount, difficulty):
@@ -7632,10 +7634,12 @@ class BlackjackGame:
         self.dealer_hand = []
         self.game_over = False
         self.result = None
+        
+        # MULTIPLICADORES REDUCIDOS PARA HACERLO MÁS DIFÍCIL
         self.payout_multiplier = {
-            "facil": 1.5,
-            "normal": 2.0,
-            "dificil": 3.0
+            "facil": 1.2,    # 20% de ganancia
+            "normal": 1.5,   # 50% de ganancia
+            "dificil": 1.7   # 70% de ganancia
         }
         
     def create_deck(self):
@@ -7651,6 +7655,8 @@ class BlackjackGame:
     
     def deal_card(self):
         """Reparte una carta de la baraja"""
+        if len(self.deck) < 10:
+            self.deck = self.create_deck()  # Rebarajar si quedan pocas cartas
         return self.deck.pop()
     
     def calculate_hand_value(self, hand):
@@ -7675,66 +7681,96 @@ class BlackjackGame:
         
         return value
     
+    def is_blackjack(self, hand):
+        """Determina si una mano es un blackjack natural (21 con dos cartas)"""
+        return len(hand) == 2 and self.calculate_hand_value(hand) == 21
+    
     def get_difficulty_description(self):
         """Devuelve la descripción de la dificultad"""
         descriptions = {
             "facil": {
                 "name": "Fácil",
-                "multiplier": "1.5x",
+                "multiplier": "1.2x",
                 "color": discord.Color.green(),
-                "ai_desc": "La IA juega conservadoramente, se planta con 16+"
+                "desc": "Multiplicador bajo, dealer juega normal"
             },
             "normal": {
                 "name": "Normal", 
-                "multiplier": "2.0x",
+                "multiplier": "1.5x",
                 "color": discord.Color.blue(),
-                "ai_desc": "La IA usa estrategia básica, se planta con 17+"
+                "desc": "Multiplicador medio, dealer juega normal"
             },
             "dificil": {
                 "name": "Difícil",
-                "multiplier": "3.0x",
+                "multiplier": "1.7x",
                 "color": discord.Color.red(),
-                "ai_desc": "La IA juega agresivamente, se planta con 18+"
+                "desc": "Multiplicador alto, reglas anti-jugador"
             }
         }
         return descriptions.get(self.difficulty, descriptions["normal"])
     
-    def dealer_decision(self, player_value):
-        """La IA del dealer decide si pedir carta o plantarse según la dificultad"""
+    def dealer_must_hit(self):
+        """Determina si el dealer debe pedir carta (reglas del casino)"""
+        dealer_value = self.calculate_hand_value(self.dealer_hand)
+        return dealer_value < 17  # Dealer debe pedir hasta 17 o más
+    
+    def determine_winner(self):
+        """Determina el ganador con las NUEVAS REGLAS DIFÍCILES"""
+        player_value = self.calculate_hand_value(self.player_hand)
         dealer_value = self.calculate_hand_value(self.dealer_hand)
         
-        # Diferentes estrategias según dificultad
-        if self.difficulty == "facil":
-            # Fácil: Se planta en 16 o más
-            return dealer_value >= 16
-        elif self.difficulty == "normal":
-            # Normal: Se planta en 17 o más
-            return dealer_value >= 17
-        else:  # Difícil
-            # Difícil: Se planta en 18 o más, o si el jugador tiene 19+ y el dealer tiene 17+
-            if dealer_value >= 18:
-                return True
-            elif player_value >= 19 and dealer_value >= 17:
-                return True
-            return False
+        player_blackjack = self.is_blackjack(self.player_hand)
+        dealer_blackjack = self.is_blackjack(self.dealer_hand)
+        
+        # REGLA 1: Si el dealer tiene blackjack, GANA EL DEALER (incluso si jugador también tiene blackjack)
+        if dealer_blackjack:
+            return "dealer_blackjack"
+        
+        # REGLA 2: Si el jugador tiene blackjack y el dealer no, gana el jugador
+        if player_blackjack and not dealer_blackjack:
+            return "player_blackjack"
+        
+        # REGLA 3: Si jugador se pasa de 21, pierde
+        if player_value > 21:
+            return "player_bust"
+        
+        # REGLA 4: Si dealer se pasa de 21, gana jugador
+        if dealer_value > 21:
+            return "dealer_bust"
+        
+        # REGLA 5: Si ambos tienen 21, GANA EL DEALER (regla nueva)
+        if player_value == 21 and dealer_value == 21:
+            return "dealer_wins"
+        
+        # REGLA 6: Si empate, GANA EL DEALER (regla nueva)
+        if player_value == dealer_value:
+            return "dealer_wins"
+        
+        # REGLA 7: Si dealer tiene más, gana dealer
+        if dealer_value > player_value:
+            return "dealer_wins"
+        
+        # REGLA 8: Si jugador tiene más, gana jugador
+        if player_value > dealer_value:
+            return "player_wins"
+        
+        return "error"
 
 @bot.command()
 async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
     """
-    Inicia un juego de blackjack con comandos de texto.
+    Inicia un juego de blackjack CON REGLAS EXTREMADAMENTE DIFÍCILES.
     
-    Uso: !blackjack <apuesta> <dificultad>
+    NUEVAS REGLAS:
+    • Apuesta: 200-2000 gemas
+    • EMPATE = Gana el dealer
+    • 21 vs 21 = Gana el dealer
+    • Dealer blackjack GANA sobre jugador blackjack
     
-    Ejemplos:
-    !blackjack 100 facil      - Apuesta 100 gemas en fácil (ganas 1.5x)
-    !blackjack 250 normal     - Apuesta 250 gemas en normal (ganas 2x)
-    !blackjack 500 dificil    - Apuesta 500 gemas en difícil (ganas 3x)
-    
-    Una vez iniciado el juego, usa:
-    !pedir       - Pedir otra carta
-    !quedarse    - Plantarte y ver el resultado
-    !rendirse    - Rendirte y perder la mitad
-    !cancelar_bj - Cancelar el juego actual
+    Dificultades:
+    • facil: Ganas 1.2x tu apuesta
+    • normal: Ganas 1.5x tu apuesta
+    • dificil: Ganas 1.7x tu apuesta
     """
     
     # 1. Verificar cooldown (10 minutos)
@@ -7749,36 +7785,66 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
     # 2. Validar argumentos
     if apuesta is None or dificultad is None:
         embed = discord.Embed(
-            title="🎰 BLACKJACK - Ayuda",
-            description="**Uso correcto:** `!blackjack <apuesta> <dificultad>`\n\n**Ejemplos:**",
-            color=discord.Color.blue()
+            title="🎰 BLACKJACK EXTREMO - AYUDA",
+            description="**⚠️ REGLAS NUEVAS Y MÁS DIFÍCILES ⚠️**",
+            color=discord.Color.red()
         )
+        
         embed.add_field(
-            name="💰 Apuestas",
-            value="Puedes apostar hasta 500 gemas",
-            inline=True
-        )
-        embed.add_field(
-            name="🎯 Dificultades",
-            value="`facil` - `normal` - `dificil`",
-            inline=True
-        )
-        embed.add_field(
-            name="📊 Multiplicadores",
-            value="• **Fácil:** 1.5x tu apuesta\n• **Normal:** 2.0x tu apuesta\n• **Difícil:** 3.0x tu apuesta",
+            name="💰 APUESTAS OBLIGATORIAS",
+            value=f"**Mínimo:** {APUESTA_MINIMA} gemas\n**Máximo:** {APUESTA_MAXIMA} gemas",
             inline=False
         )
+        
         embed.add_field(
-            name="🎮 Comandos durante el juego",
-            value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarse\n• `!rendirse` - Rendirse\n• `!cancelar_bj` - Cancelar",
+            name="😈 REGLAS ANTI-JUGADOR",
+            value=(
+                "• **Empate = Gana el DEALER**\n"
+                "• **21 vs 21 = Gana el DEALER**\n"
+                "• **Dealer blackjack GANA sobre jugador blackjack**\n"
+                "• **Puedes plantarte cuando quieras**"
+            ),
             inline=False
         )
+        
+        embed.add_field(
+            name="🎯 DIFICULTADES Y PAGOS",
+            value=(
+                "• `facil`: **1.2x** tu apuesta (20% ganancia)\n"
+                "• `normal`: **1.5x** tu apuesta (50% ganancia)\n"
+                "• `dificil`: **1.7x** tu apuesta (70% ganancia)"
+            ),
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎮 COMANDOS DURANTE EL JUEGO",
+            value=(
+                "• `!pedir` - Pedir otra carta\n"
+                "• `!quedarse` - Plantarte (cuando quieras)\n"
+                "• `!rendirse` - Rendirte (pierdes la mitad)\n"
+                "• `!cancelar_bj` - Cancelar juego"
+            ),
+            inline=False
+        )
+        
+        embed.add_field(
+            name="📝 EJEMPLOS",
+            value=(
+                f"`!blackjack {APUESTA_MINIMA} facil`\n"
+                "`!blackjack 1000 normal`\n"
+                f"`!blackjack {APUESTA_MAXIMA} dificil`"
+            ),
+            inline=False
+        )
+        
+        embed.set_footer(text="¡Las probabilidades están en tu contra!")
         await ctx.send(embed=embed)
         return
     
-    # 3. Validar apuesta
-    if apuesta < 1 or apuesta > 500:
-        await ctx.send("❌ La apuesta debe estar entre 1 y 500 gemas.")
+    # 3. Validar apuesta (NUEVO: 200-2000)
+    if apuesta < APUESTA_MINIMA or apuesta > APUESTA_MAXIMA:
+        await ctx.send(f"❌ La apuesta debe estar entre **{APUESTA_MINIMA}** y **{APUESTA_MAXIMA}** gemas.")
         return
     
     # 4. Validar dificultad
@@ -7801,7 +7867,7 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
     # 7. Restar la apuesta del balance
     add_balance(user_id, -apuesta)
     
-    # 8. Actualizar cooldown (solo para iniciar nuevo juego)
+    # 8. Actualizar cooldown
     user_last_blackjack[user_id] = now
     
     # 9. Crear el juego
@@ -7818,12 +7884,88 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
         'channel_id': ctx.channel.id
     }
     
-    # 11. Mostrar estado inicial
+    # 11. Verificar blackjack inmediato
+    player_blackjack = game.is_blackjack(game.player_hand)
+    dealer_blackjack = game.is_blackjack(game.dealer_hand)
+    
+    # REGLA NUEVA: Si dealer tiene blackjack, GANA INMEDIATAMENTE (incluso contra jugador blackjack)
+    if dealer_blackjack:
+        game.game_over = True
+        game.result = "dealer_blackjack"
+        
+        diff_info = game.get_difficulty_description()
+        
+        embed = discord.Embed(
+            title="💀 ¡DEALER BLACKJACK!",
+            description=f"**El dealer tiene BLACKJACK.** Has perdido **{format_gems(apuesta)}**.",
+            color=discord.Color.red()
+        )
+        
+        embed.add_field(
+            name="🃏 Cartas del Dealer (BLACKJACK)",
+            value=f"**{' '.join(game.dealer_hand)}**",
+            inline=False
+        )
+        
+        embed.add_field(
+            name=f"👤 Tus Cartas ({game.calculate_hand_value(game.player_hand)})",
+            value=f"**{' '.join(game.player_hand)}**",
+            inline=False
+        )
+        
+        if player_blackjack:
+            embed.add_field(
+                name="⚠️ REGLA NUEVA",
+                value="El dealer blackjack GANA sobre jugador blackjack",
+                inline=False
+            )
+        
+        embed.set_footer(text="¡Las probabilidades están en tu contra!")
+        
+        del active_blackjack_games[user_id]
+        await ctx.send(embed=embed)
+        return
+    
+    # Si jugador tiene blackjack y dealer no, gana inmediatamente
+    if player_blackjack and not dealer_blackjack:
+        game.game_over = True
+        game.result = "player_blackjack"
+        
+        winnings = int(apuesta * game.payout_multiplier[dificultad])
+        add_balance(user_id, winnings)
+        
+        diff_info = game.get_difficulty_description()
+        
+        embed = discord.Embed(
+            title="🎉 ¡BLACKJACK!",
+            description=f"**¡Tienes BLACKJACK!** Ganas **{format_gems(winnings)}** ({diff_info['multiplier']}).",
+            color=discord.Color.green()
+        )
+        
+        embed.add_field(
+            name=f"👤 Tus Cartas (BLACKJACK)",
+            value=f"**{' '.join(game.player_hand)}**",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🃏 Cartas del Dealer",
+            value=f"**{game.dealer_hand[0]}** ? ?",
+            inline=False
+        )
+        
+        embed.set_footer(text="¡Felicidades! Has vencido las probabilidades")
+        
+        del active_blackjack_games[user_id]
+        await ctx.send(embed=embed)
+        return
+    
+    # 12. Mostrar estado inicial
     diff_info = game.get_difficulty_description()
     player_value = game.calculate_hand_value(game.player_hand)
     
     embed = discord.Embed(
-        title=f"♠️ BLACKJACK - {diff_info['name']}",
+        title=f"♠️ BLACKJACK EXTREMO - {diff_info['name']}",
         description=f"**¡Juego iniciado!** Apuesta: {format_gems(apuesta)} | Multiplicador: {diff_info['multiplier']}",
         color=diff_info['color']
     )
@@ -7840,15 +7982,24 @@ async def blackjack(ctx, apuesta: int = None, dificultad: str = None):
         inline=False
     )
     
+    # Comandos disponibles (sin restricción de 17)
+    available_commands = (
+        "• `!pedir` - Pedir carta\n"
+        "• `!quedarse` - Plantarte (cuando quieras)\n"
+        "• `!rendirse` - Rendirte (pierdes la mitad)\n"
+        "• `!cancelar_bj` - Cancelar juego"
+    )
+    
     embed.add_field(
         name="🎮 Comandos Disponibles",
-        value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarte\n• `!rendirse` - Rendirte (pierdes la mitad)\n• `!cancelar_bj` - Cancelar juego",
+        value=available_commands,
         inline=False
     )
     
-    embed.set_footer(text="Usa los comandos en los próximos 5 minutos")
+    embed.set_footer(text="Tienes 10 minutos para completar el juego")
     
     await ctx.send(embed=embed)
+
 
 @bot.command()
 async def pedir(ctx):
@@ -7876,7 +8027,7 @@ async def pedir(ctx):
     # Verificar si se pasó de 21
     if player_value > 21:
         game.game_over = True
-        game.result = "lose"
+        game.result = "player_bust"
         
         # Mostrar resultado
         diff_info = game.get_difficulty_description()
@@ -7928,15 +8079,24 @@ async def pedir(ctx):
         inline=False
     )
     
+    # Comandos disponibles
+    available_commands = (
+        "• `!pedir` - Pedir otra carta\n"
+        "• `!quedarse` - Plantarte (recomendado si tienes 17+)\n"
+        "• `!rendirse` - Rendirte (pierdes la mitad)\n"
+        "• `!cancelar_bj` - Cancelar juego"
+    )
+    
     embed.add_field(
         name="🎮 ¿Qué quieres hacer?",
-        value="• `!pedir` - Pedir otra carta\n• `!quedarse` - Plantarte\n• `!rendirse` - Rendirte\n• `!cancelar_bj` - Cancelar",
+        value=available_commands,
         inline=False
     )
     
     embed.set_footer(text=f"Tus cartas suman {player_value}")
     
     await ctx.send(embed=embed)
+
 
 @bot.command()
 async def quedarse(ctx):
@@ -7960,41 +8120,60 @@ async def quedarse(ctx):
     # Calcular valores
     player_value = game.calculate_hand_value(game.player_hand)
     
-    # Turno del dealer
-    while not game.dealer_decision(player_value):
+    # ELIMINADO: Ya no verificamos si el jugador tiene menos de 17 puntos
+    # Ahora puede plantarse cuando quiera
+    
+    # Turno del dealer: debe pedir hasta 17 o más
+    while game.dealer_must_hit():
         game.dealer_hand.append(game.deal_card())
     
     dealer_value = game.calculate_hand_value(game.dealer_hand)
     
-    # Determinar resultado
-    if dealer_value > 21:
-        # Dealer se pasó, jugador gana
-        game.result = "win"
+    # Determinar ganador usando las NUEVAS REGLAS DIFÍCILES
+    result = game.determine_winner()
+    
+    # Procesar resultado
+    if result == "player_blackjack":
+        # Esto no debería pasar aquí, pero por si acaso
         winnings = int(game.bet * game.payout_multiplier[game.difficulty])
         add_balance(user_id, winnings)
-        result_text = f"🎉 **¡GANASTE!** El dealer se pasó de 21.\nGanas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
+        result_text = f"🎉 **¡BLACKJACK!** Ganas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
         color = discord.Color.green()
         
-    elif dealer_value > player_value:
-        # Dealer gana
-        game.result = "lose"
-        result_text = f"💀 **PERDISTE**. El dealer tiene mejor mano.\nPierdes **{format_gems(game.bet)}**"
+    elif result == "dealer_blackjack":
+        result_text = f"💀 **DEALER BLACKJACK**. Pierdes **{format_gems(game.bet)}**"
         color = discord.Color.red()
         
-    elif dealer_value < player_value:
-        # Jugador gana
-        game.result = "win"
+    elif result == "player_bust":
+        result_text = f"💀 **TE PASASTE DE 21**. Pierdes **{format_gems(game.bet)}**"
+        color = discord.Color.red()
+        
+    elif result == "dealer_bust":
         winnings = int(game.bet * game.payout_multiplier[game.difficulty])
         add_balance(user_id, winnings)
-        result_text = f"🎉 **¡GANASTE!** Tu mano es mejor.\nGanas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
+        result_text = f"🎉 **¡DEALER SE PASÓ!** Ganas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
+        color = discord.Color.green()
+        
+    elif result == "dealer_wins":
+        # Esto incluye EMPATES y 21 vs 21 (nuevas reglas)
+        if player_value == dealer_value:
+            if player_value == 21:
+                result_text = f"💀 **21 vs 21 = GANA DEALER**. Pierdes **{format_gems(game.bet)}**"
+            else:
+                result_text = f"💀 **EMPATE = GANA DEALER**. Pierdes **{format_gems(game.bet)}**"
+        else:
+            result_text = f"💀 **DEALER GANA** ({dealer_value} vs {player_value}). Pierdes **{format_gems(game.bet)}**"
+        color = discord.Color.red()
+        
+    elif result == "player_wins":
+        winnings = int(game.bet * game.payout_multiplier[game.difficulty])
+        add_balance(user_id, winnings)
+        result_text = f"🎉 **¡GANASTE!** ({player_value} vs {dealer_value}). Ganas **{format_gems(winnings)}** ({game.payout_multiplier[game.difficulty]}x)"
         color = discord.Color.green()
         
     else:
-        # Empate
-        game.result = "push"
-        add_balance(user_id, game.bet)  # Devolver apuesta
-        result_text = f"🤝 **EMPATE**. Recuperas tu apuesta de **{format_gems(game.bet)}**"
-        color = discord.Color.blue()
+        result_text = "❌ Error en el juego"
+        color = discord.Color.orange()
     
     game.game_over = True
     
@@ -8018,6 +8197,21 @@ async def quedarse(ctx):
         value=f"**{' '.join(game.player_hand)}**",
         inline=False
     )
+    
+    # Mostrar reglas aplicadas
+    if player_value == dealer_value:
+        if player_value == 21:
+            embed.add_field(
+                name="⚠️ REGLA APLICADA",
+                value="**21 vs 21 = GANA EL DEALER**",
+                inline=False
+            )
+        else:
+            embed.add_field(
+                name="⚠️ REGLA APLICADA",
+                value="**EMPATE = GANA EL DEALER**",
+                inline=False
+            )
     
     embed.add_field(
         name="💰 Nuevo Balance",
