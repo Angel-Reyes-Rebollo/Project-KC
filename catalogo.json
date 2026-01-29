@@ -3466,6 +3466,75 @@
         "Suerte": 54,
         "Carisma": 54
       }
+    },
+    {
+      "id": "E028",
+      "nombre": "Zuko",
+      "rareza": "E",
+      "valor": 600,
+      "stock": "1",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E028.png",
+      "descripcion": "Zuko (Admin Exclusive)",
+      "stats": {
+        "Evasion": 93,
+        "Fuerza": 95,
+        "Reacción": 98,
+        "Defensa": 90,
+        "Velocidad": 94,
+        "IQ": 90,
+        "Carisma ": 1,
+        "Precisión": 95,
+        "Energia": 99,
+        "Suerte": 53,
+        "Carisma": 85
+      }
+    },
+    {
+      "id": "E029",
+      "nombre": "Gaara",
+      "rareza": "E",
+      "valor": 600,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E029.png",
+      "descripcion": "Gaara E (Admin Exclusive)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 94,
+        "Reacción": 95,
+        "Defensa": 99,
+        "Velocidad": 88,
+        "IQ": 90,
+        "Carisma ": 1,
+        "Precisión": 94,
+        "Energia": 98,
+        "Suerte": 54,
+        "Carisma": 95
+      }
+    },
+    {
+      "id": "E030",
+      "nombre": "Arthur Morgan (E)",
+      "rareza": "E",
+      "valor": 600,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E030.png",
+      "descripcion": "Arthur Morgan (Admin Exclusive)",
+      "stats": {
+        "Evasion": 88,
+        "Fuerza": 95,
+        "Reacción": 95,
+        "Defensa": 94,
+        "Velocidad": 90,
+        "IQ": 82,
+        "Carisma ": 1,
+        "Precisión": 99,
+        "Energia": 96,
+        "Suerte": 52,
+        "Carisma": 84
+      }
     }
   ]
 }

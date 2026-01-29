@@ -144,7 +144,7 @@ COOLDOWN_CASINO = 1 * 3600     # !casino (1 hora) <--- NUEVO
 COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
 COOLDOWN_MINAR = 60            # !minar (1 minuto)
 COOLDOWN_ENCUENTRA_GEMA = 2 * 3600  # !encuentra_gema (2 horas)
-COOLDOWN_BLACKJACK = 2 * 3600   # !blackjack (10 minutos)
+COOLDOWN_BLACKJACK = 60 * 15   # !blackjack (15 minutos)
 
 
 
@@ -583,17 +583,12 @@ class FinalTradeView(View):
         # Realizar el intercambio
         try:
             # Remover cartas de los inventarios originales
-            user1_removed_cards = []
-            user2_removed_cards = []
-            
             for card in user1_cards:
                 card_id = card.get('id')
                 inv = get_inventory(self.user1.id)
                 for i, c in enumerate(inv):
                     if c.get('id') == card_id:
-                        removed_card = remove_from_inventory_by_index(self.user1.id, i)
-                        if removed_card:
-                            user1_removed_cards.append(removed_card)
+                        remove_from_inventory_by_index(self.user1.id, i)
                         break
             
             for card in user2_cards:
@@ -601,19 +596,15 @@ class FinalTradeView(View):
                 inv = get_inventory(self.user2.id)
                 for i, c in enumerate(inv):
                     if c.get('id') == card_id:
-                        removed_card = remove_from_inventory_by_index(self.user2.id, i)
-                        if removed_card:
-                            user2_removed_cards.append(removed_card)
+                        remove_from_inventory_by_index(self.user2.id, i)
                         break
 
-            # Añadir cartas a los nuevos dueños PRESERVANDO LOS IDs
-            for card in user1_removed_cards:  # Cartas que User1 estaba intercambiando
-                # Añadir a User2 con el mismo ID
-                add_to_inventory(self.user2.id, card, card_id=card['id'])
+            # Añadir cartas a los nuevos dueños
+            for card in user1_cards:
+                add_to_inventory(self.user2.id, card)
             
-            for card in user2_removed_cards:  # Cartas que User2 estaba intercambiando
-                # Añadir a User1 con el mismo ID
-                add_to_inventory(self.user1.id, card, card_id=card['id'])
+            for card in user2_cards:
+                add_to_inventory(self.user1.id, card)
 
             # Eliminar intercambio
             del pending_trades[self.trade_id]
@@ -625,8 +616,8 @@ class FinalTradeView(View):
                 color=discord.Color.green()
             )
             
-            user1_receives = "\n".join([f"• {card['nombre']} ({card.get('rareza', 'C')})" for card in user2_removed_cards]) if user2_removed_cards else "Nada"
-            user2_receives = "\n".join([f"• {card['nombre']} ({card.get('rareza', 'C')})" for card in user1_removed_cards]) if user1_removed_cards else "Nada"
+            user1_receives = "\n".join([f"• {card['nombre']}" for card in user2_cards]) if user2_cards else "Nada"
+            user2_receives = "\n".join([f"• {card['nombre']}" for card in user1_cards]) if user1_cards else "Nada"
             
             embed.add_field(name=f"🎁 {self.user1.display_name} recibe:", value=user1_receives, inline=False)
             embed.add_field(name=f"🎁 {self.user2.display_name} recibe:", value=user2_receives, inline=False)
@@ -641,61 +632,7 @@ class FinalTradeView(View):
             await interaction.response.edit_message(embed=embed, view=None)
 
         except Exception as e:
-            print(f"❌ Error en intercambio: {e}")
             await interaction.response.send_message("❌ Error al ejecutar el intercambio. Inténtalo de nuevo.", ephemeral=True)
-
-# Comando para iniciar intercambio
-@bot.command()
-async def intercambiar(ctx, usuario: discord.Member):
-    """Inicia un intercambio con otro usuario"""
-    if usuario.id == ctx.author.id:
-        await ctx.send("❌ No puedes intercambiar contigo mismo.")
-        return
-    
-    if usuario.bot:
-        await ctx.send("❌ No puedes intercambiar con bots.")
-        return
-    
-    # Verificar que ambos tengan cartas
-    if not get_inventory(ctx.author.id):
-        await ctx.send("❌ No tienes cartas para intercambiar.")
-        return
-    
-    if not get_inventory(usuario.id):
-        await ctx.send(f"❌ {usuario.mention} no tiene cartas para intercambiar.")
-        return
-    
-    # Crear ID único para el intercambio
-    import uuid
-    trade_id = str(uuid.uuid4())[:8]
-    
-    # Inicializar datos del intercambio
-    pending_trades[trade_id] = {
-        'inviter': ctx.author.id,
-        'invited': usuario.id,
-        'user1_cards': [],
-        'user2_cards': [],
-        'user1_confirmed': False,
-        'user2_confirmed': False,
-        'user1_final_accept': False,
-        'user2_final_accept': False,
-        'accepted': False,
-        'invited_accepted': False
-    }
-    
-    # Crear embed de solicitud
-    embed = discord.Embed(
-        title="🔄 Solicitud de Intercambio",
-        description=f"{ctx.author.mention} quiere intercambiar cartas con {usuario.mention}",
-        color=discord.Color.blue()
-    )
-    embed.add_field(name="Instrucciones", value=f"{usuario.mention} debe aceptar o rechazar esta solicitud en 5 minutos.")
-    embed.add_field(name="Estado", value="🟡 Esperando respuesta...")
-    
-    # Crear vista de aceptación/rechazo
-    view = AcceptRejectView(trade_id, ctx.author, usuario)
-    
-    await ctx.send(f"{usuario.mention}", embed=embed, view=view)
 
 
 # ----------------------------
@@ -2585,7 +2522,7 @@ async def gacha_comprar(ctx, cantidad: int = 1):
         return
 
     user_id = ctx.author.id
-    cost = 150 * cantidad
+    cost = 110 * cantidad
     current_gems = get_balance(user_id)
     
     # Verificar si tiene suficientes gemas
