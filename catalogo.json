@@ -3535,6 +3535,29 @@
         "Suerte": 52,
         "Carisma": 84
       }
+    },
+    {
+      "id": "E031",
+      "nombre": "Shoto Todorki (E)",
+      "rareza": "E",
+      "valor": 500,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E031.png",
+      "descripcion": "Shoto Todoroki (Invite Exclusive)",
+      "stats": {
+        "Evasion": 90,
+        "Fuerza": 94,
+        "Reacción": 96,
+        "Defensa": 92,
+        "Velocidad": 95,
+        "IQ": 54,
+        "Carisma ": 1,
+        "Precisión": 94,
+        "Energia": 96,
+        "Suerte": 80,
+        "Carisma": 86
+      }
     }
   ]
 }
