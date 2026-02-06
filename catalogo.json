@@ -3558,6 +3558,29 @@
         "Suerte": 80,
         "Carisma": 86
       }
+    },
+    {
+      "id": "E032",
+      "nombre": "Esil Radiru",
+      "rareza": "E",
+      "valor": 600,
+      "stock": "Unlimited",
+      "max_per_user": "Unlimited",
+      "imagen": "images/E032.png",
+      "descripcion": "Esil Radiru (Drawing Exclusive)",
+      "stats": {
+        "Evasion": 95,
+        "Fuerza": 100,
+        "Reacción": 91,
+        "Defensa": 92,
+        "Velocidad": 91,
+        "IQ": 54,
+        "Carisma ": 1,
+        "Precisión": 90,
+        "Energia": 94,
+        "Suerte": 1,
+        "Carisma": 95
+      }
     }
   ]
 }
