@@ -7074,24 +7074,14 @@ async def apoyo(ctx):
     
     await ctx.send(embed=embed)
 
-
 # ----------------------------
-# COMANDO !MOSTRAR - Versión Mejorada con Soporte para GIFs y Cartas E
+# COMANDO !MOSTRAR - VERSIÓN FINAL CORREGIDA
 # ----------------------------
 @bot.command(aliases=['ver', 'carta'])
 async def mostrar(ctx, numero: int = None):
     """
-    Muestra una carta específica de tu inventario en el canal.
-    Soporta imágenes estáticas (PNG/JPG) y animadas (GIF).
-    Incluye cartas de tipo E (Evento/Especial).
-    
-    Uso:
-    !mostrar                  - Te envía por MD la lista numerada de tus cartas
-    !mostrar <número>         - Muestra la carta con ese número en el canal actual
-    
-    Ejemplo:
-    !mostrar                  (recibes lista por MD)
-    !mostrar 3                (muestra la carta #3 en el canal)
+    Muestra una carta específica de tu inventario.
+    SOPORTE COMPLETO PARA GIFS ANIMADOS.
     """
     user_id = ctx.author.id
     inventory = get_inventory(user_id)
@@ -7099,15 +7089,15 @@ async def mostrar(ctx, numero: int = None):
     if not inventory:
         embed = discord.Embed(
             title="📭 Inventario Vacío",
-            description="No tienes cartas para mostrar. ¡Usa `!gacha` para obtener algunas!",
+            description="No tienes cartas para mostrar.",
             color=discord.Color.blue()
         )
         await ctx.send(embed=embed)
         return
     
-    # Definir orden de rareza (incluyendo E - Evento)
-    RARITY_ORDER_COMPLETO = {
-        'E': 0,   # Evento (más rara/importante)
+    # Definir orden de rareza (E es la más alta)
+    RARITY_ORDER = {
+        'E': 0,   # Evento (más rara)
         'G': 1,   # Galaxia
         'SP': 2,  # Special
         'UR': 3,  # Ultra Raro
@@ -7117,322 +7107,194 @@ async def mostrar(ctx, numero: int = None):
     }
     
     def get_rarity_value(card):
-        rarity = card.get("rareza", "N")
-        return RARITY_ORDER_COMPLETO.get(rarity, 7)
+        return RARITY_ORDER.get(card.get("rareza", "N"), 7)
     
-    # Ordenar por rareza (mayor a menor) y luego por nombre
+    # Ordenar inventario
     sorted_inventory = sorted(inventory, key=lambda x: (get_rarity_value(x), x.get("nombre", "")))
     
-    # Función para obtener emoji de rareza (actualizada para E)
-    def get_rarity_emoji_completo(rarity):
+    # Función para emoji de rareza
+    def get_rarity_emoji(rarity):
         emoji_map = {
-            "E": "🎪",   # Evento - Carpa de circo/evento especial
-            "G": "🌌",   # Galaxia - Espacio
-            "SP": "✨",  # Special - Brillo especial
-            "UR": "💫",  # Ultra Raro - Estrella fugaz
-            "SSR": "🔥", # Super Super Raro - Fuego
-            "R": "⭐",   # Raro - Estrella
-            "N": "🔹",   # Normal - Diamante azul
+            "E": "🎪",   # Evento
+            "G": "🌌",   # Galaxia
+            "SP": "✨",  # Special
+            "UR": "💫",  # Ultra Raro
+            "SSR": "🔥", # Super Super Raro
+            "R": "⭐",   # Raro
+            "N": "🔹",   # Normal
         }
         return emoji_map.get(rarity, "📄")
     
-    # Si no se proporciona número, enviar lista por MD
+    # Función para color de rareza
+    def get_rarity_color(rarity):
+        color_map = {
+            "E": 0x9B59B6,   # Púrpura para Evento
+            "G": 0x6C5CE7,   # Morado espacial
+            "SP": 0xFF69B4,  # Rosa
+            "UR": 0x3498DB,  # Azul
+            "SSR": 0xE74C3C, # Rojo
+            "R": 0xF1C40F,   # Amarillo
+            "N": 0x95A5A6,   # Gris
+        }
+        return color_map.get(rarity, 0x000000)
+    
+    # Si no hay número, enviar lista por MD
     if numero is None:
         try:
-            # Crear lista numerada
             cards_list = []
             for i, card in enumerate(sorted_inventory, 1):
                 rarity = card.get("rareza", "N")
-                rarity_emoji = get_rarity_emoji_completo(rarity)
+                rarity_emoji = get_rarity_emoji(rarity)
                 value = card.get("valor", 0)
                 
-                # Detectar si es GIF
-                image_path = card.get("imagen", "")
-                es_gif = image_path.lower().endswith('.gif') if image_path else False
+                # Detectar si tiene URL de imagen (para mostrar indicador)
+                tiene_url = "imagen_url" in card and card["imagen_url"]
+                es_gif = tiene_url and card["imagen_url"].lower().endswith('.gif')
                 gif_indicador = " 🎬" if es_gif else ""
                 
-                # Añadir indicador de evento si es carta E
-                if rarity == "E":
-                    cards_list.append(f"**{i}. {rarity_emoji} **{card['nombre']}** ({rarity}){gif_indicador} - {format_gems(value)} 🎪**")
-                else:
-                    cards_list.append(f"**{i}. {rarity_emoji} {card['nombre']}** ({rarity}){gif_indicador} - {format_gems(value)}")
+                cards_list.append(f"**{i}.** {rarity_emoji} **{card['nombre']}** ({rarity}){gif_indicador} - {format_gems(value)}")
             
-            # Dividir en chunks para evitar límites de Discord
+            # Enviar lista por MD
             chunk_size = 15
             chunks = [cards_list[i:i + chunk_size] for i in range(0, len(cards_list), chunk_size)]
             
-            # Enviar mensaje inicial
             embed = discord.Embed(
                 title=f"📋 Tu Inventario - {len(sorted_inventory)} cartas",
-                description="Lista de tus cartas ordenadas por rareza (de mayor a menor):",
+                description="Lista de tus cartas ordenadas por rareza:",
                 color=discord.Color.gold()
             )
             
-            # Mostrar estadísticas rápidas
+            # Estadísticas
             rarity_count = {}
             gif_count = 0
             for card in sorted_inventory:
                 rarity = card.get("rareza", "N")
                 rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
-                if card.get("imagen", "").lower().endswith('.gif'):
+                if "imagen_url" in card and card["imagen_url"].lower().endswith('.gif'):
                     gif_count += 1
             
             stats_text = ""
             for rarity in ["E", "G", "SP", "UR", "SSR", "R", "N"]:
                 if rarity in rarity_count:
-                    emoji = get_rarity_emoji_completo(rarity)
+                    emoji = get_rarity_emoji(rarity)
                     stats_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
             
             if stats_text:
-                embed.add_field(name="📊 Distribución por rareza", value=stats_text, inline=False)
+                embed.add_field(name="📊 Distribución", value=stats_text, inline=False)
             
             if gif_count > 0:
-                embed.add_field(
-                    name="🎬 Cartas Animadas",
-                    value=f"Tienes **{gif_count}** cartas con animación GIF",
-                    inline=False
-                )
+                embed.add_field(name="🎬 Cartas Animadas", value=f"**{gif_count}** cartas con GIF", inline=False)
             
             embed.add_field(
                 name="🎯 Cómo usar",
-                value="Responde con `!mostrar <número>` en este canal para mostrar una carta específica.\nEjemplo: `!mostrar 5`\n\n🎬 = Carta animada (GIF)",
+                value="`!mostrar <número>` para ver una carta\nEj: `!mostrar 3`\n🎬 = Carta animada",
                 inline=False
             )
             
             await ctx.author.send(embed=embed)
             
-            # Enviar cada chunk de cartas
+            # Enviar chunks
             for page_num, chunk in enumerate(chunks, 1):
                 page_embed = discord.Embed(
                     title=f"📖 Página {page_num}/{len(chunks)}",
                     color=discord.Color.blue()
                 )
-                
                 page_embed.description = "\n".join(chunk)
-                page_embed.set_footer(text=f"Cartas {((page_num-1)*chunk_size)+1}-{min(page_num*chunk_size, len(sorted_inventory))} de {len(sorted_inventory)}")
-                
+                page_embed.set_footer(text=f"Página {page_num} de {len(chunks)}")
                 await ctx.author.send(embed=page_embed)
             
-            # Confirmación en el canal
-            await ctx.send(f"✅ {ctx.author.mention}, te he enviado la lista de tus cartas por mensaje directo. Usa `!mostrar <número>` para mostrar una carta en este canal.")
+            await ctx.send(f"✅ {ctx.author.mention}, revisa tus MDs")
             
         except discord.Forbidden:
-            await ctx.send("❌ No puedo enviarte mensajes directos. Por favor, habilita los MDs en la configuración de privacidad del servidor.")
+            await ctx.send("❌ No puedo enviarte MDs")
         return
     
-    # Si se proporciona un número, mostrar esa carta en el canal
     # Validar número
     if numero < 1 or numero > len(sorted_inventory):
         await ctx.send(f"❌ Número inválido. Debe estar entre 1 y {len(sorted_inventory)}.")
         return
     
-    # Obtener la carta seleccionada
+    # Obtener carta seleccionada
     selected_card = sorted_inventory[numero - 1]
-    
-    # Verificar si es una carta de evento (E)
-    es_evento = selected_card.get("rareza", "N") == "E"
-    
-    # Crear embed para mostrar la carta
     rarity = selected_card.get("rareza", "N")
-    rarity_emoji = get_rarity_emoji_completo(rarity)
-    card_value = selected_card.get("valor", 0)
+    rarity_emoji = get_rarity_emoji(rarity)
     
-    # Título especial para cartas de evento
-    if es_evento:
-        titulo = f"{rarity_emoji} 🎪 {selected_card['nombre']} (EVENTO) 🎪 {rarity_emoji}"
-        color_embed = discord.Color.purple()  # Color especial para eventos
-    else:
-        titulo = f"{rarity_emoji} {selected_card['nombre']} ({rarity})"
-        color_embed = get_rarity_color(rarity)
+    # Determinar si es evento
+    es_evento = rarity == "E"
     
+    # Crear embed
     embed = discord.Embed(
-        title=titulo,
-        description=f"**{ctx.author.display_name}** muestra su carta:",
-        color=color_embed
-    )
-    
-    # Añadir descripción si existe
-    descripcion = selected_card.get("descripcion", "")
-    if descripcion:
-        embed.add_field(name="📝 Descripción", value=descripcion, inline=False)
-    
-    # Añadir valor
-    embed.add_field(name="💰 Valor", value=format_gems(card_value), inline=True)
-    
-    # Añadir información de evento si aplica
-    if es_evento:
-        evento_info = selected_card.get("evento", "Evento Especial")
-        embed.add_field(name="🎪 Evento", value=evento_info, inline=True)
-    
-    # Añadir stats (mostrar todas, incluso las de evento)
-    stats = selected_card.get("stats", {})
-    if stats:
-        # Dividir stats en dos columnas para mejor presentación
-        stats_column1 = ""
-        stats_column2 = ""
-        
-        stat_names = list(stats.keys())
-        half = len(stat_names) // 2
-        
-        for i, stat_name in enumerate(stat_names):
-            stat_value = stats[stat_name]
-            
-            # Mapear nombres de stats a emojis
-            stat_emoji_map = {
-                "Evasion": "👻",
-                "Fuerza": "💥",
-                "Reacción": "🌀",
-                "Defensa": "🛡️",
-                "Velocidad": "💨",
-                "IQ": "🧠",
-                "Carisma": "✨",
-                "Precisión": "🎯",
-                "Energia": "⚡",
-                "Suerte": "🍀"
-            }
-            
-            emoji = stat_emoji_map.get(stat_name, "📊")
-            stat_line = f"{emoji} **{stat_name}:** {stat_value}\n"
-            
-            if i < half:
-                stats_column1 += stat_line
-            else:
-                stats_column2 += stat_line
-        
-        # Añadir columnas al embed
-        embed.add_field(name="📊 Estadísticas", value=stats_column1 if stats_column1 else "N/A", inline=True)
-        if stats_column2:
-            embed.add_field(name="‎", value=stats_column2, inline=True)
-    
-    # Información adicional
-    card_id = selected_card.get("id", "N/A")
-    embed.add_field(name="🆔 ID", value=card_id, inline=True)
-    
-    # Posición en la lista ordenada
-    embed.add_field(name="🎯 Posición", value=f"#{numero} de {len(sorted_inventory)}", inline=True)
-    
-    # Detectar si es GIF
-    image_path = selected_card.get("imagen", "")
-    es_gif = image_path.lower().endswith('.gif') if image_path else False
-    
-    if es_gif:
-        embed.add_field(name="🎬 Animación", value="¡Esta carta es animada!", inline=True)
-        embed.set_footer(text="✨ Carta animada • Se mueve como GIF")
-    else:
-        embed.set_footer(text=f"Carta {numero} de {len(sorted_inventory)}")
-    
-    # Intentar cargar y mostrar la imagen/GIF
-    file = None
-    
-    try:
-        if image_path and os.path.exists(image_path):
-            # Obtener el nombre del archivo original para mantener la extensión
-            filename = os.path.basename(image_path)
-            file = discord.File(image_path, filename=filename)
-            embed.set_image(url="attachment://" + filename)
-            
-            # Si es carta de evento, añadir borde especial en la descripción visual
-            if es_evento and not es_gif:
-                embed.add_field(name="🎪", value="Carta Especial de Evento", inline=False)
-        else:
-            # Intentar buscar en carpeta images por defecto
-            default_path = f"images/{card_id}.png"
-            if os.path.exists(default_path):
-                file = discord.File(default_path, filename=f"{card_id}.png")
-                embed.set_image(url=f"attachment://{card_id}.png")
-            else:
-                # Buscar versión GIF
-                gif_path = f"images/{card_id}.gif"
-                if os.path.exists(gif_path):
-                    file = discord.File(gif_path, filename=f"{card_id}.gif")
-                    embed.set_image(url=f"attachment://{card_id}.gif")
-                    embed.set_footer(text="✨ Carta animada • GIF")
-                else:
-                    embed.add_field(name="⚠️ Imagen", value="No disponible", inline=False)
-    except Exception as e:
-        print(f"Error cargando imagen/GIF: {e}")
-        embed.add_field(name="⚠️ Error", value="No se pudo cargar la imagen", inline=False)
-    
-    # Enviar al canal
-    if file:
-        await ctx.send(embed=embed, file=file)
-    else:
-        await ctx.send(embed=embed)
-
-
-# ----------------------------
-# COMANDO ADICIONAL: !mostrar_por_id - Mostrar carta por ID
-# ----------------------------
-@bot.command()
-async def mostrar_por_id(ctx, card_id: str):
-    """
-    Muestra una carta específica usando su ID en lugar del número.
-    Útil para cartas de evento o cuando sabes el ID exacto.
-    
-    Ejemplo: !mostrar_por_id E001
-    """
-    user_id = ctx.author.id
-    inventory = get_inventory(user_id)
-    
-    if not inventory:
-        await ctx.send("📭 No tienes cartas en tu inventario.")
-        return
-    
-    # Buscar la carta por ID
-    found_card = None
-    for card in inventory:
-        if card.get("id", "").upper() == card_id.upper():
-            found_card = card
-            break
-    
-    if not found_card:
-        await ctx.send(f"❌ No se encontró ninguna carta con ID `{card_id}` en tu inventario.")
-        return
-    
-    # Usar la misma lógica de mostrar pero con la carta encontrada
-    # (Podrías reutilizar la función de mostrar o copiar la lógica)
-    
-    es_evento = found_card.get("rareza", "N") == "E"
-    rarity = found_card.get("rareza", "N")
-    rarity_emoji = get_rarity_emoji_completo(rarity)
-    
-    embed = discord.Embed(
-        title=f"{rarity_emoji} {found_card['nombre']} ({rarity})" + (" 🎪 EVENTO" if es_evento else ""),
+        title=f"{rarity_emoji} {selected_card['nombre']} ({rarity})" + (" 🎪 EVENTO" if es_evento else ""),
         description=f"**{ctx.author.display_name}** muestra su carta:",
         color=discord.Color.purple() if es_evento else get_rarity_color(rarity)
     )
     
-    # Añadir campos básicos
-    embed.add_field(name="📝 Descripción", value=found_card.get("descripcion", "Sin descripción"), inline=False)
-    embed.add_field(name="💰 Valor", value=format_gems(found_card.get("valor", 0)), inline=True)
-    embed.add_field(name="🆔 ID", value=found_card.get("id", "N/A"), inline=True)
+    # Añadir descripción
+    if selected_card.get("descripcion"):
+        embed.add_field(name="📝 Descripción", value=selected_card["descripcion"], inline=False)
+    
+    # Añadir valor
+    embed.add_field(name="💰 Valor", value=format_gems(selected_card.get("valor", 0)), inline=True)
+    
+    # Añadir ID
+    embed.add_field(name="🆔 ID", value=selected_card.get("id", "N/A"), inline=True)
+    
+    # Añadir evento si aplica
+    if es_evento and selected_card.get("evento"):
+        embed.add_field(name="🎪 Evento", value=selected_card["evento"], inline=True)
     
     # Añadir stats
-    stats = found_card.get("stats", {})
+    stats = selected_card.get("stats", {})
     if stats:
-        stats_text = "\n".join([f"• {k}: {v}" for k, v in stats.items() if v > 1])
+        stats_text = ""
+        stat_emojis = {
+            "Evasion": "👻", "Fuerza": "💥", "Reaccion": "🌀", "Reacción": "🌀",
+            "Defensa": "🛡️", "Velocidad": "💨", "IQ": "🧠", "Carisma": "✨",
+            "Precision": "🎯", "Precisión": "🎯", "Energia": "⚡", "Energía": "⚡",
+            "Suerte": "🍀"
+        }
+        
+        for stat_name, stat_value in stats.items():
+            if stat_value > 1:
+                emoji = stat_emojis.get(stat_name, "📊")
+                stats_text += f"{emoji} **{stat_name}:** {stat_value}\n"
+        
         if stats_text:
-            embed.add_field(name="📊 Stats", value=stats_text, inline=False)
+            embed.add_field(name="📊 Estadísticas", value=stats_text, inline=False)
     
-    # Cargar imagen
-    image_path = found_card.get("imagen", "")
-    file = None
-    
-    try:
-        if image_path and os.path.exists(image_path):
-            filename = os.path.basename(image_path)
-            file = discord.File(image_path, filename=filename)
-            embed.set_image(url="attachment://" + filename)
-            
-            if image_path.lower().endswith('.gif'):
-                embed.set_footer(text="✨ Carta animada • GIF")
-    except Exception as e:
-        print(f"Error: {e}")
-    
-    if file:
-        await ctx.send(embed=embed, file=file)
-    else:
+    # ===== PARTE CRÍTICA: MANEJO DE IMÁGENES =====
+    # PRIORIDAD 1: Usar imagen_url SIEMPRE (para GIFs animados)
+    if "imagen_url" in selected_card and selected_card["imagen_url"]:
+        imagen_url = selected_card["imagen_url"]
+        embed.set_image(url=imagen_url)
+        
+        # Verificar si es GIF por la extensión
+        if imagen_url.lower().endswith('.gif'):
+            embed.set_footer(text="✨ Carta animada • GIF")
+        else:
+            embed.set_footer(text=f"Carta {numero} de {len(sorted_inventory)}")
+        
+        # Enviar solo el embed (sin archivo adjunto)
         await ctx.send(embed=embed)
+        return
+    
+    # PRIORIDAD 2: Usar imagen local (solo PNG/JPG estáticos)
+    if "imagen" in selected_card and selected_card["imagen"]:
+        image_path = selected_card["imagen"]
+        if os.path.exists(image_path):
+            try:
+                filename = os.path.basename(image_path)
+                file = discord.File(image_path, filename=filename)
+                embed.set_image(url="attachment://" + filename)
+                embed.set_footer(text=f"Carta {numero} de {len(sorted_inventory)}")
+                await ctx.send(embed=embed, file=file)
+                return
+            except Exception as e:
+                print(f"Error cargando imagen: {e}")
+    
+    # Si no hay imagen
+    embed.add_field(name="⚠️ Imagen", value="No disponible", inline=False)
+    await ctx.send(embed=embed)
 
 # ----------------------------
 # COMANDO !ENCUENTRA_GEMA
