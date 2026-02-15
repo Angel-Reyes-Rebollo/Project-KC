@@ -145,6 +145,8 @@ COOLDOWN_PESCA = 2 * 3600      # !pesca (2 horas) <-- ¡AÑADE ESTA LÍNEA!
 COOLDOWN_MINAR = 60            # !minar (1 minuto)
 COOLDOWN_ENCUENTRA_GEMA = 2 * 3600  # !encuentra_gema (2 horas)
 COOLDOWN_BLACKJACK = 60 * 15   # !blackjack (15 minutos)
+COOLDOWN_RULETA = 300  # 5 minutos en segundos
+
 
 
 
@@ -189,6 +191,7 @@ async def espera(ctx):
         ("⛏️ Minar", user_last_minar, COOLDOWN_MINAR),
         ("💎 Encuentra Gema", user_last_encuentra_gema, COOLDOWN_ENCUENTRA_GEMA),
         ("♠️ Blackjack", user_last_blackjack, COOLDOWN_BLACKJACK),
+        ("🎰 Ruleta", user_last_ruleta, COOLDOWN_RULETA),
 
     ]
     
@@ -1389,6 +1392,8 @@ async def ayuda(ctx):
             "• `!rob @usuario` - Roba gemas a otro usuario (30min cooldown)"
             "• `!encuentra_gema` - Juego interactivo de gemas (2h cooldown)"
             "• `!blackjack <apuesta> <dificultad>` - Juego de blackjack (10min cooldown)"
+            "• `!ruleta [apuesta] [número]` - Juego de ruleta (5min cooldown, máx 200 gemas)"
+
 
         ),
         inline=False
@@ -8297,6 +8302,225 @@ async def cleanup_blackjack_games():
 async def on_ready():
     cleanup_blackjack_games.start()
     print(f"✅ Bot conectado como {bot.user}")
+
+
+    # ----------------------------
+# RULETA DE CASINO
+# ----------------------------
+
+# Diccionario para almacenar el último uso de la ruleta por usuario
+user_last_ruleta = {}
+
+# Colores y números de la ruleta europea
+RULETA_NUMEROS = list(range(0, 37))  # 0 al 36
+RULETA_COLORES = {
+    0: "🟢 Verde",
+    # Rojos (18 números)
+    1: "🔴 Rojo", 3: "🔴 Rojo", 5: "🔴 Rojo", 7: "🔴 Rojo", 9: "🔴 Rojo", 
+    12: "🔴 Rojo", 14: "🔴 Rojo", 16: "🔴 Rojo", 18: "🔴 Rojo", 19: "🔴 Rojo", 
+    21: "🔴 Rojo", 23: "🔴 Rojo", 25: "🔴 Rojo", 27: "🔴 Rojo", 30: "🔴 Rojo", 
+    32: "🔴 Rojo", 34: "🔴 Rojo", 36: "🔴 Rojo",
+    # Negros (18 números)
+    2: "⚫ Negro", 4: "⚫ Negro", 6: "⚫ Negro", 8: "⚫ Negro", 10: "⚫ Negro", 
+    11: "⚫ Negro", 13: "⚫ Negro", 15: "⚫ Negro", 17: "⚫ Negro", 20: "⚫ Negro", 
+    22: "⚫ Negro", 24: "⚫ Negro", 26: "⚫ Negro", 28: "⚫ Negro", 29: "⚫ Negro", 
+    31: "⚫ Negro", 33: "⚫ Negro", 35: "⚫ Negro"
+}
+
+@bot.command()
+async def ruleta(ctx, apuesta: int = None, numero: int = None):
+    """
+    Juega a la ruleta clásica del casino.
+    
+    Uso: !ruleta <apuesta> <número>
+    
+    Características:
+    • Apuesta máxima: 200 gemas
+    • Cooldown: 5 minutos
+    • Ganancia por número ganador: 1.5x tu apuesta
+    • Números disponibles: 0 al 36
+    
+    Ejemplos:
+    • !ruleta 100 17  - Apuesta 100 gemas al número 17
+    • !ruleta 50 0    - Apuesta 50 gemas al número 0 (verde)
+    """
+    
+    user_id = ctx.author.id
+    now = time.time()
+    
+    # 1. Mostrar ayuda si no se proporcionan argumentos
+    if apuesta is None or numero is None:
+        embed = discord.Embed(
+            title="🎰 RULETA CLÁSICA - AYUDA",
+            description="¡Prueba tu suerte en la ruleta del casino!",
+            color=discord.Color.gold()
+        )
+        
+        embed.add_field(
+            name="💰 APUESTAS",
+            value=f"• **Máximo:** 200 gemas por jugada\n• **Mínimo:** 1 gema",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎯 CÓMO JUGAR",
+            value=(
+                "Elige un número del **0 al 36** y apuesta.\n"
+                "• **Número exacto:** Ganas 1.5x tu apuesta\n"
+                "• **Cualquier otro número:** Pierdes tu apuesta\n\n"
+                "**Ejemplo:**\n"
+                "`!ruleta 100 17` - Apuestas 100 gemas al número 17\n"
+                "Si sale el 17, ganas 150 gemas (100 × 1.5)"
+            ),
+            inline=False
+        )
+        
+        embed.add_field(
+            name="🎨 COLORES DE LA RULETA",
+            value=(
+                "• 🟢 **Verde:** 0\n"
+                "• 🔴 **Rojo:** 1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36\n"
+                "• ⚫ **Negro:** 2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35"
+            ),
+            inline=False
+        )
+        
+        embed.add_field(
+            name="⏰ COOLDOWN",
+            value="Puedes jugar cada **5 minutos**",
+            inline=False
+        )
+        
+        embed.set_footer(text="¡Buena suerte!")
+        await ctx.send(embed=embed)
+        return
+    
+    # 2. Validar apuesta (máximo 200)
+    if apuesta < 1:
+        await ctx.send("❌ La apuesta debe ser de al menos 1 gema.")
+        return
+    
+    if apuesta > 200:
+        await ctx.send(f"❌ La apuesta máxima es de **200 gemas**. Has apostado {apuesta} gemas.")
+        return
+    
+    # 3. Validar número (0-36)
+    if numero < 0 or numero > 36:
+        await ctx.send("❌ El número debe estar entre **0** y **36**.")
+        return
+    
+    # 4. Verificar cooldown (5 minutos = 300 segundos)
+    
+    if user_id in user_last_ruleta and now - user_last_ruleta[user_id] < COOLDOWN_RULETA:
+        time_remaining = COOLDOWN_RULETA - (now - user_last_ruleta[user_id])
+        await ctx.send(f"⏰ **¡Espera!** Debes esperar {format_cooldown(time_remaining)} antes de volver a jugar a la ruleta.")
+        return
+    
+    # 5. Verificar que tenga gemas suficientes
+    user_balance = get_balance(user_id)
+    if user_balance < apuesta:
+        await ctx.send(f"❌ No tienes suficientes gemas. Necesitas {format_gems(apuesta)} pero tienes {format_gems(user_balance)}.")
+        return
+    
+    # 6. Restar la apuesta del balance
+    add_balance(user_id, -apuesta)
+    
+    # 7. Actualizar cooldown
+    user_last_ruleta[user_id] = now
+    
+    # 8. Simular el giro de la ruleta
+    numero_ganador = random.choice(RULETA_NUMEROS)
+    color_ganador = RULETA_COLORES[numero_ganador]
+    
+    # 9. Determinar si ganó
+    if numero == numero_ganador:
+        # ¡Ganó! Multiplicador 1.5x
+        ganancia = int(apuesta * 1.5)  # 1.5x la apuesta
+        add_balance(user_id, ganancia)
+        
+        embed = discord.Embed(
+            title="🎉 ¡GANASTE EN LA RULETA!",
+            description=f"**¡Felicidades {ctx.author.mention}!**",
+            color=discord.Color.green()
+        )
+        
+        embed.add_field(
+            name="🎯 Tu elección",
+            value=f"Número **{numero}**",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="🎰 Número ganador",
+            value=f"**{numero_ganador}** {color_ganador}",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="💰 Ganancias",
+            value=f"+{format_gems(ganancia)} (1.5x)",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="💎 Nuevo balance",
+            value=format_gems(get_balance(user_id)),
+            inline=True
+        )
+        
+        embed.add_field(
+            name="⏰ Próxima jugada",
+            value=format_cooldown(COOLDOWN_RULETA),
+            inline=True
+        )
+        
+        embed.set_footer(text="¡Qué suerte! ¿Jugarás de nuevo?")
+        
+    else:
+        # Perdió
+        embed = discord.Embed(
+            title="😅 Perdiste en la ruleta",
+            description=f"Mejor suerte la próxima vez, {ctx.author.mention}.",
+            color=discord.Color.red()
+        )
+        
+        embed.add_field(
+            name="🎯 Tu elección",
+            value=f"Número **{numero}**",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="🎰 Número ganador",
+            value=f"**{numero_ganador}** {color_ganador}",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="💰 Pérdida",
+            value=f"-{format_gems(apuesta)}",
+            inline=True
+        )
+        
+        embed.add_field(
+            name="💎 Balance actual",
+            value=format_gems(get_balance(user_id)),
+            inline=True
+        )
+        
+        embed.add_field(
+            name="⏰ Próxima jugada",
+            value=format_cooldown(COOLDOWN_RULETA),
+            inline=True
+        )
+        
+        embed.set_footer(text="¡La ruleta siempre da revancha!")
+    
+    # 10. Guardar datos
+    save_data()
+    
+    # 11. Enviar resultado
+    await ctx.send(embed=embed)
 
 # ----------------------------
 # EVENTO DE INICIO
