@@ -5017,27 +5017,27 @@
       }
     },
     {
-      "id": "E034",
-      "nombre": "Juvia Corazones E",
-      "rareza": "E",
-      "valor": 400,
-      "stock": "Unlimited",
-      "max_per_user": 5,
-      "imagen": "images/Juvia_E.gif",
-      "imagen_url": "https://media.tenor.com/4533675554179729900/AAAAe/juvia-lockser.gif",
-      "descripcion": "Juvia Corazones (E)",
-      "stats": {
-        "Evasion": 82,
-        "Fuerza": 85,
-        "Reaccion": 92,
-        "Defensa": 84,
-        "Velocidad": 90,
-        "IQ": 99,
-        "Carisma": 99,
-        "Precision": 84,
-        "Energia": 80,
-        "Suerte": 99
-      }
-    }
+  "id": "E034",
+  "nombre": "Juvia Corazones E",
+  "rareza": "E",
+  "valor": 400,
+  "stock": "Unlimited",
+  "max_per_user": 5,
+  "imagen": "images/Juvia_E.gif",
+  "imagen_url": "https://raw.githubusercontent.com/CosmicDragneel21/Project-KC/main/images/Juvia_E.gif?token=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",
+  "descripcion": "Juvia Corazones (E)",
+  "stats": {
+    "Evasion": 82,
+    "Fuerza": 85,
+    "Reaccion": 92,
+    "Defensa": 84,
+    "Velocidad": 90,
+    "IQ": 99,
+    "Carisma": 99,
+    "Precision": 84,
+    "Energia": 80,
+    "Suerte": 99
+  }
+}
   ]
 }
