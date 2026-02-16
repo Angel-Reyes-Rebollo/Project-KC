@@ -7074,14 +7074,23 @@ async def apoyo(ctx):
     
     await ctx.send(embed=embed)
 
+
 # ----------------------------
-# COMANDO !MOSTRAR - VERSIÓN FINAL CORREGIDA
+# COMANDO !MOSTRAR - VERSIÓN COMPLETA Y CORREGIDA
 # ----------------------------
 @bot.command(aliases=['ver', 'carta'])
 async def mostrar(ctx, numero: int = None):
     """
     Muestra una carta específica de tu inventario.
     SOPORTE COMPLETO PARA GIFS ANIMADOS.
+    
+    Uso:
+    !mostrar                  - Te envía por MD la lista numerada de tus cartas
+    !mostrar <número>         - Muestra la carta con ese número en el canal actual
+    
+    Ejemplo:
+    !mostrar                  (recibes lista por MD)
+    !mostrar 3                (muestra la carta #3 en el canal)
     """
     user_id = ctx.author.id
     inventory = get_inventory(user_id)
@@ -7089,7 +7098,7 @@ async def mostrar(ctx, numero: int = None):
     if not inventory:
         embed = discord.Embed(
             title="📭 Inventario Vacío",
-            description="No tienes cartas para mostrar.",
+            description="No tienes cartas para mostrar. ¡Usa `!gacha` para obtener algunas!",
             color=discord.Color.blue()
         )
         await ctx.send(embed=embed)
@@ -7109,7 +7118,7 @@ async def mostrar(ctx, numero: int = None):
     def get_rarity_value(card):
         return RARITY_ORDER.get(card.get("rareza", "N"), 7)
     
-    # Ordenar inventario
+    # Ordenar inventario por rareza (mayor a menor) y luego por nombre
     sorted_inventory = sorted(inventory, key=lambda x: (get_rarity_value(x), x.get("nombre", "")))
     
     # Función para emoji de rareza
@@ -7170,7 +7179,7 @@ async def mostrar(ctx, numero: int = None):
             for card in sorted_inventory:
                 rarity = card.get("rareza", "N")
                 rarity_count[rarity] = rarity_count.get(rarity, 0) + 1
-                if "imagen_url" in card and card["imagen_url"].lower().endswith('.gif'):
+                if "imagen_url" in card and card["imagen_url"] and card["imagen_url"].lower().endswith('.gif'):
                     gif_count += 1
             
             stats_text = ""
@@ -7180,7 +7189,7 @@ async def mostrar(ctx, numero: int = None):
                     stats_text += f"{emoji} {rarity}: {rarity_count[rarity]}\n"
             
             if stats_text:
-                embed.add_field(name="📊 Distribución", value=stats_text, inline=False)
+                embed.add_field(name="📊 Distribución por rareza", value=stats_text, inline=False)
             
             if gif_count > 0:
                 embed.add_field(name="🎬 Cartas Animadas", value=f"**{gif_count}** cartas con GIF", inline=False)
@@ -7200,13 +7209,13 @@ async def mostrar(ctx, numero: int = None):
                     color=discord.Color.blue()
                 )
                 page_embed.description = "\n".join(chunk)
-                page_embed.set_footer(text=f"Página {page_num} de {len(chunks)}")
+                page_embed.set_footer(text=f"Cartas {((page_num-1)*chunk_size)+1}-{min(page_num*chunk_size, len(sorted_inventory))} de {len(sorted_inventory)}")
                 await ctx.author.send(embed=page_embed)
             
-            await ctx.send(f"✅ {ctx.author.mention}, revisa tus MDs")
+            await ctx.send(f"✅ {ctx.author.mention}, te he enviado la lista de tus cartas por mensaje directo. Usa `!mostrar <número>` para mostrar una carta en este canal.")
             
         except discord.Forbidden:
-            await ctx.send("❌ No puedo enviarte MDs")
+            await ctx.send("❌ No puedo enviarte mensajes directos. Por favor, habilita los MDs en la configuración de privacidad del servidor.")
         return
     
     # Validar número
@@ -7222,7 +7231,7 @@ async def mostrar(ctx, numero: int = None):
     # Determinar si es evento
     es_evento = rarity == "E"
     
-    # Crear embed
+    # ===== CREAR EMBED CON TODOS LOS CAMPOS PRIMERO =====
     embed = discord.Embed(
         title=f"{rarity_emoji} {selected_card['nombre']} ({rarity})" + (" 🎪 EVENTO" if es_evento else ""),
         description=f"**{ctx.author.display_name}** muestra su carta:",
@@ -7254,25 +7263,39 @@ async def mostrar(ctx, numero: int = None):
             "Suerte": "🍀"
         }
         
-        for stat_name, stat_value in stats.items():
-            if stat_value > 1:
-                emoji = stat_emojis.get(stat_name, "📊")
-                stats_text += f"{emoji} **{stat_name}:** {stat_value}\n"
+        # Mostrar todas las stats
+        stat_items = list(stats.items())
+        mitad = len(stat_items) // 2
         
-        if stats_text:
-            embed.add_field(name="📊 Estadísticas", value=stats_text, inline=False)
+        columna1 = ""
+        columna2 = ""
+        
+        for i, (stat_name, stat_value) in enumerate(stat_items):
+            if stat_value > 1:  # Solo mostrar stats que no sean 1
+                emoji = stat_emojis.get(stat_name, "📊")
+                stat_line = f"{emoji} **{stat_name}:** {stat_value}\n"
+                
+                if i < mitad:
+                    columna1 += stat_line
+                else:
+                    columna2 += stat_line
+        
+        if columna1:
+            embed.add_field(name="📊 Estadísticas", value=columna1, inline=True)
+        if columna2:
+            embed.add_field(name="‎", value=columna2, inline=True)  # Carácter invisible para alinear
     
-    # ===== PARTE CRÍTICA: MANEJO DE IMÁGENES =====
-    # PRIORIDAD 1: Usar imagen_url SIEMPRE (para GIFs animados)
+    # ===== MANEJO DE IMÁGENES =====
+    # PRIORIDAD 1: Usar imagen_url (para GIFs animados o imágenes externas)
     if "imagen_url" in selected_card and selected_card["imagen_url"]:
         imagen_url = selected_card["imagen_url"]
         embed.set_image(url=imagen_url)
         
         # Verificar si es GIF por la extensión
         if imagen_url.lower().endswith('.gif'):
-            embed.set_footer(text="✨ Carta animada • GIF")
+            embed.set_footer(text=f"✨ Carta animada • GIF • #{numero} de {len(sorted_inventory)}")
         else:
-            embed.set_footer(text=f"Carta {numero} de {len(sorted_inventory)}")
+            embed.set_footer(text=f"Carta #{numero} de {len(sorted_inventory)}")
         
         # Enviar solo el embed (sin archivo adjunto)
         await ctx.send(embed=embed)
@@ -7286,15 +7309,22 @@ async def mostrar(ctx, numero: int = None):
                 filename = os.path.basename(image_path)
                 file = discord.File(image_path, filename=filename)
                 embed.set_image(url="attachment://" + filename)
-                embed.set_footer(text=f"Carta {numero} de {len(sorted_inventory)}")
+                embed.set_footer(text=f"Carta #{numero} de {len(sorted_inventory)}")
                 await ctx.send(embed=embed, file=file)
                 return
             except Exception as e:
                 print(f"Error cargando imagen: {e}")
+                embed.add_field(name="⚠️ Error", value="No se pudo cargar la imagen", inline=False)
+        else:
+            embed.add_field(name="⚠️ Imagen", value="Archivo no encontrado", inline=False)
+    else:
+        embed.add_field(name="⚠️ Imagen", value="No disponible", inline=False)
+        embed.set_footer(text=f"Carta #{numero} de {len(sorted_inventory)}")
     
-    # Si no hay imagen
-    embed.add_field(name="⚠️ Imagen", value="No disponible", inline=False)
+    # Si llegamos aquí, significa que no hay imagen o hubo error
     await ctx.send(embed=embed)
+
+
 
 # ----------------------------
 # COMANDO !ENCUENTRA_GEMA
