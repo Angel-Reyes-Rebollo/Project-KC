@@ -4165,6 +4165,28 @@
                     "Energia": 53,
                     "Suerte": 59
                 }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
+                "stats": {
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
             }
         ],
         "1129612222272897244": [
@@ -4917,28 +4939,6 @@
                     "Carisma": 70,
                     "Precision": 79,
                     "Energia": 86,
-                    "Suerte": 72
-                }
-            },
-            {
-                "id": "SP002",
-                "nombre": "Tetsurō Kuroo",
-                "rareza": "SP",
-                "valor": 260,
-                "stock": "Unlimited",
-                "max_per_user": 10,
-                "imagen": "images/Kuroo_SP.png",
-                "descripcion": "Tetsurō Kuroo (SP)",
-                "stats": {
-                    "Evasion": 75,
-                    "Fuerza": 75,
-                    "Reaccion": 73,
-                    "Defensa": 85,
-                    "Velocidad": 44,
-                    "IQ": 75,
-                    "Carisma": 72,
-                    "Precision": 73,
-                    "Energia": 72,
                     "Suerte": 72
                 }
             },
@@ -5957,28 +5957,6 @@
                 }
             },
             {
-                "id": "SP022",
-                "nombre": "Mahito Instant Spirit Body",
-                "rareza": "SP",
-                "valor": 260,
-                "stock": "Unlimited",
-                "max_per_user": 10,
-                "imagen": "images/Mahito_Instant_Spirit_Body_SP.png",
-                "descripcion": "Mahito Instant Spirit Body (SP)",
-                "stats": {
-                    "Evasion": 90,
-                    "Fuerza": 82,
-                    "Reaccion": 87,
-                    "Defensa": 80,
-                    "Velocidad": 86,
-                    "IQ": 54,
-                    "Carisma": 78,
-                    "Precision": 85,
-                    "Energia": 88,
-                    "Suerte": 74
-                }
-            },
-            {
                 "id": "G013",
                 "nombre": "Antares",
                 "rareza": "G",
@@ -6657,6 +6635,204 @@
                     "Carisma": 50,
                     "Precision": 53,
                     "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N027",
+                "nombre": "Falco Grice",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Falco_Grice_N.png",
+                "descripcion": "Falco Grice (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 56,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 47,
+                    "Carisma": 51,
+                    "Precision": 53,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N019",
+                "nombre": "Tetsutetsu",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
+                "stats": {
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N029",
+                "nombre": "Armin Arlert",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Armin_Arlert_N.png",
+                "descripcion": "Armin Arlert (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 45,
+                    "Reaccion": 53,
+                    "Defensa": 47,
+                    "Velocidad": 49,
+                    "IQ": 56,
+                    "Carisma": 54,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N012",
+                "nombre": "Gin Gagamaru",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gin_Gagamaru_N.png",
+                "descripcion": "Gin Gagamaru (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 54,
+                    "Reaccion": 59,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N004",
+                "nombre": "Ryūnosuke Tanaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tanaka_N.png",
+                "descripcion": "Ryūnosuke Tanaka (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 55,
+                    "Velocidad": 56,
+                    "IQ": 48,
+                    "Carisma": 53,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N005",
+                "nombre": "Tadashi Yamaguchi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Yamaguchi_N.png",
+                "descripcion": "Tadashi Yamaguchi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 54,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 55,
+                    "Precision": 58,
+                    "Energia": 53,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N004",
+                "nombre": "Ryūnosuke Tanaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tanaka_N.png",
+                "descripcion": "Ryūnosuke Tanaka (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 55,
+                    "Velocidad": 56,
+                    "IQ": 48,
+                    "Carisma": 53,
+                    "Precision": 54,
+                    "Energia": 54,
                     "Suerte": 52
                 }
             }
@@ -9905,6 +10081,72 @@
                     "Energia": 72,
                     "Suerte": 56
                 }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
             }
         ],
         "388418629999394817": [
@@ -10987,6 +11229,160 @@
                     "Precision": 40,
                     "Energia": 54,
                     "Suerte": 48
+                }
+            },
+            {
+                "id": "N013",
+                "nombre": "Asahi Naruhaya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Asahi_Naruhaya_N.png",
+                "descripcion": "Asahi Naruhaya (N)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N006",
+                "nombre": "Sung Jin-Woo",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Sung_Jin_Woo_N.png",
+                "descripcion": "Sung Jin-Woo (N)",
+                "stats": {
+                    "Evasion": 48,
+                    "Fuerza": 55,
+                    "Reaccion": 49,
+                    "Defensa": 34,
+                    "Velocidad": 52,
+                    "IQ": 47,
+                    "Carisma": 38,
+                    "Precision": 51,
+                    "Energia": 50,
+                    "Suerte": 46
+                }
+            },
+            {
+                "id": "N013",
+                "nombre": "Asahi Naruhaya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Asahi_Naruhaya_N.png",
+                "descripcion": "Asahi Naruhaya (N)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "SSR019",
+                "nombre": "Nagi Seishiro",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Nagi_Seishiro_SSR.png",
+                "descripcion": "Nagi Seishiro (SSR)",
+                "stats": {
+                    "Evasion": 68,
+                    "Fuerza": 65,
+                    "Reaccion": 77,
+                    "Defensa": 59,
+                    "Velocidad": 63,
+                    "IQ": 71,
+                    "Carisma": 58,
+                    "Precision": 81,
+                    "Energia": 54,
+                    "Suerte": 60
+                }
+            },
+            {
+                "id": "N026",
+                "nombre": "Eren Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Eren_Yeager_N.png",
+                "descripcion": "Eren Yeager (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 59,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 45,
+                    "Carisma": 57,
+                    "Precision": 54,
+                    "Energia": 56,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N004",
+                "nombre": "Ryūnosuke Tanaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tanaka_N.png",
+                "descripcion": "Ryūnosuke Tanaka (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 55,
+                    "Velocidad": 56,
+                    "IQ": 48,
+                    "Carisma": 53,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N019",
+                "nombre": "Tetsutetsu",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
+                    "Suerte": 52
                 }
             }
         ],
@@ -13059,6 +13455,94 @@
                     "Precision": 54,
                     "Energia": 54,
                     "Suerte": 52
+                }
+            },
+            {
+                "id": "N030",
+                "nombre": "Carla Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Carla_Yeager_N.png",
+                "descripcion": "Carla Yeager (N)",
+                "stats": {
+                    "Evasion": 45,
+                    "Fuerza": 46,
+                    "Reaccion": 48,
+                    "Defensa": 55,
+                    "Velocidad": 47,
+                    "IQ": 49,
+                    "Carisma": 54,
+                    "Precision": 46,
+                    "Energia": 53,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N012",
+                "nombre": "Gin Gagamaru",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gin_Gagamaru_N.png",
+                "descripcion": "Gin Gagamaru (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 54,
+                    "Reaccion": 59,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N006",
+                "nombre": "Sung Jin-Woo",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Sung_Jin_Woo_N.png",
+                "descripcion": "Sung Jin-Woo (N)",
+                "stats": {
+                    "Evasion": 48,
+                    "Fuerza": 55,
+                    "Reaccion": 49,
+                    "Defensa": 34,
+                    "Velocidad": 52,
+                    "IQ": 47,
+                    "Carisma": 38,
+                    "Precision": 51,
+                    "Energia": 50,
+                    "Suerte": 46
                 }
             }
         ],
@@ -19572,6 +20056,50 @@
                     "Energia": 57,
                     "Suerte": 55
                 }
+            },
+            {
+                "id": "N030",
+                "nombre": "Carla Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Carla_Yeager_N.png",
+                "descripcion": "Carla Yeager (N)",
+                "stats": {
+                    "Evasion": 45,
+                    "Fuerza": 46,
+                    "Reaccion": 48,
+                    "Defensa": 55,
+                    "Velocidad": 47,
+                    "IQ": 49,
+                    "Carisma": 54,
+                    "Precision": 46,
+                    "Energia": 53,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N012",
+                "nombre": "Gin Gagamaru",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gin_Gagamaru_N.png",
+                "descripcion": "Gin Gagamaru (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 54,
+                    "Reaccion": 59,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
             }
         ],
         "947609625795125298": [
@@ -26056,6 +26584,50 @@
                     "Energia": 54,
                     "Suerte": 52
                 }
+            },
+            {
+                "id": "N014",
+                "nombre": "Hyoma Chigiri",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Hyoma_Chigiri_N.png",
+                "descripcion": "Hyoma Chigiri (N)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 51,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "SSR001",
+                "nombre": "Ryūnosuke Tanaka",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Tanaka_SSR.png",
+                "descripcion": "Ryūnosuke Tanaka (SSR)",
+                "stats": {
+                    "Evasion": 65,
+                    "Fuerza": 78,
+                    "Reaccion": 66,
+                    "Defensa": 64,
+                    "Velocidad": 68,
+                    "IQ": 53,
+                    "Carisma": 60,
+                    "Precision": 63,
+                    "Energia": 67,
+                    "Suerte": 62
+                }
             }
         ],
         "340933924941463566": [
@@ -29501,28 +30073,6 @@
                 }
             },
             {
-                "id": "N030",
-                "nombre": "Carla Yeager",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Carla_Yeager_N.png",
-                "descripcion": "Carla Yeager (N)",
-                "stats": {
-                    "Evasion": 45,
-                    "Fuerza": 46,
-                    "Reaccion": 48,
-                    "Defensa": 55,
-                    "Velocidad": 47,
-                    "IQ": 49,
-                    "Carisma": 54,
-                    "Precision": 46,
-                    "Energia": 53,
-                    "Suerte": 50
-                }
-            },
-            {
                 "id": "N005",
                 "nombre": "Tadashi Yamaguchi",
                 "rareza": "N",
@@ -29545,91 +30095,25 @@
                 }
             },
             {
-                "id": "N029",
-                "nombre": "Armin Arlert",
+                "id": "N023",
+                "nombre": "Momo Nishimiya",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Armin_Arlert_N.png",
-                "descripcion": "Armin Arlert (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 45,
-                    "Reaccion": 53,
-                    "Defensa": 47,
-                    "Velocidad": 49,
-                    "IQ": 56,
-                    "Carisma": 54,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
-                }
-            },
-            {
-                "id": "R009",
-                "nombre": "Jingo Raichi",
-                "rareza": "R",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Jingo_Raichi_R.png",
-                "descripcion": "Jingo Raichi (R)",
+                "imagen": "images/Momo_Nishimiya_N.png",
+                "descripcion": "Momo Nishimiya (N)",
                 "stats": {
                     "Evasion": 56,
-                    "Fuerza": 67,
-                    "Reaccion": 61,
-                    "Defensa": 60,
-                    "Velocidad": 59,
-                    "IQ": 52,
-                    "Carisma": 55,
-                    "Precision": 58,
-                    "Energia": 63,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N024",
-                "nombre": "Junpei Yoshino",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Junpei_Yoshino_N.png",
-                "descripcion": "Junpei Yoshino (N)",
-                "stats": {
-                    "Evasion": 51,
                     "Fuerza": 50,
-                    "Reaccion": 52,
+                    "Reaccion": 53,
                     "Defensa": 51,
-                    "Velocidad": 51,
-                    "IQ": 54,
-                    "Carisma": 50,
-                    "Precision": 53,
-                    "Energia": 55,
-                    "Suerte": 50
-                }
-            },
-            {
-                "id": "N010",
-                "nombre": "Yoo Jin-Ho",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Yoo_Jin_Ho_N.png",
-                "descripcion": "Yoo Jin-Ho (N)",
-                "stats": {
-                    "Evasion": 42,
-                    "Fuerza": 32,
-                    "Reaccion": 46,
-                    "Defensa": 45,
-                    "Velocidad": 44,
-                    "IQ": 50,
-                    "Carisma": 56,
-                    "Precision": 40,
-                    "Energia": 54,
-                    "Suerte": 48
+                    "Velocidad": 57,
+                    "IQ": 51,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 52,
+                    "Suerte": 53
                 }
             },
             {
@@ -29655,69 +30139,25 @@
                 }
             },
             {
-                "id": "R021",
-                "nombre": "Yaga Masamichi",
-                "rareza": "R",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Yaga_Masamichi_R.png",
-                "descripcion": "Yaga Masamichi (R)",
-                "stats": {
-                    "Evasion": 64,
-                    "Fuerza": 69,
-                    "Reaccion": 66,
-                    "Defensa": 68,
-                    "Velocidad": 65,
-                    "IQ": 70,
-                    "Carisma": 68,
-                    "Precision": 65,
-                    "Energia": 68,
-                    "Suerte": 64
-                }
-            },
-            {
-                "id": "N028",
-                "nombre": "Gabi Braun",
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Gabi_Braun_N.png",
-                "descripcion": "Gabi Braun (N)",
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
                 "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 51,
+                    "Evasion": 55,
+                    "Fuerza": 52,
                     "Reaccion": 55,
-                    "Defensa": 50,
+                    "Defensa": 53,
                     "Velocidad": 54,
-                    "IQ": 46,
-                    "Carisma": 48,
-                    "Precision": 57,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
                     "Energia": 54,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N028",
-                "nombre": "Gabi Braun",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Gabi_Braun_N.png",
-                "descripcion": "Gabi Braun (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 50,
-                    "Velocidad": 54,
-                    "IQ": 46,
-                    "Carisma": 48,
-                    "Precision": 57,
-                    "Energia": 54,
-                    "Suerte": 52
+                    "Suerte": 53
                 }
             },
             {
@@ -29743,91 +30183,223 @@
                 }
             },
             {
-                "id": "N027",
-                "nombre": "Falco Grice",
+                "id": "N004",
+                "nombre": "Ryūnosuke Tanaka",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Falco_Grice_N.png",
-                "descripcion": "Falco Grice (N)",
+                "imagen": "images/Tanaka_N.png",
+                "descripcion": "Ryūnosuke Tanaka (N)",
                 "stats": {
                     "Evasion": 55,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 55,
+                    "Velocidad": 56,
+                    "IQ": 48,
+                    "Carisma": 53,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
                     "Fuerza": 50,
-                    "Reaccion": 56,
-                    "Defensa": 52,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N029",
+                "nombre": "Armin Arlert",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Armin_Arlert_N.png",
+                "descripcion": "Armin Arlert (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 45,
+                    "Reaccion": 53,
+                    "Defensa": 47,
+                    "Velocidad": 49,
+                    "IQ": 56,
+                    "Carisma": 54,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
                     "Velocidad": 54,
-                    "IQ": 47,
-                    "Carisma": 51,
-                    "Precision": 53,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
                     "Energia": 54,
                     "Suerte": 53
                 }
             },
             {
-                "id": "SSR021",
-                "nombre": "Shouei Barou",
-                "rareza": "SSR",
-                "valor": 60,
-                "stock": "Unlimited",
-                "max_per_user": 100,
-                "imagen": "images/Shouei_Barou_SSR.png",
-                "descripcion": "Shouei Barou (SSR)",
-                "stats": {
-                    "Evasion": 62,
-                    "Fuerza": 81,
-                    "Reaccion": 72,
-                    "Defensa": 60,
-                    "Velocidad": 70,
-                    "IQ": 54,
-                    "Carisma": 74,
-                    "Precision": 76,
-                    "Energia": 68,
-                    "Suerte": 58
-                }
-            },
-            {
-                "id": "R012",
-                "nombre": "Ikki Niko",
-                "rareza": "R",
-                "valor": 35,
-                "stock": "Unlimited",
-                "max_per_user": 500,
-                "imagen": "images/Ikki_Niko_R.png",
-                "descripcion": "Ikki Niko (R)",
-                "stats": {
-                    "Evasion": 59,
-                    "Fuerza": 53,
-                    "Reaccion": 63,
-                    "Defensa": 62,
-                    "Velocidad": 60,
-                    "IQ": 71,
-                    "Carisma": 56,
-                    "Precision": 58,
-                    "Energia": 61,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N017",
-                "nombre": "Koji Koda",
+                "id": "N015",
+                "nombre": "Rensuke Kunigami",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Koji_Koda_N.png",
-                "descripcion": "Koji Koda (N)",
+                "imagen": "images/Rensuke_Kunigami_N.png",
+                "descripcion": "Rensuke Kunigami (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 56,
+                    "Reaccion": 55,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 52,
+                    "Carisma": 51,
+                    "Precision": 54,
+                    "Energia": 55,
+                    "Suerte": 57
+                }
+            },
+            {
+                "id": "N005",
+                "nombre": "Tadashi Yamaguchi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Yamaguchi_N.png",
+                "descripcion": "Tadashi Yamaguchi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 54,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 55,
+                    "Precision": 58,
+                    "Energia": 53,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
                 "stats": {
                     "Evasion": 54,
                     "Fuerza": 52,
-                    "Reaccion": 54,
-                    "Defensa": 56,
-                    "Velocidad": 53,
-                    "IQ": 58,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "R021",
+                "nombre": "Yaga Masamichi",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Yaga_Masamichi_R.png",
+                "descripcion": "Yaga Masamichi (R)",
+                "stats": {
+                    "Evasion": 64,
+                    "Fuerza": 69,
+                    "Reaccion": 66,
+                    "Defensa": 68,
+                    "Velocidad": 65,
+                    "IQ": 70,
+                    "Carisma": 68,
+                    "Precision": 65,
+                    "Energia": 68,
+                    "Suerte": 64
+                }
+            },
+            {
+                "id": "SSR009",
+                "nombre": "Tōru Oikawa",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Oikawa_SSR.png",
+                "descripcion": "Tōru Oikawa (SSR)",
+                "stats": {
+                    "Evasion": 62,
+                    "Fuerza": 52,
+                    "Reaccion": 68,
+                    "Defensa": 60,
+                    "Velocidad": 66,
+                    "IQ": 79,
+                    "Carisma": 78,
+                    "Precision": 81,
+                    "Energia": 64,
+                    "Suerte": 63
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
                     "Carisma": 50,
-                    "Precision": 52,
-                    "Energia": 55,
-                    "Suerte": 54
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
                 }
             }
         ],
@@ -33737,6 +34309,226 @@
                     "Energia": 53,
                     "Suerte": 53
                 }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N001",
+                "nombre": "Hinata Shōyō",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Hinata_N.png",
+                "descripcion": "Hinata Shōyō (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 55,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 59
+                }
+            },
+            {
+                "id": "N017",
+                "nombre": "Koji Koda",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Koji_Koda_N.png",
+                "descripcion": "Koji Koda (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 58,
+                    "Carisma": 50,
+                    "Precision": 52,
+                    "Energia": 55,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N007",
+                "nombre": "Lee Joo-hee",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Lee_Joo_hee_N.png",
+                "descripcion": "Lee Joo-hee (N)",
+                "stats": {
+                    "Evasion": 42,
+                    "Fuerza": 28,
+                    "Reaccion": 46,
+                    "Defensa": 57,
+                    "Velocidad": 44,
+                    "IQ": 50,
+                    "Carisma": 52,
+                    "Precision": 40,
+                    "Energia": 54,
+                    "Suerte": 45
+                }
+            },
+            {
+                "id": "N026",
+                "nombre": "Eren Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Eren_Yeager_N.png",
+                "descripcion": "Eren Yeager (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 59,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 45,
+                    "Carisma": 57,
+                    "Precision": 54,
+                    "Energia": 56,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "N017",
+                "nombre": "Koji Koda",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Koji_Koda_N.png",
+                "descripcion": "Koji Koda (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 58,
+                    "Carisma": 50,
+                    "Precision": 52,
+                    "Energia": 55,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "N026",
+                "nombre": "Eren Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Eren_Yeager_N.png",
+                "descripcion": "Eren Yeager (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 59,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 45,
+                    "Carisma": 57,
+                    "Precision": 54,
+                    "Energia": 56,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N024",
+                "nombre": "Junpei Yoshino",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Junpei_Yoshino_N.png",
+                "descripcion": "Junpei Yoshino (N)",
+                "stats": {
+                    "Evasion": 51,
+                    "Fuerza": 50,
+                    "Reaccion": 52,
+                    "Defensa": 51,
+                    "Velocidad": 51,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 55,
+                    "Suerte": 50
+                }
             }
         ],
         "768891783295139871": [
@@ -36269,6 +37061,116 @@
                     "Precision": 52,
                     "Energia": 52,
                     "Suerte": 53
+                }
+            },
+            {
+                "id": "SSR005",
+                "nombre": "Kei Tsukishima",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Tsukishima_SSR.png",
+                "descripcion": "Kei Tsukishima (SSR)",
+                "stats": {
+                    "Evasion": 58,
+                    "Fuerza": 63,
+                    "Reaccion": 69,
+                    "Defensa": 77,
+                    "Velocidad": 54,
+                    "IQ": 72,
+                    "Carisma": 61,
+                    "Precision": 64,
+                    "Energia": 60,
+                    "Suerte": 58
+                }
+            },
+            {
+                "id": "N020",
+                "nombre": "Pony Tsunotori",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Pony_Tsunotori_N.png",
+                "descripcion": "Pony Tsunotori (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 58,
+                    "Defensa": 52,
+                    "Velocidad": 56,
+                    "IQ": 53,
+                    "Carisma": 50,
+                    "Precision": 59,
+                    "Energia": 57,
+                    "Suerte": 55
+                }
+            },
+            {
+                "id": "SSR021",
+                "nombre": "Shouei Barou",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Shouei_Barou_SSR.png",
+                "descripcion": "Shouei Barou (SSR)",
+                "stats": {
+                    "Evasion": 62,
+                    "Fuerza": 81,
+                    "Reaccion": 72,
+                    "Defensa": 60,
+                    "Velocidad": 70,
+                    "IQ": 54,
+                    "Carisma": 74,
+                    "Precision": 76,
+                    "Energia": 68,
+                    "Suerte": 58
+                }
+            },
+            {
+                "id": "N002",
+                "nombre": "Kei Tsukishima",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tsukishima_N.png",
+                "descripcion": "Kei Tsukishima (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 52,
+                    "IQ": 55,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N007",
+                "nombre": "Lee Joo-hee",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Lee_Joo_hee_N.png",
+                "descripcion": "Lee Joo-hee (N)",
+                "stats": {
+                    "Evasion": 42,
+                    "Fuerza": 28,
+                    "Reaccion": 46,
+                    "Defensa": 57,
+                    "Velocidad": 44,
+                    "IQ": 50,
+                    "Carisma": 52,
+                    "Precision": 40,
+                    "Energia": 54,
+                    "Suerte": 45
                 }
             }
         ],
@@ -49740,94 +50642,6 @@
                 }
             },
             {
-                "id": "N020",
-                "nombre": "Pony Tsunotori",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Pony_Tsunotori_N.png",
-                "descripcion": "Pony Tsunotori (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 54,
-                    "Reaccion": 58,
-                    "Defensa": 52,
-                    "Velocidad": 56,
-                    "IQ": 53,
-                    "Carisma": 50,
-                    "Precision": 59,
-                    "Energia": 57,
-                    "Suerte": 55
-                }
-            },
-            {
-                "id": "N020",
-                "nombre": "Pony Tsunotori",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Pony_Tsunotori_N.png",
-                "descripcion": "Pony Tsunotori (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 54,
-                    "Reaccion": 58,
-                    "Defensa": 52,
-                    "Velocidad": 56,
-                    "IQ": 53,
-                    "Carisma": 50,
-                    "Precision": 59,
-                    "Energia": 57,
-                    "Suerte": 55
-                }
-            },
-            {
-                "id": "N018",
-                "nombre": "Mezo Shoji",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mezo_Shoji_N.png",
-                "descripcion": "Mezo Shoji (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 57,
-                    "Reaccion": 56,
-                    "Defensa": 58,
-                    "Velocidad": 54,
-                    "IQ": 55,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 56,
-                    "Suerte": 53
-                }
-            },
-            {
-                "id": "N001",
-                "nombre": "Hinata Shōyō",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Hinata_N.png",
-                "descripcion": "Hinata Shōyō (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 55,
-                    "Reaccion": 55,
-                    "Defensa": 50,
-                    "Velocidad": 56,
-                    "IQ": 52,
-                    "Carisma": 52,
-                    "Precision": 54,
-                    "Energia": 53,
-                    "Suerte": 59
-                }
-            },
-            {
                 "id": "R009",
                 "nombre": "Jingo Raichi",
                 "rareza": "R",
@@ -49846,72 +50660,6 @@
                     "Carisma": 55,
                     "Precision": 58,
                     "Energia": 63,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N005",
-                "nombre": "Tadashi Yamaguchi",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Yamaguchi_N.png",
-                "descripcion": "Tadashi Yamaguchi (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 50,
-                    "Reaccion": 55,
-                    "Defensa": 54,
-                    "Velocidad": 54,
-                    "IQ": 54,
-                    "Carisma": 55,
-                    "Precision": 58,
-                    "Energia": 53,
-                    "Suerte": 53
-                }
-            },
-            {
-                "id": "N028",
-                "nombre": "Gabi Braun",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Gabi_Braun_N.png",
-                "descripcion": "Gabi Braun (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 50,
-                    "Velocidad": 54,
-                    "IQ": 46,
-                    "Carisma": 48,
-                    "Precision": 57,
-                    "Energia": 54,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 55,
                     "Suerte": 57
                 }
             },
@@ -49938,50 +50686,6 @@
                 }
             },
             {
-                "id": "N021",
-                "nombre": "Mai Zenin",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mai_Zenin_N.png",
-                "descripcion": "Mai Zenin (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 55,
-                    "Carisma": 56,
-                    "Precision": 60,
-                    "Energia": 50,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N020",
-                "nombre": "Pony Tsunotori",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Pony_Tsunotori_N.png",
-                "descripcion": "Pony Tsunotori (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 54,
-                    "Reaccion": 58,
-                    "Defensa": 52,
-                    "Velocidad": 56,
-                    "IQ": 53,
-                    "Carisma": 50,
-                    "Precision": 59,
-                    "Energia": 57,
-                    "Suerte": 55
-                }
-            },
-            {
                 "id": "UR006",
                 "nombre": "Iron",
                 "rareza": "UR",
@@ -50001,94 +50705,6 @@
                     "Precision": 70,
                     "Energia": 84,
                     "Suerte": 58
-                }
-            },
-            {
-                "id": "N029",
-                "nombre": "Armin Arlert",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Armin_Arlert_N.png",
-                "descripcion": "Armin Arlert (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 45,
-                    "Reaccion": 53,
-                    "Defensa": 47,
-                    "Velocidad": 49,
-                    "IQ": 56,
-                    "Carisma": 54,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
-                }
-            },
-            {
-                "id": "N019",
-                "nombre": "Tetsutetsu",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Tetsutetsu_N.png",
-                "descripcion": "Tetsutetsu (N)",
-                "stats": {
-                    "Evasion": 52,
-                    "Fuerza": 59,
-                    "Reaccion": 54,
-                    "Defensa": 56,
-                    "Velocidad": 53,
-                    "IQ": 50,
-                    "Carisma": 54,
-                    "Precision": 52,
-                    "Energia": 58,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N023",
-                "nombre": "Momo Nishimiya",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Momo_Nishimiya_N.png",
-                "descripcion": "Momo Nishimiya (N)",
-                "stats": {
-                    "Evasion": 56,
-                    "Fuerza": 50,
-                    "Reaccion": 53,
-                    "Defensa": 51,
-                    "Velocidad": 57,
-                    "IQ": 51,
-                    "Carisma": 54,
-                    "Precision": 52,
-                    "Energia": 52,
-                    "Suerte": 53
-                }
-            },
-            {
-                "id": "N020",
-                "nombre": "Pony Tsunotori",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Pony_Tsunotori_N.png",
-                "descripcion": "Pony Tsunotori (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 54,
-                    "Reaccion": 58,
-                    "Defensa": 52,
-                    "Velocidad": 56,
-                    "IQ": 53,
-                    "Carisma": 50,
-                    "Precision": 59,
-                    "Energia": 57,
-                    "Suerte": 55
                 }
             },
             {
@@ -50114,50 +50730,6 @@
                 }
             },
             {
-                "id": "N014",
-                "nombre": "Hyoma Chigiri",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Hyoma_Chigiri_N.png",
-                "descripcion": "Hyoma Chigiri (N)",
-                "stats": {
-                    "Evasion": 56,
-                    "Fuerza": 52,
-                    "Reaccion": 55,
-                    "Defensa": 53,
-                    "Velocidad": 55,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 53
-                }
-            },
-            {
-                "id": "N018",
-                "nombre": "Mezo Shoji",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mezo_Shoji_N.png",
-                "descripcion": "Mezo Shoji (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 57,
-                    "Reaccion": 56,
-                    "Defensa": 58,
-                    "Velocidad": 54,
-                    "IQ": 55,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 56,
-                    "Suerte": 53
-                }
-            },
-            {
                 "id": "SP028",
                 "nombre": "Titán Hembra",
                 "rareza": "SP",
@@ -50177,116 +50749,6 @@
                     "Precision": 74,
                     "Energia": 76,
                     "Suerte": 70
-                }
-            },
-            {
-                "id": "N026",
-                "nombre": "Eren Yeager",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Eren_Yeager_N.png",
-                "descripcion": "Eren Yeager (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 59,
-                    "Reaccion": 55,
-                    "Defensa": 53,
-                    "Velocidad": 55,
-                    "IQ": 45,
-                    "Carisma": 57,
-                    "Precision": 54,
-                    "Energia": 56,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N012",
-                "nombre": "Gin Gagamaru",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Gin_Gagamaru_N.png",
-                "descripcion": "Gin Gagamaru (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 54,
-                    "Reaccion": 59,
-                    "Defensa": 56,
-                    "Velocidad": 53,
-                    "IQ": 52,
-                    "Carisma": 50,
-                    "Precision": 53,
-                    "Energia": 53,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N002",
-                "nombre": "Kei Tsukishima",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Tsukishima_N.png",
-                "descripcion": "Kei Tsukishima (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 54,
-                    "Reaccion": 55,
-                    "Defensa": 58,
-                    "Velocidad": 52,
-                    "IQ": 55,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 53
-                }
-            },
-            {
-                "id": "N025",
-                "nombre": "Ijichi Kiyotaka",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Ijichi_Kiyotaka_N.png",
-                "descripcion": "Ijichi Kiyotaka (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 50,
-                    "Reaccion": 50,
-                    "Defensa": 50,
-                    "Velocidad": 50,
-                    "IQ": 54,
-                    "Carisma": 50,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
-                }
-            },
-            {
-                "id": "N029",
-                "nombre": "Armin Arlert",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Armin_Arlert_N.png",
-                "descripcion": "Armin Arlert (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 45,
-                    "Reaccion": 53,
-                    "Defensa": 47,
-                    "Velocidad": 49,
-                    "IQ": 56,
-                    "Carisma": 54,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
                 }
             },
             {
@@ -50331,94 +50793,6 @@
                     "Precision": 54,
                     "Energia": 65,
                     "Suerte": 59
-                }
-            },
-            {
-                "id": "N017",
-                "nombre": "Koji Koda",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Koji_Koda_N.png",
-                "descripcion": "Koji Koda (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 52,
-                    "Reaccion": 54,
-                    "Defensa": 56,
-                    "Velocidad": 53,
-                    "IQ": 58,
-                    "Carisma": 50,
-                    "Precision": 52,
-                    "Energia": 55,
-                    "Suerte": 54
-                }
-            },
-            {
-                "id": "N016",
-                "nombre": "Mashirao Ojiro",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mashirao_Ojiro_N.png",
-                "descripcion": "Mashirao Ojiro (N)",
-                "stats": {
-                    "Evasion": 56,
-                    "Fuerza": 58,
-                    "Reaccion": 55,
-                    "Defensa": 57,
-                    "Velocidad": 55,
-                    "IQ": 52,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N021",
-                "nombre": "Mai Zenin",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mai_Zenin_N.png",
-                "descripcion": "Mai Zenin (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 55,
-                    "Carisma": 56,
-                    "Precision": 60,
-                    "Energia": 50,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 55,
-                    "Suerte": 57
                 }
             },
             {
@@ -50488,160 +50862,6 @@
                 }
             },
             {
-                "id": "N016",
-                "nombre": "Mashirao Ojiro",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Mashirao_Ojiro_N.png",
-                "descripcion": "Mashirao Ojiro (N)",
-                "stats": {
-                    "Evasion": 56,
-                    "Fuerza": 58,
-                    "Reaccion": 55,
-                    "Defensa": 57,
-                    "Velocidad": 55,
-                    "IQ": 52,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 52
-                }
-            },
-            {
-                "id": "N030",
-                "nombre": "Carla Yeager",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Carla_Yeager_N.png",
-                "descripcion": "Carla Yeager (N)",
-                "stats": {
-                    "Evasion": 45,
-                    "Fuerza": 46,
-                    "Reaccion": 48,
-                    "Defensa": 55,
-                    "Velocidad": 47,
-                    "IQ": 49,
-                    "Carisma": 54,
-                    "Precision": 46,
-                    "Energia": 53,
-                    "Suerte": 50
-                }
-            },
-            {
-                "id": "N013",
-                "nombre": "Asahi Naruhaya",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Asahi_Naruhaya_N.png",
-                "descripcion": "Asahi Naruhaya (N)",
-                "stats": {
-                    "Evasion": 60,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 53,
-                    "Velocidad": 55,
-                    "IQ": 52,
-                    "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 54
-                }
-            },
-            {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 55,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 55,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N029",
-                "nombre": "Armin Arlert",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Armin_Arlert_N.png",
-                "descripcion": "Armin Arlert (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 45,
-                    "Reaccion": 53,
-                    "Defensa": 47,
-                    "Velocidad": 49,
-                    "IQ": 56,
-                    "Carisma": 54,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
-                }
-            },
-            {
-                "id": "N027",
-                "nombre": "Falco Grice",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Falco_Grice_N.png",
-                "descripcion": "Falco Grice (N)",
-                "stats": {
-                    "Evasion": 55,
-                    "Fuerza": 50,
-                    "Reaccion": 56,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 47,
-                    "Carisma": 51,
-                    "Precision": 53,
-                    "Energia": 54,
-                    "Suerte": 53
-                }
-            },
-            {
                 "id": "SSR005",
                 "nombre": "Kei Tsukishima",
                 "rareza": "SSR",
@@ -50664,25 +50884,113 @@
                 }
             },
             {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
+                "id": "R008",
+                "nombre": "Woo Jin-Chul",
+                "rareza": "R",
+                "valor": 35,
                 "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
+                "max_per_user": 500,
+                "imagen": "images/Woo_Jin_Chul_R.png",
+                "descripcion": "Woo Jin-Chul (R)",
                 "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
+                    "Evasion": 48,
+                    "Fuerza": 54,
+                    "Reaccion": 66,
+                    "Defensa": 55,
+                    "Velocidad": 50,
+                    "IQ": 65,
+                    "Carisma": 42,
+                    "Precision": 70,
+                    "Energia": 58,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "R024",
+                "nombre": "Nobara Kugisaki",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Nobara_Kugisaki_R.png",
+                "descripcion": "Nobara Kugisaki (R)",
+                "stats": {
+                    "Evasion": 61,
+                    "Fuerza": 60,
+                    "Reaccion": 62,
+                    "Defensa": 60,
+                    "Velocidad": 60,
+                    "IQ": 62,
+                    "Carisma": 68,
+                    "Precision": 64,
+                    "Energia": 66,
+                    "Suerte": 63
+                }
+            },
+            {
+                "id": "SSR022",
+                "nombre": "Mt. Lady",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Mt_Lady_SSR.png",
+                "descripcion": "Mt. Lady (SSR)",
+                "stats": {
+                    "Evasion": 64,
+                    "Fuerza": 80,
+                    "Reaccion": 70,
+                    "Defensa": 74,
+                    "Velocidad": 66,
+                    "IQ": 50,
+                    "Carisma": 77,
+                    "Precision": 68,
+                    "Energia": 78,
+                    "Suerte": 62
+                }
+            },
+            {
+                "id": "R007",
+                "nombre": "Hwang Dongsuk",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Hwang_Dongsuk_R.png",
+                "descripcion": "Hwang Dongsuk (R)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 69,
+                    "Reaccion": 60,
+                    "Defensa": 48,
+                    "Velocidad": 56,
+                    "IQ": 45,
+                    "Carisma": 40,
+                    "Precision": 57,
                     "Energia": 55,
-                    "Suerte": 57
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "R022",
+                "nombre": "Kamo Noritoshi",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Kamo_Noritoshi_R.png",
+                "descripcion": "Kamo Noritoshi (R)",
+                "stats": {
+                    "Evasion": 64,
+                    "Fuerza": 63,
+                    "Reaccion": 67,
+                    "Defensa": 62,
+                    "Velocidad": 66,
+                    "IQ": 67,
+                    "Carisma": 63,
+                    "Precision": 68,
+                    "Energia": 65,
+                    "Suerte": 60
                 }
             }
         ],
@@ -58493,6 +58801,50 @@
                     "Energia": 54,
                     "Suerte": 54
                 }
+            },
+            {
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N026",
+                "nombre": "Eren Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Eren_Yeager_N.png",
+                "descripcion": "Eren Yeager (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 59,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 45,
+                    "Carisma": 57,
+                    "Precision": 54,
+                    "Energia": 56,
+                    "Suerte": 52
+                }
             }
         ],
         "757403713974435850": [
@@ -60937,6 +61289,50 @@
                     "Energia": 54,
                     "Suerte": 52
                 }
+            },
+            {
+                "id": "N024",
+                "nombre": "Junpei Yoshino",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Junpei_Yoshino_N.png",
+                "descripcion": "Junpei Yoshino (N)",
+                "stats": {
+                    "Evasion": 51,
+                    "Fuerza": 50,
+                    "Reaccion": 52,
+                    "Defensa": 51,
+                    "Velocidad": 51,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 55,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N019",
+                "nombre": "Tetsutetsu",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
+                    "Suerte": 52
+                }
             }
         ],
         "1072089192445775913": [
@@ -61821,69 +62217,201 @@
                 }
             },
             {
-                "id": "N013",
-                "nombre": "Asahi Naruhaya",
+                "id": "UR017",
+                "nombre": "Dabi",
+                "rareza": "UR",
+                "valor": 145,
+                "stock": "Unlimited",
+                "max_per_user": 50,
+                "imagen": "images/Dabi_UR.png",
+                "descripcion": "Dabi (UR)",
+                "stats": {
+                    "Evasion": 70,
+                    "Fuerza": 86,
+                    "Reaccion": 82,
+                    "Defensa": 60,
+                    "Velocidad": 74,
+                    "IQ": 44,
+                    "Carisma": 68,
+                    "Precision": 84,
+                    "Energia": 90,
+                    "Suerte": 62
+                }
+            },
+            {
+                "id": "R001",
+                "nombre": "Morisuke Yaku",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Yaku_R.png",
+                "descripcion": "Morisuke Yaku (R)",
+                "stats": {
+                    "Evasion": 63,
+                    "Fuerza": 52,
+                    "Reaccion": 70,
+                    "Defensa": 71,
+                    "Velocidad": 61,
+                    "IQ": 57,
+                    "Carisma": 56,
+                    "Precision": 61,
+                    "Energia": 58,
+                    "Suerte": 60
+                }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Asahi_Naruhaya_N.png",
-                "descripcion": "Asahi Naruhaya (N)",
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
                 "stats": {
-                    "Evasion": 60,
-                    "Fuerza": 51,
-                    "Reaccion": 55,
-                    "Defensa": 53,
-                    "Velocidad": 55,
-                    "IQ": 52,
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
+            },
+            {
+                "id": "N017",
+                "nombre": "Koji Koda",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Koji_Koda_N.png",
+                "descripcion": "Koji Koda (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 58,
                     "Carisma": 50,
-                    "Precision": 54,
-                    "Energia": 54,
+                    "Precision": 52,
+                    "Energia": 55,
                     "Suerte": 54
                 }
             },
             {
-                "id": "N026",
-                "nombre": "Eren Yeager",
+                "id": "N028",
+                "nombre": "Gabi Braun",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Eren_Yeager_N.png",
-                "descripcion": "Eren Yeager (N)",
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
                 "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 59,
+                    "Evasion": 53,
+                    "Fuerza": 51,
                     "Reaccion": 55,
-                    "Defensa": 53,
-                    "Velocidad": 55,
-                    "IQ": 45,
-                    "Carisma": 57,
-                    "Precision": 54,
-                    "Energia": 56,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
                     "Suerte": 52
                 }
             },
             {
-                "id": "N004",
-                "nombre": "Ryūnosuke Tanaka",
+                "id": "N019",
+                "nombre": "Tetsutetsu",
                 "rareza": "N",
                 "valor": 25,
                 "stock": "Unlimited",
                 "max_per_user": 1000,
-                "imagen": "images/Tanaka_N.png",
-                "descripcion": "Ryūnosuke Tanaka (N)",
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
                 "stats": {
-                    "Evasion": 55,
+                    "Evasion": 52,
                     "Fuerza": 59,
                     "Reaccion": 54,
-                    "Defensa": 55,
-                    "Velocidad": 56,
-                    "IQ": 48,
-                    "Carisma": 53,
-                    "Precision": 54,
-                    "Energia": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
                     "Suerte": 52
+                }
+            },
+            {
+                "id": "SP018",
+                "nombre": "Mirio Togata",
+                "rareza": "SP",
+                "valor": 260,
+                "stock": "Unlimited",
+                "max_per_user": 10,
+                "imagen": "images/Mirio_Togata_SP.png",
+                "descripcion": "Mirio Togata (SP)",
+                "stats": {
+                    "Evasion": 94,
+                    "Fuerza": 86,
+                    "Reaccion": 92,
+                    "Defensa": 62,
+                    "Velocidad": 90,
+                    "IQ": 48,
+                    "Carisma": 88,
+                    "Precision": 82,
+                    "Energia": 84,
+                    "Suerte": 74
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
                 }
             }
         ],
@@ -64026,6 +64554,72 @@
                     "Energia": 53,
                     "Suerte": 59
                 }
+            },
+            {
+                "id": "SSR020",
+                "nombre": "Reo Mikage",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Reo_Mikage_SSR.png",
+                "descripcion": "Reo Mikage (SSR)",
+                "stats": {
+                    "Evasion": 64,
+                    "Fuerza": 54,
+                    "Reaccion": 68,
+                    "Defensa": 63,
+                    "Velocidad": 66,
+                    "IQ": 74,
+                    "Carisma": 64,
+                    "Precision": 70,
+                    "Energia": 62,
+                    "Suerte": 59
+                }
+            },
+            {
+                "id": "R001",
+                "nombre": "Morisuke Yaku",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Yaku_R.png",
+                "descripcion": "Morisuke Yaku (R)",
+                "stats": {
+                    "Evasion": 63,
+                    "Fuerza": 52,
+                    "Reaccion": 70,
+                    "Defensa": 71,
+                    "Velocidad": 61,
+                    "IQ": 57,
+                    "Carisma": 56,
+                    "Precision": 61,
+                    "Energia": 58,
+                    "Suerte": 60
+                }
+            },
+            {
+                "id": "N007",
+                "nombre": "Lee Joo-hee",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Lee_Joo_hee_N.png",
+                "descripcion": "Lee Joo-hee (N)",
+                "stats": {
+                    "Evasion": 42,
+                    "Fuerza": 28,
+                    "Reaccion": 46,
+                    "Defensa": 57,
+                    "Velocidad": 44,
+                    "IQ": 50,
+                    "Carisma": 52,
+                    "Precision": 40,
+                    "Energia": 54,
+                    "Suerte": 45
+                }
             }
         ],
         "1399517443935699004": [
@@ -64269,6 +64863,50 @@
                     "Precision": 59,
                     "Energia": 61,
                     "Suerte": 56
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N016",
+                "nombre": "Mashirao Ojiro",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mashirao_Ojiro_N.png",
+                "descripcion": "Mashirao Ojiro (N)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 58,
+                    "Reaccion": 55,
+                    "Defensa": 57,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
                 }
             }
         ],
@@ -68002,6 +68640,94 @@
                     "Energia": 50,
                     "Suerte": 46
                 }
+            },
+            {
+                "id": "N017",
+                "nombre": "Koji Koda",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Koji_Koda_N.png",
+                "descripcion": "Koji Koda (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 58,
+                    "Carisma": 50,
+                    "Precision": 52,
+                    "Energia": 55,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "R007",
+                "nombre": "Hwang Dongsuk",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Hwang_Dongsuk_R.png",
+                "descripcion": "Hwang Dongsuk (R)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 69,
+                    "Reaccion": 60,
+                    "Defensa": 48,
+                    "Velocidad": 56,
+                    "IQ": 45,
+                    "Carisma": 40,
+                    "Precision": 57,
+                    "Energia": 55,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N013",
+                "nombre": "Asahi Naruhaya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Asahi_Naruhaya_N.png",
+                "descripcion": "Asahi Naruhaya (N)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N020",
+                "nombre": "Pony Tsunotori",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Pony_Tsunotori_N.png",
+                "descripcion": "Pony Tsunotori (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 58,
+                    "Defensa": 52,
+                    "Velocidad": 56,
+                    "IQ": 53,
+                    "Carisma": 50,
+                    "Precision": 59,
+                    "Energia": 57,
+                    "Suerte": 55
+                }
             }
         ],
         "995212447713599578": [
@@ -69173,6 +69899,28 @@
                     "Precision": 54,
                     "Energia": 53,
                     "Suerte": 52
+                }
+            },
+            {
+                "id": "SSR004",
+                "nombre": "Asahi Azumane",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Asahi_SSR.png",
+                "descripcion": "Asahi Azumane (SSR)",
+                "stats": {
+                    "Evasion": 59,
+                    "Fuerza": 72,
+                    "Reaccion": 61,
+                    "Defensa": 63,
+                    "Velocidad": 62,
+                    "IQ": 53,
+                    "Carisma": 74,
+                    "Precision": 64,
+                    "Energia": 65,
+                    "Suerte": 60
                 }
             }
         ],
@@ -71242,6 +71990,182 @@
                     "Energia": 60,
                     "Suerte": 58
                 }
+            },
+            {
+                "id": "SSR026",
+                "nombre": "Ryukyu",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Ryukyu_SSR.png",
+                "descripcion": "Ryukyu (SSR)",
+                "stats": {
+                    "Evasion": 65,
+                    "Fuerza": 78,
+                    "Reaccion": 70,
+                    "Defensa": 74,
+                    "Velocidad": 67,
+                    "IQ": 50,
+                    "Carisma": 68,
+                    "Precision": 66,
+                    "Energia": 77,
+                    "Suerte": 61
+                }
+            },
+            {
+                "id": "N029",
+                "nombre": "Armin Arlert",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Armin_Arlert_N.png",
+                "descripcion": "Armin Arlert (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 45,
+                    "Reaccion": 53,
+                    "Defensa": 47,
+                    "Velocidad": 49,
+                    "IQ": 56,
+                    "Carisma": 54,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "UR025",
+                "nombre": "Kenny Ackerman",
+                "rareza": "UR",
+                "valor": 145,
+                "stock": "Unlimited",
+                "max_per_user": 50,
+                "imagen": "images/Kenny_Ackerman_UR.png",
+                "descripcion": "Kenny Ackerman (UR)",
+                "stats": {
+                    "Evasion": 85,
+                    "Fuerza": 86,
+                    "Reaccion": 87,
+                    "Defensa": 78,
+                    "Velocidad": 89,
+                    "IQ": 54,
+                    "Carisma": 72,
+                    "Precision": 84,
+                    "Energia": 74,
+                    "Suerte": 80
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N021",
+                "nombre": "Mai Zenin",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mai_Zenin_N.png",
+                "descripcion": "Mai Zenin (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 55,
+                    "Carisma": 56,
+                    "Precision": 60,
+                    "Energia": 50,
+                    "Suerte": 52
+                }
             }
         ],
         "433790921549807617": [
@@ -71532,160 +72456,6 @@
                 }
             },
             {
-                "id": "N024",
-                "nombre": "Junpei Yoshino",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Junpei_Yoshino_N.png",
-                "descripcion": "Junpei Yoshino (N)",
-                "stats": {
-                    "Evasion": 51,
-                    "Fuerza": 50,
-                    "Reaccion": 52,
-                    "Defensa": 51,
-                    "Velocidad": 51,
-                    "IQ": 54,
-                    "Carisma": 50,
-                    "Precision": 53,
-                    "Energia": 55,
-                    "Suerte": 50
-                }
-            },
-            {
-                "id": "N008",
-                "nombre": "Kang Taeshik",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kang_Taeshik_N.png",
-                "descripcion": "Kang Taeshik (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 52,
-                    "Reaccion": 53,
-                    "Defensa": 38,
-                    "Velocidad": 59,
-                    "IQ": 47,
-                    "Carisma": 35,
-                    "Precision": 55,
-                    "Energia": 46,
-                    "Suerte": 44
-                }
-            },
-            {
-                "id": "N022",
-                "nombre": "Miwa Kasumi",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Miwa_Kasumi_N.png",
-                "descripcion": "Miwa Kasumi (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 53,
-                    "Reaccion": 58,
-                    "Defensa": 55,
-                    "Velocidad": 52,
-                    "IQ": 53,
-                    "Carisma": 57,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 50
-                }
-            },
-            {
-                "id": "N008",
-                "nombre": "Kang Taeshik",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Kang_Taeshik_N.png",
-                "descripcion": "Kang Taeshik (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 52,
-                    "Reaccion": 53,
-                    "Defensa": 38,
-                    "Velocidad": 59,
-                    "IQ": 47,
-                    "Carisma": 35,
-                    "Precision": 55,
-                    "Energia": 46,
-                    "Suerte": 44
-                }
-            },
-            {
-                "id": "N025",
-                "nombre": "Ijichi Kiyotaka",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Ijichi_Kiyotaka_N.png",
-                "descripcion": "Ijichi Kiyotaka (N)",
-                "stats": {
-                    "Evasion": 50,
-                    "Fuerza": 50,
-                    "Reaccion": 50,
-                    "Defensa": 50,
-                    "Velocidad": 50,
-                    "IQ": 54,
-                    "Carisma": 50,
-                    "Precision": 50,
-                    "Energia": 52,
-                    "Suerte": 51
-                }
-            },
-            {
-                "id": "N015",
-                "nombre": "Rensuke Kunigami",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Rensuke_Kunigami_N.png",
-                "descripcion": "Rensuke Kunigami (N)",
-                "stats": {
-                    "Evasion": 53,
-                    "Fuerza": 56,
-                    "Reaccion": 55,
-                    "Defensa": 52,
-                    "Velocidad": 54,
-                    "IQ": 52,
-                    "Carisma": 51,
-                    "Precision": 54,
-                    "Energia": 55,
-                    "Suerte": 57
-                }
-            },
-            {
-                "id": "N022",
-                "nombre": "Miwa Kasumi",
-                "rareza": "N",
-                "valor": 25,
-                "stock": "Unlimited",
-                "max_per_user": 1000,
-                "imagen": "images/Miwa_Kasumi_N.png",
-                "descripcion": "Miwa Kasumi (N)",
-                "stats": {
-                    "Evasion": 54,
-                    "Fuerza": 53,
-                    "Reaccion": 58,
-                    "Defensa": 55,
-                    "Velocidad": 52,
-                    "IQ": 53,
-                    "Carisma": 57,
-                    "Precision": 54,
-                    "Energia": 54,
-                    "Suerte": 50
-                }
-            },
-            {
                 "id": "UR002",
                 "nombre": "Tōru Oikawa",
                 "rareza": "UR",
@@ -71705,6 +72475,28 @@
                     "Precision": 91,
                     "Energia": 76,
                     "Suerte": 67
+                }
+            },
+            {
+                "id": "R025",
+                "nombre": "Jean Kirstein",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Jean_Kirstein_R.png",
+                "descripcion": "Jean Kirstein (R)",
+                "stats": {
+                    "Evasion": 62,
+                    "Fuerza": 66,
+                    "Reaccion": 68,
+                    "Defensa": 64,
+                    "Velocidad": 65,
+                    "IQ": 54,
+                    "Carisma": 71,
+                    "Precision": 63,
+                    "Energia": 67,
+                    "Suerte": 60
                 }
             },
             {
@@ -71730,6 +72522,160 @@
                 }
             },
             {
+                "id": "N001",
+                "nombre": "Hinata Shōyō",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Hinata_N.png",
+                "descripcion": "Hinata Shōyō (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 55,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 59
+                }
+            },
+            {
+                "id": "R009",
+                "nombre": "Jingo Raichi",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Jingo_Raichi_R.png",
+                "descripcion": "Jingo Raichi (R)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 67,
+                    "Reaccion": 61,
+                    "Defensa": 60,
+                    "Velocidad": 59,
+                    "IQ": 52,
+                    "Carisma": 55,
+                    "Precision": 58,
+                    "Energia": 63,
+                    "Suerte": 57
+                }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
+                "stats": {
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
+            },
+            {
+                "id": "R024",
+                "nombre": "Nobara Kugisaki",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Nobara_Kugisaki_R.png",
+                "descripcion": "Nobara Kugisaki (R)",
+                "stats": {
+                    "Evasion": 61,
+                    "Fuerza": 60,
+                    "Reaccion": 62,
+                    "Defensa": 60,
+                    "Velocidad": 60,
+                    "IQ": 62,
+                    "Carisma": 68,
+                    "Precision": 64,
+                    "Energia": 66,
+                    "Suerte": 63
+                }
+            },
+            {
+                "id": "N002",
+                "nombre": "Kei Tsukishima",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tsukishima_N.png",
+                "descripcion": "Kei Tsukishima (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 52,
+                    "IQ": 55,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N029",
+                "nombre": "Armin Arlert",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Armin_Arlert_N.png",
+                "descripcion": "Armin Arlert (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 45,
+                    "Reaccion": 53,
+                    "Defensa": 47,
+                    "Velocidad": 49,
+                    "IQ": 56,
+                    "Carisma": 54,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
                 "id": "N011",
                 "nombre": "Isagi Yoichi",
                 "rareza": "N",
@@ -71749,6 +72695,116 @@
                     "Precision": 58,
                     "Energia": 54,
                     "Suerte": 53
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N019",
+                "nombre": "Tetsutetsu",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N027",
+                "nombre": "Falco Grice",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Falco_Grice_N.png",
+                "descripcion": "Falco Grice (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 56,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 47,
+                    "Carisma": 51,
+                    "Precision": 53,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "R014",
+                "nombre": "Kanji Koganegawa",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Koganegawa_R.png",
+                "descripcion": "Kanji Koganegawa (R)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 66,
+                    "Reaccion": 61,
+                    "Defensa": 59,
+                    "Velocidad": 57,
+                    "IQ": 54,
+                    "Carisma": 56,
+                    "Precision": 57,
+                    "Energia": 60,
+                    "Suerte": 58
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
                 }
             }
         ],
@@ -73160,6 +74216,50 @@
                     "Energia": 54,
                     "Suerte": 52
                 }
+            },
+            {
+                "id": "SSR020",
+                "nombre": "Reo Mikage",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Reo_Mikage_SSR.png",
+                "descripcion": "Reo Mikage (SSR)",
+                "stats": {
+                    "Evasion": 64,
+                    "Fuerza": 54,
+                    "Reaccion": 68,
+                    "Defensa": 63,
+                    "Velocidad": 66,
+                    "IQ": 74,
+                    "Carisma": 64,
+                    "Precision": 70,
+                    "Energia": 62,
+                    "Suerte": 59
+                }
+            },
+            {
+                "id": "N001",
+                "nombre": "Hinata Shōyō",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Hinata_N.png",
+                "descripcion": "Hinata Shōyō (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 55,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 59
+                }
             }
         ],
         "687925761361051659": [
@@ -73495,6 +74595,50 @@
                     "Precision": 52,
                     "Energia": 55,
                     "Suerte": 54
+                }
+            },
+            {
+                "id": "N013",
+                "nombre": "Asahi Naruhaya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Asahi_Naruhaya_N.png",
+                "descripcion": "Asahi Naruhaya (N)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 54
+                }
+            },
+            {
+                "id": "N002",
+                "nombre": "Kei Tsukishima",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tsukishima_N.png",
+                "descripcion": "Kei Tsukishima (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 52,
+                    "IQ": 55,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 53
                 }
             }
         ],
@@ -73984,6 +75128,28 @@
                     "Energia": 54,
                     "Suerte": 52
                 }
+            },
+            {
+                "id": "N013",
+                "nombre": "Asahi Naruhaya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Asahi_Naruhaya_N.png",
+                "descripcion": "Asahi Naruhaya (N)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 54
+                }
             }
         ],
         "757980870920634470": [
@@ -74100,6 +75266,50 @@
                     "Energia": 58,
                     "Suerte": 52
                 }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
+                "stats": {
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
+            },
+            {
+                "id": "N015",
+                "nombre": "Rensuke Kunigami",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Rensuke_Kunigami_N.png",
+                "descripcion": "Rensuke Kunigami (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 56,
+                    "Reaccion": 55,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 52,
+                    "Carisma": 51,
+                    "Precision": 54,
+                    "Energia": 55,
+                    "Suerte": 57
+                }
             }
         ],
         "424730320357687307": [
@@ -74215,23 +75425,821 @@
                     "Suerte": 53
                 }
             }
+        ],
+        "1304041643254743040": [
+            {
+                "id": "R002",
+                "nombre": "Hajime Iwaizumi",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Iwaizumi_R.png",
+                "descripcion": "Hajime Iwaizumi (R)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 71,
+                    "Reaccion": 62,
+                    "Defensa": 68,
+                    "Velocidad": 62,
+                    "IQ": 59,
+                    "Carisma": 53,
+                    "Precision": 61,
+                    "Energia": 64,
+                    "Suerte": 58
+                }
+            },
+            {
+                "id": "N024",
+                "nombre": "Junpei Yoshino",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Junpei_Yoshino_N.png",
+                "descripcion": "Junpei Yoshino (N)",
+                "stats": {
+                    "Evasion": 51,
+                    "Fuerza": 50,
+                    "Reaccion": 52,
+                    "Defensa": 51,
+                    "Velocidad": 51,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 55,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N027",
+                "nombre": "Falco Grice",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Falco_Grice_N.png",
+                "descripcion": "Falco Grice (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 56,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 47,
+                    "Carisma": 51,
+                    "Precision": 53,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N027",
+                "nombre": "Falco Grice",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Falco_Grice_N.png",
+                "descripcion": "Falco Grice (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 50,
+                    "Reaccion": 56,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 47,
+                    "Carisma": 51,
+                    "Precision": 53,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N020",
+                "nombre": "Pony Tsunotori",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Pony_Tsunotori_N.png",
+                "descripcion": "Pony Tsunotori (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 54,
+                    "Reaccion": 58,
+                    "Defensa": 52,
+                    "Velocidad": 56,
+                    "IQ": 53,
+                    "Carisma": 50,
+                    "Precision": 59,
+                    "Energia": 57,
+                    "Suerte": 55
+                }
+            },
+            {
+                "id": "N015",
+                "nombre": "Rensuke Kunigami",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Rensuke_Kunigami_N.png",
+                "descripcion": "Rensuke Kunigami (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 56,
+                    "Reaccion": 55,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 52,
+                    "Carisma": 51,
+                    "Precision": 54,
+                    "Energia": 55,
+                    "Suerte": 57
+                }
+            }
+        ],
+        "1468827372236177419": [
+            {
+                "id": "R015",
+                "nombre": "Tetsuro Kuroo",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Kuroo_R.png",
+                "descripcion": "Tetsuro Kuroo (R)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 60,
+                    "Reaccion": 62,
+                    "Defensa": 68,
+                    "Velocidad": 56,
+                    "IQ": 54,
+                    "Carisma": 59,
+                    "Precision": 58,
+                    "Energia": 61,
+                    "Suerte": 57
+                }
+            },
+            {
+                "id": "N016",
+                "nombre": "Mashirao Ojiro",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mashirao_Ojiro_N.png",
+                "descripcion": "Mashirao Ojiro (N)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 58,
+                    "Reaccion": 55,
+                    "Defensa": 57,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "R018",
+                "nombre": "Hanta Sero",
+                "rareza": "R",
+                "valor": 35,
+                "stock": "Unlimited",
+                "max_per_user": 500,
+                "imagen": "images/Hanta_Sero_R.png",
+                "descripcion": "Hanta Sero (R)",
+                "stats": {
+                    "Evasion": 60,
+                    "Fuerza": 58,
+                    "Reaccion": 63,
+                    "Defensa": 56,
+                    "Velocidad": 64,
+                    "IQ": 47,
+                    "Carisma": 61,
+                    "Precision": 65,
+                    "Energia": 66,
+                    "Suerte": 57
+                }
+            },
+            {
+                "id": "N030",
+                "nombre": "Carla Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Carla_Yeager_N.png",
+                "descripcion": "Carla Yeager (N)",
+                "stats": {
+                    "Evasion": 45,
+                    "Fuerza": 46,
+                    "Reaccion": 48,
+                    "Defensa": 55,
+                    "Velocidad": 47,
+                    "IQ": 49,
+                    "Carisma": 54,
+                    "Precision": 46,
+                    "Energia": 53,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "N006",
+                "nombre": "Sung Jin-Woo",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Sung_Jin_Woo_N.png",
+                "descripcion": "Sung Jin-Woo (N)",
+                "stats": {
+                    "Evasion": 48,
+                    "Fuerza": 55,
+                    "Reaccion": 49,
+                    "Defensa": 34,
+                    "Velocidad": 52,
+                    "IQ": 47,
+                    "Carisma": 38,
+                    "Precision": 51,
+                    "Energia": 50,
+                    "Suerte": 46
+                }
+            },
+            {
+                "id": "N009",
+                "nombre": "Kim Sangshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kim_Sangshik_N.png",
+                "descripcion": "Kim Sangshik (N)",
+                "stats": {
+                    "Evasion": 40,
+                    "Fuerza": 30,
+                    "Reaccion": 44,
+                    "Defensa": 41,
+                    "Velocidad": 42,
+                    "IQ": 55,
+                    "Carisma": 52,
+                    "Precision": 38,
+                    "Energia": 50,
+                    "Suerte": 47
+                }
+            },
+            {
+                "id": "N026",
+                "nombre": "Eren Yeager",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Eren_Yeager_N.png",
+                "descripcion": "Eren Yeager (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 59,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 55,
+                    "IQ": 45,
+                    "Carisma": 57,
+                    "Precision": 54,
+                    "Energia": 56,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "SSR027",
+                "nombre": "Mei Mei",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Mei_Mei_SSR.png",
+                "descripcion": "Mei Mei (SSR)",
+                "stats": {
+                    "Evasion": 78,
+                    "Fuerza": 81,
+                    "Reaccion": 79,
+                    "Defensa": 76,
+                    "Velocidad": 79,
+                    "IQ": 80,
+                    "Carisma": 72,
+                    "Precision": 80,
+                    "Energia": 77,
+                    "Suerte": 75
+                }
+            },
+            {
+                "id": "N025",
+                "nombre": "Ijichi Kiyotaka",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Ijichi_Kiyotaka_N.png",
+                "descripcion": "Ijichi Kiyotaka (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 50,
+                    "Reaccion": 50,
+                    "Defensa": 50,
+                    "Velocidad": 50,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "N016",
+                "nombre": "Mashirao Ojiro",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mashirao_Ojiro_N.png",
+                "descripcion": "Mashirao Ojiro (N)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 58,
+                    "Reaccion": 55,
+                    "Defensa": 57,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N003",
+                "nombre": "Yu Nishinoya",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Nishinoya_N.png",
+                "descripcion": "Yu Nishinoya (N)",
+                "stats": {
+                    "Evasion": 57,
+                    "Fuerza": 50,
+                    "Reaccion": 55,
+                    "Defensa": 58,
+                    "Velocidad": 56,
+                    "IQ": 52,
+                    "Carisma": 52,
+                    "Precision": 54,
+                    "Energia": 53,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N016",
+                "nombre": "Mashirao Ojiro",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mashirao_Ojiro_N.png",
+                "descripcion": "Mashirao Ojiro (N)",
+                "stats": {
+                    "Evasion": 56,
+                    "Fuerza": 58,
+                    "Reaccion": 55,
+                    "Defensa": 57,
+                    "Velocidad": 55,
+                    "IQ": 52,
+                    "Carisma": 50,
+                    "Precision": 54,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N011",
+                "nombre": "Isagi Yoichi",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Isagi_Yoichi_N.png",
+                "descripcion": "Isagi Yoichi (N)",
+                "stats": {
+                    "Evasion": 55,
+                    "Fuerza": 52,
+                    "Reaccion": 55,
+                    "Defensa": 53,
+                    "Velocidad": 54,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 58,
+                    "Energia": 54,
+                    "Suerte": 53
+                }
+            },
+            {
+                "id": "SP002",
+                "nombre": "Tetsurō Kuroo",
+                "rareza": "SP",
+                "valor": 260,
+                "stock": "Unlimited",
+                "max_per_user": 10,
+                "imagen": "images/Kuroo_SP.png",
+                "descripcion": "Tetsurō Kuroo (SP)",
+                "stats": {
+                    "Evasion": 75,
+                    "Fuerza": 75,
+                    "Reaccion": 73,
+                    "Defensa": 85,
+                    "Velocidad": 44,
+                    "IQ": 75,
+                    "Carisma": 72,
+                    "Precision": 73,
+                    "Energia": 72,
+                    "Suerte": 72
+                }
+            },
+            {
+                "id": "SP022",
+                "nombre": "Mahito Instant Spirit Body",
+                "rareza": "SP",
+                "valor": 260,
+                "stock": "Unlimited",
+                "max_per_user": 10,
+                "imagen": "images/Mahito_Instant_Spirit_Body_SP.png",
+                "descripcion": "Mahito Instant Spirit Body (SP)",
+                "stats": {
+                    "Evasion": 90,
+                    "Fuerza": 82,
+                    "Reaccion": 87,
+                    "Defensa": 80,
+                    "Velocidad": 86,
+                    "IQ": 54,
+                    "Carisma": 78,
+                    "Precision": 85,
+                    "Energia": 88,
+                    "Suerte": 74
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "N010",
+                "nombre": "Yoo Jin-Ho",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Yoo_Jin_Ho_N.png",
+                "descripcion": "Yoo Jin-Ho (N)",
+                "stats": {
+                    "Evasion": 42,
+                    "Fuerza": 32,
+                    "Reaccion": 46,
+                    "Defensa": 45,
+                    "Velocidad": 44,
+                    "IQ": 50,
+                    "Carisma": 56,
+                    "Precision": 40,
+                    "Energia": 54,
+                    "Suerte": 48
+                }
+            },
+            {
+                "id": "N021",
+                "nombre": "Mai Zenin",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Mai_Zenin_N.png",
+                "descripcion": "Mai Zenin (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 52,
+                    "Velocidad": 54,
+                    "IQ": 55,
+                    "Carisma": 56,
+                    "Precision": 60,
+                    "Energia": 50,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
+            },
+            {
+                "id": "N024",
+                "nombre": "Junpei Yoshino",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Junpei_Yoshino_N.png",
+                "descripcion": "Junpei Yoshino (N)",
+                "stats": {
+                    "Evasion": 51,
+                    "Fuerza": 50,
+                    "Reaccion": 52,
+                    "Defensa": 51,
+                    "Velocidad": 51,
+                    "IQ": 54,
+                    "Carisma": 50,
+                    "Precision": 53,
+                    "Energia": 55,
+                    "Suerte": 50
+                }
+            },
+            {
+                "id": "N029",
+                "nombre": "Armin Arlert",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Armin_Arlert_N.png",
+                "descripcion": "Armin Arlert (N)",
+                "stats": {
+                    "Evasion": 50,
+                    "Fuerza": 45,
+                    "Reaccion": 53,
+                    "Defensa": 47,
+                    "Velocidad": 49,
+                    "IQ": 56,
+                    "Carisma": 54,
+                    "Precision": 50,
+                    "Energia": 52,
+                    "Suerte": 51
+                }
+            },
+            {
+                "id": "N028",
+                "nombre": "Gabi Braun",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Gabi_Braun_N.png",
+                "descripcion": "Gabi Braun (N)",
+                "stats": {
+                    "Evasion": 53,
+                    "Fuerza": 51,
+                    "Reaccion": 55,
+                    "Defensa": 50,
+                    "Velocidad": 54,
+                    "IQ": 46,
+                    "Carisma": 48,
+                    "Precision": 57,
+                    "Energia": 54,
+                    "Suerte": 52
+                }
+            },
+            {
+                "id": "SSR014",
+                "nombre": "Choi Jong-In",
+                "rareza": "SSR",
+                "valor": 60,
+                "stock": "Unlimited",
+                "max_per_user": 100,
+                "imagen": "images/Choi_Jong_In_SSR.png",
+                "descripcion": "Choi Jong-In (SSR)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 42,
+                    "Reaccion": 72,
+                    "Defensa": 50,
+                    "Velocidad": 60,
+                    "IQ": 74,
+                    "Carisma": 66,
+                    "Precision": 81,
+                    "Energia": 78,
+                    "Suerte": 56
+                }
+            },
+            {
+                "id": "N019",
+                "nombre": "Tetsutetsu",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Tetsutetsu_N.png",
+                "descripcion": "Tetsutetsu (N)",
+                "stats": {
+                    "Evasion": 52,
+                    "Fuerza": 59,
+                    "Reaccion": 54,
+                    "Defensa": 56,
+                    "Velocidad": 53,
+                    "IQ": 50,
+                    "Carisma": 54,
+                    "Precision": 52,
+                    "Energia": 58,
+                    "Suerte": 52
+                }
+            }
+        ],
+        "969094871052877865": [
+            {
+                "id": "UR022",
+                "nombre": "Maki Zenin Awakening",
+                "rareza": "UR",
+                "valor": 145,
+                "stock": "Unlimited",
+                "max_per_user": 50,
+                "imagen": "images/Maki_Zenin_Awakening_UR.png",
+                "descripcion": "Maki Zenin Awakening (UR)",
+                "stats": {
+                    "Evasion": 82,
+                    "Fuerza": 86,
+                    "Reaccion": 85,
+                    "Defensa": 78,
+                    "Velocidad": 84,
+                    "IQ": 76,
+                    "Carisma": 70,
+                    "Precision": 83,
+                    "Energia": 54,
+                    "Suerte": 64
+                }
+            }
         ]
     },
     "balances": {
         "1403066168176152661": 135,
         "339181724162588674": 1046,
-        "1157022974503833691": 3375,
+        "1157022974503833691": 3672,
         "948383362555453481": 1122,
-        "1152419874472214540": 22516,
+        "1152419874472214540": 23714,
         "1129612222272897244": 1272,
-        "1429513468704460902": 4792,
-        "1154622284242362468": 25348,
+        "1429513468704460902": 6696,
+        "1154622284242362468": 28079,
         "388418629999394817": 699,
-        "807024335122333777": 26802,
+        "807024335122333777": 28890,
         "1253107353780486165": 112,
         "754530308845469829": 696,
         "402704061151051779": 344,
-        "469544388020928512": 28537,
+        "469544388020928512": 30568,
         "1092613168251015198": 8828,
         "905208623217639435": 216,
         "707656820742684673": 115,
@@ -74241,7 +76249,7 @@
         "705202868076150836": 207,
         "322519928903303169": 24,
         "228509452536381440": 605,
-        "1001180830162485439": 11654,
+        "1001180830162485439": 12262,
         "1023095871199514637": 0,
         "1236722407159369842": 15,
         "947609625795125298": 80,
@@ -74256,13 +76264,13 @@
         "750806741972942989": 1300,
         "1347063429256450138": 1,
         "180728016203153408": 1599,
-        "1156327407368802394": 406,
+        "1156327407368802394": 90,
         "806931485671030784": 1449,
         "1394789612672647253": 0,
         "340933924941463566": 20,
-        "1214018980000440345": 285,
+        "1214018980000440345": 907,
         "718982721795391560": 1945,
-        "659546852412096523": 736,
+        "659546852412096523": 645,
         "474740908596658176": 1104,
         "1142528223742283827": 46,
         "608485410963849216": 202,
@@ -74270,8 +76278,8 @@
         "734152163407823009": 48,
         "1085723757122945085": 1600,
         "361175760695721994": 2625,
-        "768891783295139871": 6382,
-        "1087409583972175933": 1050,
+        "768891783295139871": 7484,
+        "1087409583972175933": 1015,
         "485549982494228491": 19,
         "1324155618696630304": 7,
         "449977043648643083": 18,
@@ -74279,9 +76287,9 @@
         "1379257561039114241": 957,
         "855493844983742486": 61,
         "1410065063255216299": 11084,
-        "894575987096948786": 2120,
+        "894575987096948786": 2177,
         "1118743621823365130": 651,
-        "1072089192445775913": 7608,
+        "1072089192445775913": 11453,
         "599253814272327687": 618,
         "329318372963516427": 56,
         "758420924830842961": 20,
@@ -74313,7 +76321,7 @@
         "954067576286216262": 29,
         "1440121367134474271": 401,
         "1237812241148022956": 64,
-        "593470597623709754": 304,
+        "593470597623709754": 450,
         "757403713974435850": 2,
         "1448065573320785981": 21,
         "1200037996406263918": 0,
@@ -74322,10 +76330,10 @@
         "753808449376354334": 0,
         "410134906941997067": 94,
         "897221354624016385": 62,
-        "847524952533106698": 71,
+        "847524952533106698": 649,
         "1212256894845194310": 24,
-        "1399517443935699004": 18036,
-        "1457945364043661464": 3665,
+        "1399517443935699004": 18411,
+        "1457945364043661464": 4097,
         "522692047845720065": 298,
         "417418645933785108": 87,
         "801448745660186625": 433,
@@ -74335,11 +76343,11 @@
         "1191805949116166237": 21,
         "752627774736433333": 336,
         "688436123675918383": 571,
-        "785751101210624011": 2037,
+        "785751101210624011": 2927,
         "680177629843816480": 7,
         "520278389370912809": 606,
         "995212447713599578": 0,
-        "501655955696648194": 751,
+        "501655955696648194": 955,
         "1460827925191327959": 95,
         "1458187034366574639": 128,
         "1345271353028378745": 1361,
@@ -74351,22 +76359,25 @@
         "426461742558740494": 222,
         "754351299813703802": 126,
         "437555953328717824": 255,
-        "674086142379032637": 1279,
-        "433790921549807617": 6,
+        "674086142379032637": 3187,
+        "433790921549807617": 578,
         "1130576867045425302": 29,
         "687925761361051659": 62,
-        "1467634864646783099": 14,
+        "1467634864646783099": 512,
         "1382060713274507304": 24,
-        "1138157126385147995": 1727,
+        "1138157126385147995": 2071,
         "545972866252800035": 800,
         "1324780792043536471": 328,
-        "489694151160496128": 492,
+        "489694151160496128": 698,
         "757980870920634470": 237,
         "530137919541870592": 97,
-        "648687632372465697": 1736,
+        "648687632372465697": 1787,
         "691368295588298782": 400,
         "424730320357687307": 223,
-        "643975277315358732": 423
+        "643975277315358732": 423,
+        "1304041643254743040": 748,
+        "1468827372236177419": 3148,
+        "969094871052877865": 1
     },
     "rob_penalties": {
         "228509452536381440": 1767697790.9932945,
@@ -74385,7 +76396,8 @@
         "1212256894845194310": 1767987273.587814,
         "847524952533106698": 1768037789.7624655,
         "1457945364043661464": 1768090728.0271566,
-        "674086142379032637": 1770769737.6502466
+        "674086142379032637": 1770769737.6502466,
+        "1468827372236177419": 1771882275.0365396
     },
     "completed_floors": {}
 }
