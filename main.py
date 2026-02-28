@@ -5424,7 +5424,7 @@ import requests
 import schedule
 
 # Configuración de GitHub para backup
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', '')  # Usar variable de entorno
+GITHUB_TOKEN = config.GITHUB_TOKEN  # Usa el token desde config.py
 REPO_OWNER = "CosmicDragneel21"
 REPO_NAME = "Project-KC"
 BACKUP_BRANCH = "backup-auto"
