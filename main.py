@@ -10,6 +10,8 @@ import discord
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 
+import config
+
 # ----------------------------
 # Archivos de datos a crear
 # ----------------------------

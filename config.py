@@ -1,3 +1,2 @@
 DISCORD_TOKEN = "MTQzNzY1NTQ4MjY4Nzk0NjgzMw.GmlUW2.UN5ogleo8XLYqgLYlcwFrZoNb3r0pC_5lQk5lc"
-
 GITHUB_TOKEN = "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"
