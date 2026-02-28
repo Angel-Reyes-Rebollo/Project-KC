@@ -27337,6 +27337,28 @@
                     "Energia": 80,
                     "Suerte": 99
                 }
+            },
+            {
+                "id": "N008",
+                "nombre": "Kang Taeshik",
+                "rareza": "N",
+                "valor": 25,
+                "stock": "Unlimited",
+                "max_per_user": 1000,
+                "imagen": "images/Kang_Taeshik_N.png",
+                "descripcion": "Kang Taeshik (N)",
+                "stats": {
+                    "Evasion": 54,
+                    "Fuerza": 52,
+                    "Reaccion": 53,
+                    "Defensa": 38,
+                    "Velocidad": 59,
+                    "IQ": 47,
+                    "Carisma": 35,
+                    "Precision": 55,
+                    "Energia": 46,
+                    "Suerte": 44
+                }
             }
         ],
         "718982721795391560": [
@@ -76711,7 +76733,7 @@
         "1214018980000440345": 907,
         "718982721795391560": 1945,
         "659546852412096523": 921,
-        "474740908596658176": 1104,
+        "474740908596658176": 1141,
         "1142528223742283827": 46,
         "608485410963849216": 202,
         "630020839362002984": 41,

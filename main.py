@@ -8607,5 +8607,4 @@ async def on_ready():
 # Arrancar el bot (no compartas tu token)
 # ----------------------------
 if __name__ == "__main__":
-    import config  # asegúrate de que en config.py está DISCORD_TOKEN
     bot.run(config.DISCORD_TOKEN)
