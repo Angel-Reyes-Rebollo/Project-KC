@@ -2,9 +2,9 @@
 main.py — Punto de entrada del bot. Solo inicialización.
 Toda la lógica vive en cogs/.
 
-Sistema de backup automático:
-  - Al arrancar: si no existe bot_data.db, lo descarga desde GitHub
-  - Cada hora: sube bot_data.db a GitHub automáticamente
+- Web Service compatible con Render (abre puerto HTTP)
+- Restore automático desde GitHub al arrancar
+- Backup automático a GitHub cada 1 hora
 """
 
 import asyncio
@@ -15,6 +15,7 @@ import time
 
 import aiohttp
 import discord
+from aiohttp import web
 from discord.ext import commands, tasks
 
 import config
@@ -108,6 +109,24 @@ bot.paused = False
 bot.catalog_cards = catalog_cards
 bot.catalog_by_id = catalog_by_id
 bot.cards_catalog = cards_catalog
+
+
+# ─────────────────────────────────────────
+# SERVIDOR WEB (requerido por Render Web Service)
+# Uptime Robot hace ping aquí para mantener el bot activo
+# ─────────────────────────────────────────
+async def health_check(request):
+    return web.Response(text="✅ Bot activo", content_type="text/plain")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.getenv("PORT", 8080))
+    site = web.TCPSite(runner, "0.0.0.0", port)
+    await site.start()
+    print(f"✅ Servidor web escuchando en puerto {port}")
 
 
 # ─────────────────────────────────────────
@@ -214,6 +233,7 @@ async def on_command_error(ctx, error):
 # Arrancar
 # ─────────────────────────────────────────
 async def main():
+    await start_web_server()  # Abre el puerto HTTP para Render
     async with bot:
         for cog in COGS:
             try:
