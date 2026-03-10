@@ -1,104 +1,75 @@
 """
-main.py — Punto de entrada del bot. Solo inicialización.
-Toda la lógica vive en cogs/.
-
-- Web Service compatible con Render (abre puerto HTTP)
-- Restore automático desde GitHub al arrancar
-- Backup automático a GitHub cada 1 hora
+main.py — Punto de entrada del bot.
+- Usa data.json igual que el original (sin SQLite)
+- Backup automático cada 1 hora a GitHub (data.json + catalogo.json)
+- Servidor web para Render Web Service
+- Toda la lógica de comandos vive en cogs/
 """
 
-import asyncio
 import base64
+import asyncio
 import json
 import os
+import threading
 import time
+from datetime import datetime
 
 import aiohttp
 import discord
+import requests
+import schedule
 from aiohttp import web
-from discord.ext import commands, tasks
+from discord.ext import commands
 
 import config
-from database import db, set_catalog
-
 
 # ─────────────────────────────────────────
-# RESTORE: descarga bot_data.db desde GitHub si no existe localmente
-# Protege contra reinicios de Render que borran el filesystem
+# ARCHIVOS DE DATOS
 # ─────────────────────────────────────────
-async def restore_from_github():
-    if os.path.exists("bot_data.db"):
-        print("✅ bot_data.db encontrado localmente, no se necesita restaurar.")
-        return
-
-    token  = getattr(config, "GITHUB_TOKEN", os.getenv("GITHUB_TOKEN", ""))
-    repo   = getattr(config, "GITHUB_REPO",  os.getenv("GITHUB_REPO", ""))
-    branch = getattr(config, "BACKUP_BRANCH", os.getenv("BACKUP_BRANCH", "backup-data"))
-
-    if not token or not repo:
-        print("⚠️  Sin credenciales GitHub — arrancando con base de datos vacía.")
-        return
-
-    print("🔄 bot_data.db no encontrado — restaurando desde GitHub...")
-    url = f"https://api.github.com/repos/{repo}/contents/backups/bot_data.db?ref={branch}"
-    headers = {
-        "Authorization": f"token {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=headers) as r:
-                if r.status == 404:
-                    print("⚠️  No existe backup en GitHub todavía — arrancando limpio.")
-                    return
-                if r.status != 200:
-                    print(f"⚠️  Error GitHub {r.status} al restaurar backup.")
-                    return
-                data = await r.json()
-                content = base64.b64decode(data["content"])
-                with open("bot_data.db", "wb") as f:
-                    f.write(content)
-                print("✅ Base de datos restaurada correctamente desde GitHub.")
-    except Exception as e:
-        print(f"❌ Error al restaurar backup: {e}")
-
-
-# Ejecutar restore ANTES de inicializar la DB
-asyncio.run(restore_from_github())
-
+CATALOG_FILE = "catalogo.json"
+DATA_FILE     = "data.json"
 
 # ─────────────────────────────────────────
-# Cargar catálogo de cartas
+# CARGAR CATÁLOGO
 # ─────────────────────────────────────────
-with open("catalogo.json", "r", encoding="utf-8") as f:
+with open(CATALOG_FILE, "r", encoding="utf-8") as f:
     catalog_data = json.load(f)
 
 catalog_cards = catalog_data.get("cards", [])
 catalog_by_id = {card["id"]: card for card in catalog_cards}
 
-cards_catalog: dict[str, list] = {}
+cards_catalog: dict = {}
 for card in catalog_cards:
     rarity = card.get("rareza", "N")
     cards_catalog.setdefault(rarity, []).append(card)
 
-set_catalog(catalog_by_id)
+# ─────────────────────────────────────────
+# CARGAR / GUARDAR data.json
+# ─────────────────────────────────────────
+if os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "r", encoding="utf-8") as f:
+        user_data = json.load(f)
+    user_inventories    = user_data.get("inventories", {})
+    user_balances       = user_data.get("balances", {})
+    user_rob_penalties  = user_data.get("rob_penalties", {})
+    user_completed_floors = user_data.get("completed_floors", {})
+else:
+    user_inventories      = {}
+    user_balances         = {}
+    user_rob_penalties    = {}
+    user_completed_floors = {}
 
+def save_data():
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump({
+            "inventories":      user_inventories,
+            "balances":         user_balances,
+            "rob_penalties":    user_rob_penalties,
+            "completed_floors": user_completed_floors,
+        }, f, ensure_ascii=False, indent=4)
 
 # ─────────────────────────────────────────
-# Inicializar base de datos SQLite
-# ─────────────────────────────────────────
-db.init()
-
-# SOLO LA PRIMERA VEZ: cambia a True para migrar data.json → SQLite
-# Luego vuelve a False
-MIGRATE = False
-if MIGRATE:
-    db.migrate_from_json("data.json")
-
-
-# ─────────────────────────────────────────
-# Inicializar bot
+# INICIALIZAR BOT
 # ─────────────────────────────────────────
 intents = discord.Intents.default()
 intents.message_content = True
@@ -106,14 +77,128 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 bot.paused = False
-bot.catalog_cards = catalog_cards
-bot.catalog_by_id = catalog_by_id
-bot.cards_catalog = cards_catalog
 
+# Datos accesibles desde los cogs vía bot.*
+bot.catalog_cards       = catalog_cards
+bot.catalog_by_id       = catalog_by_id
+bot.cards_catalog       = cards_catalog
+bot.user_inventories    = user_inventories
+bot.user_balances       = user_balances
+bot.user_rob_penalties  = user_rob_penalties
+bot.user_completed_floors = user_completed_floors
+bot.save_data           = save_data
+bot.DATA_FILE           = DATA_FILE
+bot.CATALOG_FILE        = CATALOG_FILE
+
+# Registrar bot en utils para que los cogs usen get_balance(), add_balance(), etc.
+from cogs import utils as _utils
+_utils.set_bot(bot)
+
+# ─────────────────────────────────────────
+# CHECK GLOBAL DE PAUSA
+# ─────────────────────────────────────────
+@bot.check
+async def global_commands_check(ctx):
+    allowed = ["pausa", "continuar", "reanudar"]
+    if not bot.paused:
+        return True
+    if ctx.author.guild_permissions.administrator:
+        return True
+    if ctx.command and ctx.command.name in allowed:
+        return True
+    embed = discord.Embed(
+        title="❌ Bot Pausado por Mantenimiento",
+        description="Solo los administradores pueden usar comandos ahora mismo.",
+        color=discord.Color.red(),
+    )
+    if ctx.guild:
+        await ctx.send(embed=embed)
+    return False
+
+# ─────────────────────────────────────────
+# SISTEMA DE BACKUP A GITHUB (igual que el original)
+# ─────────────────────────────────────────
+GITHUB_TOKEN  = config.GITHUB_TOKEN
+REPO_OWNER    = "CosmicDragneel21"
+REPO_NAME     = "Project-KC"
+BACKUP_BRANCH = "backup-auto"
+
+def create_github_backup():
+    """Sube data.json y catalogo.json a GitHub con timestamp."""
+    if not GITHUB_TOKEN:
+        print("⚠️  GITHUB_TOKEN no configurado — omitiendo backup")
+        return
+
+    try:
+        print("🔄 Iniciando backup automático...")
+
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            data_content = f.read()
+        with open(CATALOG_FILE, "r", encoding="utf-8") as f:
+            catalog_content = f.read()
+
+        headers = {
+            "Authorization": f"token {GITHUB_TOKEN}",
+            "Accept": "application/vnd.github.v3+json",
+        }
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_files = {
+            f"backup_{timestamp}_data.json":     data_content,
+            f"backup_{timestamp}_catalogo.json": catalog_content,
+        }
+
+        success_count = 0
+        for filename, content in backup_files.items():
+            try:
+                content_b64 = base64.b64encode(content.encode("utf-8")).decode("utf-8")
+                url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/backups/{filename}"
+                payload = {
+                    "message": f"🤖 Backup automático — {timestamp}",
+                    "content": content_b64,
+                    "branch":  BACKUP_BRANCH,
+                }
+                r = requests.put(url, headers=headers, json=payload, timeout=30)
+                if r.status_code in (200, 201):
+                    print(f"✅ Backup creado: {filename}")
+                    success_count += 1
+                else:
+                    print(f"❌ Error backup {filename}: {r.json().get('message', r.status_code)}")
+            except Exception as e:
+                print(f"❌ Error subiendo {filename}: {e}")
+
+        print(f"📊 Backup completado: {success_count}/2 archivos")
+
+    except Exception as e:
+        print(f"❌ Error en backup automático: {e}")
+
+
+def run_scheduled_backups():
+    """Hilo que ejecuta el backup cada 1 hora."""
+    schedule.every(1).hours.do(create_github_backup)
+    print("🕒 Sistema de backup iniciado (cada 1 hora)")
+    while True:
+        try:
+            schedule.run_pending()
+            time.sleep(60)
+        except Exception as e:
+            print(f"❌ Error en programador de backup: {e}")
+            time.sleep(60)
+
+# Iniciar hilo de backups
+try:
+    backup_thread = threading.Thread(target=run_scheduled_backups, daemon=True)
+    backup_thread.start()
+    print("✅ Backup automático iniciado (cada 1 hora → GitHub)")
+except Exception as e:
+    print(f"❌ No se pudo iniciar el sistema de backup: {e}")
+
+# Exponer la función para !backup_now desde admin.py
+bot.create_github_backup = create_github_backup
 
 # ─────────────────────────────────────────
 # SERVIDOR WEB (requerido por Render Web Service)
-# Uptime Robot hace ping aquí para mantener el bot activo
+# La URL del servicio sirve como endpoint para Uptime Robot
 # ─────────────────────────────────────────
 async def health_check(request):
     return web.Response(text="✅ Bot activo", content_type="text/plain")
@@ -128,91 +213,30 @@ async def start_web_server():
     await site.start()
     print(f"✅ Servidor web escuchando en puerto {port}")
 
-
 # ─────────────────────────────────────────
-# BACKUP AUTOMÁTICO cada 1 hora
-# ─────────────────────────────────────────
-@tasks.loop(hours=1)
-async def auto_backup():
-    token  = getattr(config, "GITHUB_TOKEN", os.getenv("GITHUB_TOKEN", ""))
-    repo   = getattr(config, "GITHUB_REPO",  os.getenv("GITHUB_REPO", ""))
-    branch = getattr(config, "BACKUP_BRANCH", os.getenv("BACKUP_BRANCH", "backup-data"))
-
-    if not token or not repo:
-        print("⚠️  Backup omitido: sin credenciales GitHub.")
-        return
-
-    if not os.path.exists("bot_data.db"):
-        print("⚠️  Backup omitido: bot_data.db no existe.")
-        return
-
-    print("🔄 Ejecutando backup automático...")
-    try:
-        with open("bot_data.db", "rb") as f:
-            content = base64.b64encode(f.read()).decode()
-
-        headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json",
-        }
-        url = f"https://api.github.com/repos/{repo}/contents/backups/bot_data.db"
-
-        async with aiohttp.ClientSession() as session:
-            # Obtener SHA del archivo existente (necesario para actualizarlo en GitHub)
-            async with session.get(f"{url}?ref={branch}", headers=headers) as r:
-                existing = await r.json() if r.status == 200 else {}
-
-            timestamp = time.strftime("%Y-%m-%d %H:%M UTC")
-            payload = {
-                "message": f"Backup automático {timestamp}",
-                "content": content,
-                "branch": branch,
-            }
-            if existing.get("sha"):
-                payload["sha"] = existing["sha"]
-
-            async with session.put(url, headers=headers, json=payload) as r:
-                if r.status in (200, 201):
-                    print(f"✅ Backup completado — {timestamp}")
-                else:
-                    text = await r.text()
-                    print(f"❌ Error en backup {r.status}: {text}")
-
-    except Exception as e:
-        print(f"❌ Error en backup automático: {e}")
-
-
-@auto_backup.before_loop
-async def before_backup():
-    await bot.wait_until_ready()
-
-
-# ─────────────────────────────────────────
-# Lista de cogs
+# LISTA DE COGS
 # ─────────────────────────────────────────
 COGS = [
-    "cogs.economia",      # !trabajar, !diaria, !casino, !pesca, !minar, !rob
-    "cogs.gacha",         # !gacha, !gacha_comprar, !inventario, !vender, !album
-    "cogs.juegos",        # !blackjack, !ruleta, !adivina, !encuentra_gema
-    "cogs.duelos",        # !dueloamistoso, !duelohonor, !aceptar_duelo, etc.
-    "cogs.intercambio",   # !intercambio, !cancelar_intercambio
-    "cogs.recompensas",   # !recompensa_tiempo, !recibir_recompensa, !eleccion
-    "cogs.admin",         # !dargemas, !darcarta, !clear, !interfaz, !pausa, !backup_now
-    "cogs.utilidades",    # !ayuda, !espera, !rates, !status, !menu_principal
+    "cogs.economia",    # !trabajar, !diaria, !casino, !pesca, !minar, !rob
+    "cogs.gacha",       # !gacha, !gacha_comprar, !inventario, !vender, !album
+    "cogs.juegos",      # !blackjack, !ruleta, !adivina, !encuentra_gema
+    "cogs.duelos",      # !dueloamistoso, !duelohonor, !cancelar_duelo
+    "cogs.intercambio", # !intercambio, !cancelar_intercambio
+    "cogs.recompensas", # !recompensa_tiempo, !recibir_recompensa, !eleccion
+    "cogs.admin",       # !dargemas, !darcarta, !clear, !interfaz, !pausa, !backup_now
+    "cogs.utilidades",  # !ayuda, !espera, !rates, !status, !menu_principal
 ]
 
-
 # ─────────────────────────────────────────
-# Eventos
+# EVENTOS
 # ─────────────────────────────────────────
 @bot.event
 async def on_ready():
     print(f"✅ {bot.user} está listo!")
-    print(f"🗄️  Base de datos: {db._path}")
-    print(f"📚 Catálogo: {len(catalog_cards)} cartas cargadas")
+    print(f"📚 Catálogo: {len(catalog_cards)} cartas")
+    print(f"👥 Usuarios en data.json: {len(user_inventories)}")
     print(f"🎮 Cogs: {', '.join(c.split('.')[1] for c in COGS)}")
-    print(f"🔄 Backup automático activo — cada 1 hora → GitHub")
-    auto_backup.start()
+    print(f"🔄 Backup automático: cada 1 hora → GitHub ({REPO_OWNER}/{REPO_NAME})")
 
 
 @bot.event
@@ -228,12 +252,11 @@ async def on_command_error(ctx, error):
     else:
         print(f"❌ Error no manejado en {ctx.command}: {error}")
 
-
 # ─────────────────────────────────────────
-# Arrancar
+# ARRANCAR
 # ─────────────────────────────────────────
 async def main():
-    await start_web_server()  # Abre el puerto HTTP para Render
+    await start_web_server()
     async with bot:
         for cog in COGS:
             try:

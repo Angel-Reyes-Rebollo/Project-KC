@@ -19,9 +19,8 @@ from discord.ui import Button, View
 from cogs.utils import (
     add_balance, add_to_inventory, format_gems,
     get_balance, get_inventory, get_rarity_color, get_rarity_emoji,
-    rarity_probabilities,
+    rarity_probabilities, remove_card_by_id, save_data,
 )
-from database import db
 
 try:
     import config
@@ -114,7 +113,7 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def quitarcarta(self, ctx, member: discord.Member, card_id: str):
         """Quita una carta del inventario de un usuario. Uso: !quitarcarta @usuario <card_id>"""
-        if db.remove_card(member.id, card_id):
+        if remove_card_by_id(member.id, card_id):
             await ctx.send(f"✅ Se eliminó la carta `{card_id}` del inventario de {member.mention}.")
         else:
             await ctx.send(f"❌ {member.mention} no tiene la carta `{card_id}`.")
@@ -123,7 +122,8 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def limpiar_inventario(self, ctx, member: discord.Member):
         """Limpia todo el inventario de un usuario."""
-        db.clear_inventory(member.id)
+        self.bot.user_inventories[str(member.id)] = []
+        save_data()
         await ctx.send(f"✅ Inventario de {member.mention} limpiado.")
 
     # ─────────────────────────────────────────
@@ -138,16 +138,11 @@ class Admin(commands.Cog):
         async def confirm_cb(interaction):
             if interaction.user.id != ctx.author.id:
                 await interaction.response.send_message("❌ Solo el admin que ejecutó puede confirmar.", ephemeral=True); return
-            # No hay forma fácil de borrar todo en SQLite sin iterar usuarios
-            # Borrar tabla por tabla
-            conn = db._conn()
-            conn.executescript("""
-                DELETE FROM balances;
-                DELETE FROM inventory;
-                DELETE FROM cooldowns;
-                DELETE FROM rob_penalties;
-                DELETE FROM completed_floors;
-            """)
+            self.bot.user_inventories.clear()
+            self.bot.user_balances.clear()
+            self.bot.user_rob_penalties.clear()
+            self.bot.user_completed_floors.clear()
+            save_data()
             for item in view.children: item.disabled = True
             await interaction.response.edit_message(content="⚠️ Todos los datos reseteados.", view=view)
             view.stop()

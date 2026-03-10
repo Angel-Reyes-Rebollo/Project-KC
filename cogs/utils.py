@@ -7,7 +7,6 @@ Uso: from cogs.utils import format_gems, get_rarity_emoji, COOLDOWN_GACHA, ...
 
 import time
 import discord
-from database import db
 
 # ─────────────────────────────────────────
 # CONSTANTES DE COOLDOWNS (segundos)
@@ -102,61 +101,106 @@ def get_rarity_color(rarity: str) -> int:
 
 
 # ─────────────────────────────────────────
-# WRAPPERS DE BASE DE DATOS
-# (compatibilidad con el código que aún usa estas funciones directamente)
+# WRAPPERS DE DATA.JSON
+# Se usa una referencia al bot seteada en main.py al arrancar.
+# Los cogs llaman: get_balance(user_id), add_balance(user_id, n), etc.
+# igual que en el original.
 # ─────────────────────────────────────────
 
-def get_inventory(user_id) -> list[dict]:
-    return db.get_inventory(user_id)
+_bot_instance = None
+
+def set_bot(bot):
+    """Llamar desde main.py después de crear el bot: utils.set_bot(bot)"""
+    global _bot_instance
+    _bot_instance = bot
+
+
+def get_inventory(user_id) -> list:
+    return _bot_instance.user_inventories.get(str(user_id), [])
 
 
 def add_to_inventory(user_id, card: dict):
-    """Agrega una carta al inventario. Recibe el dict completo."""
-    db.add_card(user_id, card["id"])
+    uid = str(user_id)
+    _bot_instance.user_inventories.setdefault(uid, []).append(card)
+    _bot_instance.save_data()
 
 
 def remove_from_inventory_by_index(user_id, index: int) -> dict | None:
-    """Elimina la carta en la posición `index` del inventario y la devuelve."""
-    inv = db.get_inventory(user_id)
+    uid = str(user_id)
+    inv = _bot_instance.user_inventories.get(uid, [])
     if 0 <= index < len(inv):
-        card = inv[index]
-        db.remove_card(user_id, card["id"])
+        card = inv.pop(index)
+        _bot_instance.save_data()
         return card
     return None
 
 
 def remove_card_by_id(user_id, card_id: str) -> bool:
-    """Elimina una copia de la carta con ese ID. Devuelve True si se pudo."""
-    return db.remove_card(user_id, card_id)
+    uid = str(user_id)
+    inv = _bot_instance.user_inventories.get(uid, [])
+    for i, card in enumerate(inv):
+        if card.get("id") == card_id:
+            inv.pop(i)
+            _bot_instance.save_data()
+            return True
+    return False
 
 
 def get_balance(user_id) -> int:
-    return db.get_balance(user_id)
+    return _bot_instance.user_balances.get(str(user_id), 0)
 
 
 def add_balance(user_id, amount: int) -> int:
-    return db.add_balance(user_id, amount)
+    uid = str(user_id)
+    current = _bot_instance.user_balances.get(uid, 0)
+    new_balance = max(0, current + amount)
+    _bot_instance.user_balances[uid] = new_balance
+    _bot_instance.save_data()
+    return new_balance
 
 
 def has_rob_penalty(user_id) -> bool:
-    return db.has_rob_penalty(user_id)
+    uid = str(user_id)
+    penalty = _bot_instance.user_rob_penalties.get(uid, 0)
+    return time.time() < penalty
 
 
 def get_rob_penalty_time(user_id) -> float:
-    return db.get_rob_penalty_end(user_id)
+    return _bot_instance.user_rob_penalties.get(str(user_id), 0)
 
 
 def set_rob_penalty(user_id, end_ts: float):
-    db.set_rob_penalty(user_id, end_ts)
+    _bot_instance.user_rob_penalties[str(user_id)] = end_ts
+    _bot_instance.save_data()
 
 
-def get_completed_floors(user_id) -> list[int]:
-    return db.get_completed_floors(user_id)
+def get_completed_floors(user_id) -> list:
+    return _bot_instance.user_completed_floors.get(str(user_id), [])
 
 
 def save_data():
-    """No-op: SQLite guarda automáticamente. Mantenida para compatibilidad."""
-    pass
+    """Guarda data.json manualmente."""
+    _bot_instance.save_data()
+
+
+# ─────────────────────────────────────────
+# COOLDOWNS EN MEMORIA
+# Mismo comportamiento que el original (se pierden al reiniciar)
+# ─────────────────────────────────────────
+_cooldowns: dict = {}  # {(user_id, command): timestamp}
+
+
+def check_cooldown(user_id, command: str, duration: float) -> float:
+    """Devuelve segundos restantes. 0 si puede usar el comando."""
+    key = (user_id, command)
+    last = _cooldowns.get(key, 0)
+    remaining = duration - (time.time() - last)
+    return max(0.0, remaining)
+
+
+def set_cooldown(user_id, command: str):
+    """Registra el timestamp actual para el cooldown."""
+    _cooldowns[(user_id, command)] = time.time()
 
 
 # ─────────────────────────────────────────
