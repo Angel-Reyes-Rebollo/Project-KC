@@ -37,9 +37,8 @@ from cogs.utils import (
     COOLDOWN_GACHA,
     add_balance, add_to_inventory, format_cooldown, format_gems,
     get_balance, get_rarity_color, get_rarity_emoji,
-    rarity_probabilities,
+    rarity_probabilities, check_cooldown, set_cooldown,
 )
-from database import db
 
 
 # ─────────────────────────────────────────
@@ -62,7 +61,10 @@ BANNERS: dict[str, dict] = {
         "personajes": [
             # Los nombres EXACTOS o fragmentos únicos de los personajes del anime.
             # Se hace match parcial (lower) contra card["nombre"].
-            "Hinata", "Tsukishima", "Nishinoya", "Tanaka", "Yamaguchi",
+            # NOTA: Se usa "Yu Nishinoya" y "Yū Nishinoya" exactos para no capturar
+            # "Momo Nishimiya" de JJK que tiene fragmento similar.
+            "Hinata", "Tsukishima", "Yu Nishinoya", "Yū Nishinoya",
+            "Ryūnosuke Tanaka", "Ryunosuke Tanaka", "Tadashi Yamaguchi",
             "Yaku", "Iwaizumi", "Kyōtani", "Kyotani", "Raichi", "Wanima",
             "Koganegawa", "Kuroo", "Sawamura", "Azumane", "Haiba",
             "Oikawa", "Shimizu", "Kozume", "Bokuto", "Ushijima",
@@ -72,6 +74,7 @@ BANNERS: dict[str, dict] = {
         "banner_img": "banners/haikyuu.png",
         "color": 0xF4A620,   # Naranja Karasuno
         "emoji": "🏐",
+        "exclusiones": ["Momo Nishimiya"],  # JJK, no Haikyuu
         "descripcion": "¡Cartas del universo de Haikyuu!! Personajes de Karasuno, Aoba Johsai, Fukurodani y más.",
     },
     "solo_leveling": {
@@ -129,10 +132,10 @@ BANNERS: dict[str, dict] = {
         "personajes": [
             "Mai Zenin", "Miwa Kasumi", "Momo Nishimiya", "Junpei",
             "Ijichi", "Yaga", "Kamo Noritoshi", "Panda",
-            "Nobara", "Kugisaki", "Mei Mei", "Todo", "Aoi",
-            "Maki Zenin", "Megumi", "Fushiguro", "Gojo", "Satoru",
-            "Sukuna", "Yuta", "Okkotsu", "Mahito", "Geto", "Kenjaku", "Toji",
-            "Jogo",
+            "Nobara", "Kugisaki", "Mei Mei", "Aoi Todo",
+            "Maki Zenin", "Megumi Fushiguro", "Gojo", "Satoru",
+            "Sukuna", "Yuta", "Okkotsu", "Mahito", "Geto",
+            "Kenjaku", "Toji Fushiguro", "Jogo",
         ],
         "banner_img": "banners/jjk.png",
         "color": 0x9B1FFF,   # Morado maldición
@@ -161,7 +164,7 @@ BANNERS: dict[str, dict] = {
         "aliases": ["aot", "attack on titan", "shingeki", "snk", "titan", "titanes"],
         "personajes": [
             "Eren", "Falco", "Gabi", "Armin", "Carla",
-            "Jean", "Historia", "Sasha", "Connie", "Rico",
+            "Jean Kirstein", "Historia", "Sasha", "Connie", "Rico",
             "Levi", "Mikasa", "Reiner", "Annie", "Pixis",
             "Kenny", "Erwin", "Hange",
             "Titán Colosal", "Titán Bestia", "Titán Acorazado",
@@ -200,8 +203,10 @@ def get_banner_cards(banner: dict, cards_catalog: dict) -> dict[str, list]:
     Filtra el catálogo global para devolver solo las cartas del anime del banner,
     agrupadas por rareza.
     Hace match parcial de los nombres de personajes del banner contra card["nombre"].
+    Respeta la lista opcional "exclusiones" para evitar falsos positivos.
     """
     personajes = [p.lower() for p in banner["personajes"]]
+    exclusiones = [e.lower() for e in banner.get("exclusiones", [])]
     filtered: dict[str, list] = {}
 
     for rarity in BANNER_RARITIES:
@@ -210,6 +215,9 @@ def get_banner_cards(banner: dict, cards_catalog: dict) -> dict[str, list]:
         pool = []
         for card in cards_catalog[rarity]:
             card_name = card.get("nombre", "").lower()
+            # Excluir explícitamente cartas que no pertenecen al banner
+            if any(exc in card_name for exc in exclusiones):
+                continue
             if any(p in card_name for p in personajes):
                 pool.append(card)
         if pool:
@@ -420,6 +428,15 @@ class GachaBanners(commands.Cog):
 
         # ── Modo banner ──
         if anime:
+            # Si el usuario escribió !gacha bluelock 10 por error, ignorar el número
+            parts = anime.strip().split()
+            if parts and parts[-1].isdigit():
+                anime = " ".join(parts[:-1])
+                await ctx.send(
+                    f"💡 Tip: Para comprar tiradas usa `!gacha_comprar {anime} {parts[-1]}`.\n"
+                    f"Haciendo tirada gratuita del banner **{anime}**..."
+                )
+
             banner = resolve_banner(anime)
             if not banner:
                 nombres = ", ".join(f"`{b['aliases'][0]}`" for b in BANNERS.values())
@@ -431,7 +448,7 @@ class GachaBanners(commands.Cog):
                 return
 
             # Cooldown compartido con el gacha normal
-            remaining = db.check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
+            remaining = check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
             if remaining > 0:
                 await ctx.send(
                     f"❌ Ya usaste tu tirada gratuita. Espera **{format_cooldown(remaining)}**."
@@ -446,7 +463,7 @@ class GachaBanners(commands.Cog):
                 )
                 return
 
-            db.set_cooldown(user_id, "gacha")
+            set_cooldown(user_id, "gacha")
             card = pull_from_banner(banner_cards)
             if not card:
                 await ctx.send("❌ Error al sacar carta del banner.")
@@ -466,7 +483,7 @@ class GachaBanners(commands.Cog):
         # ── Modo normal (sin banner) — delega al gacha original ──
         # Este bloque asegura que !gacha sin argumento sigue funcionando
         # aunque tengas ambos cogs cargados.
-        remaining = db.check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
+        remaining = check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
         if remaining > 0:
             await ctx.send(
                 f"❌ Ya usaste tu tirada gratuita. Espera **{format_cooldown(remaining)}**."
@@ -490,7 +507,7 @@ class GachaBanners(commands.Cog):
         chosen_rarity = random.choices(rarities, weights=probs, k=1)[0]
         card = random.choice(cards_catalog[chosen_rarity])
 
-        db.set_cooldown(user_id, "gacha")
+        set_cooldown(user_id, "gacha")
         add_to_inventory(user_id, card)
 
         rarity = card.get("rareza", "N")
@@ -626,8 +643,8 @@ class GachaBanners(commands.Cog):
                 f"Comprada ({format_gems(cost)})", user_id
             )
         else:
-            # Multi-tirada: embed resumen
-            embed = discord.Embed(
+            # Multi-tirada: primero un resumen general
+            embed_resumen = discord.Embed(
                 title=f"{banner['emoji']} Banner {banner['nombre']} — {len(cards_obtained)} tiradas",
                 description=(
                     f"Gastaste **{format_gems(cost)}**\n"
@@ -635,23 +652,48 @@ class GachaBanners(commands.Cog):
                 ),
                 color=banner["color"],
             )
+            # Lista compacta de resultados
+            lineas = []
             for card in cards_obtained:
                 rarity = card.get("rareza", "N")
-                embed.add_field(
-                    name=f"{get_rarity_emoji(rarity)} {card['nombre']}",
-                    value=f"Rareza: **{rarity}** | Valor: {format_gems(card.get('valor', 0))}",
-                    inline=False,
+                lineas.append(
+                    f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
                 )
-            embed.set_footer(text=f"Banner: {banner['nombre']} | Usa !gacha_comprar {anime_key} 10 para 10 tiradas")
+            embed_resumen.add_field(
+                name="📋 Resultados",
+                value="\n".join(lineas),
+                inline=False,
+            )
+            embed_resumen.set_footer(
+                text=f"Banner: {banner['nombre']} | Mostrando imágenes a continuación..."
+            )
 
-            # Thumbnail del banner
+            # Thumbnail del banner si existe
             banner_img = banner.get("banner_img", "")
             if banner_img and os.path.exists(banner_img):
                 file = discord.File(banner_img, filename="banner.png")
-                embed.set_thumbnail(url="attachment://banner.png")
-                await ctx.send(embed=embed, file=file)
+                embed_resumen.set_thumbnail(url="attachment://banner.png")
+                await ctx.send(embed=embed_resumen, file=file)
             else:
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed_resumen)
+
+            # Luego enviar cada carta con su imagen
+            for i, card in enumerate(cards_obtained):
+                rarity = card.get("rareza", "N")
+                embed_carta = discord.Embed(
+                    title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
+                    description=card.get("descripcion", ""),
+                    color=get_rarity_color(rarity),
+                )
+                embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — {banner['nombre']}")
+
+                image_path = card.get("imagen", "")
+                if image_path and os.path.exists(image_path):
+                    card_file = discord.File(image_path, filename="carta.png")
+                    embed_carta.set_image(url="attachment://carta.png")
+                    await ctx.send(embed=embed_carta, file=card_file)
+                else:
+                    await ctx.send(embed=embed_carta)
 
     # ─── !banners ───
 
