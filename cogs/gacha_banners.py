@@ -142,23 +142,6 @@ BANNERS: dict[str, dict] = {
         "emoji": "🌀",
         "descripcion": "Maldiciones, hechiceros y técnicas innatas. ¿Sobrevivirás?",
     },
-    "crossover": {
-        "nombre": "Crossover — Otros Animes",
-        "aliases": ["crossover", "otros", "multi", "especial", "other",
-                    "chainsaw man", "bleach", "hxh", "one punch", "tokyo ghoul",
-                    "sao", "fma", "spy family", "jojo", "evangelion"],
-        "personajes": [
-            "Chainsaw Man", "Ichigo Kurosaki", "Hisoka Morow",
-            "Saitama", "Ken Kaneki", "Kirito", "Edward Elric",
-            "Anya Forger", "Jotaro Kujo", "Asuka Langley",
-            "Dang Heng", "Neuvillette",
-            "Zuko", "Gaara", "Arthur Morgan", "Juvia",
-        ],
-        "banner_img": "banners/crossover.png",
-        "color": 0x2C3E50,   # Gris oscuro premium
-        "emoji": "🌐",
-        "descripcion": "Personajes especiales de múltiples universos. Cartas raras y exclusivas.",
-    },
     "aot": {
         "nombre": "Attack on Titan",
         "aliases": ["aot", "attack on titan", "shingeki", "snk", "titan", "titanes"],
@@ -671,32 +654,35 @@ class GachaBanners(commands.Cog):
         else:
             await ctx.send(embed=embed)
 
-    # ─── !gacha_comprar <anime> <cantidad> ───
+    # ─── !gacha_comprar <cantidad> o !gacha_comprar <anime> <cantidad> ───
 
     @commands.command(name="gacha_comprar")
     async def gacha_comprar(self, ctx, *, args: str = None):
         """
-        Compra tiradas del banner de un anime específico.
-        Precios iguales al gacha normal: 1=50💎 5=225💎 10=400💎
+        Compra tiradas de gacha.
+        Sin anime → pool general (todas las cartas).
+        Con anime → solo cartas de ese banner.
 
         Ejemplos:
-          !gacha_comprar haikyuu 1
-          !gacha_comprar solo leveling 5
+          !gacha_comprar 1          → 1 tirada general
+          !gacha_comprar 5          → 5 tiradas generales
+          !gacha_comprar 10         → 10 tiradas generales
+          !gacha_comprar haikyuu 5  → 5 tiradas del banner Haikyuu
           !gacha_comprar bluelock 10
-          !gacha_comprar mha 1
+          !gacha_comprar jjk 1
         """
         PRICES = {1: 50, 5: 225, 10: 400}
 
         if not args:
             embed = discord.Embed(
-                title="🛒 Comprar Tiradas de Banner",
+                title="🛒 Comprar Tiradas de Gacha",
                 description=(
-                    "Compra tiradas del gacha filtradas a un anime.\n"
-                    "**Uso:** `!gacha_comprar <anime> <cantidad>`\n\n"
+                    "**Sin anime** → tiradas del pool general (todas las cartas).\n"
+                    "**Con anime** → tiradas filtradas al banner del anime.\n\n"
                     "**Ejemplos:**\n"
-                    "`!gacha_comprar haikyuu 5`\n"
-                    "`!gacha_comprar bluelock 1`\n"
-                    "`!gacha_comprar jjk 10`"
+                    "`!gacha_comprar 5` → 5 tiradas generales\n"
+                    "`!gacha_comprar haikyuu 5` → 5 tiradas de Haikyuu\n"
+                    "`!gacha_comprar bluelock 10` → 10 tiradas de Blue Lock"
                 ),
                 color=discord.Color.blue(),
             )
@@ -711,15 +697,113 @@ class GachaBanners(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-        # Parsear: el último token debería ser el número
         parts = args.strip().split()
+        user_id = ctx.author.id
+
+        # ── Detectar si es solo un número (pool general) ──
+        if len(parts) == 1 and parts[0].isdigit():
+            cantidad = int(parts[0])
+            if cantidad not in PRICES:
+                await ctx.send(
+                    f"❌ Cantidad inválida. Solo puedes comprar: {', '.join(str(k) for k in PRICES)} tiradas."
+                )
+                return
+
+            cost = PRICES[cantidad]
+            balance = get_balance(user_id)
+            if balance < cost:
+                await ctx.send(
+                    f"❌ No tienes suficientes gemas.\n"
+                    f"Necesitas: **{format_gems(cost)}** | Tienes: **{format_gems(balance)}**"
+                )
+                return
+
+            # Pool general — todas las cartas
+            cards_catalog = self.bot.cards_catalog
+            target_rarities = ["G", "SP", "UR", "SSR", "R", "N"]
+            available = [
+                (r, rarity_probabilities[r])
+                for r in target_rarities
+                if r in cards_catalog and cards_catalog[r] and r in rarity_probabilities
+            ]
+            if not available:
+                await ctx.send("❌ No hay cartas disponibles.")
+                return
+
+            rarities, probs = zip(*available)
+            total_prob = sum(probs)
+            probs_norm = [p / total_prob for p in probs]
+
+            add_balance(user_id, -cost)
+            cards_obtained = []
+            for _ in range(cantidad):
+                chosen_rarity = random.choices(rarities, weights=probs_norm, k=1)[0]
+                card = random.choice(cards_catalog[chosen_rarity])
+                add_to_inventory(user_id, card)
+                cards_obtained.append(card)
+
+            if not cards_obtained:
+                await ctx.send("❌ Error al obtener cartas.")
+                return
+
+            # Banner general ficticio para el display
+            banner_general = {
+                "nombre": "General",
+                "emoji": "🎲",
+                "color": discord.Color.gold().value,
+                "banner_img": "",
+            }
+
+            if cantidad == 1:
+                await self._send_banner_result(
+                    ctx, cards_obtained[0], banner_general, "general",
+                    f"Comprada ({format_gems(cost)})", user_id
+                )
+            else:
+                embed_resumen = discord.Embed(
+                    title=f"🎲 Gacha General — {len(cards_obtained)} tiradas",
+                    description=(
+                        f"Gastaste **{format_gems(cost)}**\n"
+                        f"Balance restante: **{format_gems(get_balance(user_id))}**"
+                    ),
+                    color=discord.Color.gold(),
+                )
+                lineas = []
+                for card in cards_obtained:
+                    rarity = card.get("rareza", "N")
+                    lineas.append(
+                        f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
+                    )
+                embed_resumen.add_field(name="📋 Resultados", value="\n".join(lineas), inline=False)
+                embed_resumen.set_footer(text="Pool general — todas las cartas del catálogo")
+                await ctx.send(embed=embed_resumen)
+
+                for i, card in enumerate(cards_obtained):
+                    rarity = card.get("rareza", "N")
+                    embed_carta = discord.Embed(
+                        title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
+                        description=card.get("descripcion", ""),
+                        color=get_rarity_color(rarity),
+                    )
+                    embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — Gacha General")
+                    image_path = card.get("imagen", "")
+                    if image_path and os.path.exists(image_path):
+                        card_file = discord.File(image_path, filename="carta.png")
+                        embed_carta.set_image(url="attachment://carta.png")
+                        await ctx.send(embed=embed_carta, file=card_file)
+                    else:
+                        await ctx.send(embed=embed_carta)
+            return
+
+        # ── Con anime: parsear número al final ──
         try:
             cantidad = int(parts[-1])
             anime_query = " ".join(parts[:-1])
         except (ValueError, IndexError):
             await ctx.send(
-                "❌ Formato incorrecto. Ej: `!gacha_comprar haikyuu 5`\n"
-                "El número de tiradas va al final."
+                "❌ Formato incorrecto.\n"
+                "Sin anime: `!gacha_comprar 5`\n"
+                "Con anime: `!gacha_comprar haikyuu 5`"
             )
             return
 
@@ -732,7 +816,7 @@ class GachaBanners(commands.Cog):
         if not anime_query:
             await ctx.send(
                 "❌ Debes indicar el anime. Ej: `!gacha_comprar haikyuu 5`\n"
-                "Usa `!banners` para ver los disponibles."
+                "O sin anime para pool general: `!gacha_comprar 5`"
             )
             return
 
@@ -745,10 +829,8 @@ class GachaBanners(commands.Cog):
             )
             return
 
-        user_id = ctx.author.id
         cost = PRICES[cantidad]
         balance = get_balance(user_id)
-
         if balance < cost:
             await ctx.send(
                 f"❌ No tienes suficientes gemas.\n"
@@ -758,9 +840,7 @@ class GachaBanners(commands.Cog):
 
         banner_cards = get_banner_cards(banner, self.bot.cards_catalog)
         if not banner_cards:
-            await ctx.send(
-                f"❌ El banner de **{banner['nombre']}** no tiene cartas disponibles."
-            )
+            await ctx.send(f"❌ El banner de **{banner['nombre']}** no tiene cartas disponibles.")
             return
 
         anime_key = next((k for k, b in BANNERS.items() if b is banner), "unknown")
@@ -783,49 +863,106 @@ class GachaBanners(commands.Cog):
                 f"Comprada ({format_gems(cost)})", user_id
             )
         else:
-            # Multi-tirada: carrusel ordenado de mayor a menor rareza
-            carousel = MultiPullCarouselView(
-                ctx=ctx,
-                cards=cards_obtained,
-                banner=banner,
-                cost=cost,
-                balance_after=get_balance(user_id),
+            embed_resumen = discord.Embed(
+                title=f"{banner['emoji']} Banner {banner['nombre']} — {len(cards_obtained)} tiradas",
+                description=(
+                    f"Gastaste **{format_gems(cost)}**\n"
+                    f"Balance restante: **{format_gems(get_balance(user_id))}**"
+                ),
+                color=banner["color"],
             )
-            await carousel.send()
+            lineas = []
+            for card in cards_obtained:
+                rarity = card.get("rareza", "N")
+                lineas.append(
+                    f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
+                )
+            embed_resumen.add_field(name="📋 Resultados", value="\n".join(lineas), inline=False)
+            embed_resumen.set_footer(text=f"Banner: {banner['nombre']} | Mostrando imágenes a continuación...")
+
+            banner_img = banner.get("banner_img", "")
+            if banner_img and os.path.exists(banner_img):
+                file = discord.File(banner_img, filename="banner.png")
+                embed_resumen.set_thumbnail(url="attachment://banner.png")
+                await ctx.send(embed=embed_resumen, file=file)
+            else:
+                await ctx.send(embed=embed_resumen)
+
+            for i, card in enumerate(cards_obtained):
+                rarity = card.get("rareza", "N")
+                embed_carta = discord.Embed(
+                    title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
+                    description=card.get("descripcion", ""),
+                    color=get_rarity_color(rarity),
+                )
+                embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — {banner['nombre']}")
+                image_path = card.get("imagen", "")
+                if image_path and os.path.exists(image_path):
+                    card_file = discord.File(image_path, filename="carta.png")
+                    embed_carta.set_image(url="attachment://carta.png")
+                    await ctx.send(embed=embed_carta, file=card_file)
+                else:
+                    await ctx.send(embed=embed_carta)
 
     # ─── !banners ───
 
     @commands.command(name="banners")
     async def banners(self, ctx):
-        """Muestra todos los banners de anime disponibles."""
-        embed = discord.Embed(
+        """Muestra todos los banners de anime disponibles, cada uno con su imagen."""
+        # Embed introductorio
+        intro = discord.Embed(
             title="🎰 Banners de Gacha Disponibles",
             description=(
                 "Usa `!gacha <anime>` para una tirada gratuita del banner.\n"
                 "Usa `!gacha_comprar <anime> <1|5|10>` para tiradas de pago.\n"
-                "El cooldown de la tirada gratuita es de **4 horas** (compartido con `!gacha`)."
+                "Usa `!gacha_comprar <1|5|10>` para el pool general.\n"
+                "El cooldown de la tirada gratuita es de **4 horas**."
             ),
             color=discord.Color.gold(),
         )
+        await ctx.send(embed=intro)
 
+        # Un mensaje por banner con su imagen
         for key, banner in BANNERS.items():
             banner_cards = get_banner_cards(banner, self.bot.cards_catalog)
             total_cards = sum(len(v) for v in banner_cards.values())
             rarities_available = " ".join(
                 get_rarity_emoji(r) for r in BANNER_RARITIES if r in banner_cards
             )
+
+            embed = discord.Embed(
+                title=f"{banner['emoji']} {banner['nombre']}",
+                description=banner["descripcion"],
+                color=banner["color"],
+            )
             embed.add_field(
-                name=f"{banner['emoji']} {banner['nombre']}",
-                value=(
-                    f"{banner['descripcion']}\n"
-                    f"🃏 **{total_cards} cartas** | {rarities_available}\n"
-                    f"Uso: `!gacha {key}` | `!banner_info {key}`"
-                ),
+                name="🃏 Cartas disponibles",
+                value=f"{total_cards} cartas | {rarities_available}",
                 inline=False,
             )
+            embed.add_field(
+                name="🎲 Tirada gratuita",
+                value=f"`!gacha {key}`",
+                inline=True,
+            )
+            embed.add_field(
+                name="💎 Comprar tiradas",
+                value=f"`!gacha_comprar {key} 1/5/10`",
+                inline=True,
+            )
+            embed.add_field(
+                name="📋 Info detallada",
+                value=f"`!banner_info {key}`",
+                inline=True,
+            )
 
-        embed.set_footer(text="Usa !banner_info <anime> para ver las cartas exactas de cada banner")
-        await ctx.send(embed=embed)
+            banner_img = banner.get("banner_img", "")
+            if banner_img and os.path.exists(banner_img):
+                file = discord.File(banner_img, filename="banner.png")
+                embed.set_image(url="attachment://banner.png")
+                await ctx.send(embed=embed, file=file)
+            else:
+                await ctx.send(embed=embed)
 
     # ─── !banner_info <anime> ───
 
