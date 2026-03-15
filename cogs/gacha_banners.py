@@ -760,39 +760,14 @@ class GachaBanners(commands.Cog):
                     f"Comprada ({format_gems(cost)})", user_id
                 )
             else:
-                embed_resumen = discord.Embed(
-                    title=f"🎲 Gacha General — {len(cards_obtained)} tiradas",
-                    description=(
-                        f"Gastaste **{format_gems(cost)}**\n"
-                        f"Balance restante: **{format_gems(get_balance(user_id))}**"
-                    ),
-                    color=discord.Color.gold(),
+                carousel = MultiPullCarouselView(
+                    ctx=ctx,
+                    cards=cards_obtained,
+                    banner=banner_general,
+                    cost=cost,
+                    balance_after=get_balance(user_id),
                 )
-                lineas = []
-                for card in cards_obtained:
-                    rarity = card.get("rareza", "N")
-                    lineas.append(
-                        f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
-                    )
-                embed_resumen.add_field(name="📋 Resultados", value="\n".join(lineas), inline=False)
-                embed_resumen.set_footer(text="Pool general — todas las cartas del catálogo")
-                await ctx.send(embed=embed_resumen)
-
-                for i, card in enumerate(cards_obtained):
-                    rarity = card.get("rareza", "N")
-                    embed_carta = discord.Embed(
-                        title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
-                        description=card.get("descripcion", ""),
-                        color=get_rarity_color(rarity),
-                    )
-                    embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — Gacha General")
-                    image_path = card.get("imagen", "")
-                    if image_path and os.path.exists(image_path):
-                        card_file = discord.File(image_path, filename="carta.png")
-                        embed_carta.set_image(url="attachment://carta.png")
-                        await ctx.send(embed=embed_carta, file=card_file)
-                    else:
-                        await ctx.send(embed=embed_carta)
+                await carousel.send()
             return
 
         # ── Con anime: parsear número al final ──
@@ -863,46 +838,14 @@ class GachaBanners(commands.Cog):
                 f"Comprada ({format_gems(cost)})", user_id
             )
         else:
-            embed_resumen = discord.Embed(
-                title=f"{banner['emoji']} Banner {banner['nombre']} — {len(cards_obtained)} tiradas",
-                description=(
-                    f"Gastaste **{format_gems(cost)}**\n"
-                    f"Balance restante: **{format_gems(get_balance(user_id))}**"
-                ),
-                color=banner["color"],
+            carousel = MultiPullCarouselView(
+                ctx=ctx,
+                cards=cards_obtained,
+                banner=banner,
+                cost=cost,
+                balance_after=get_balance(user_id),
             )
-            lineas = []
-            for card in cards_obtained:
-                rarity = card.get("rareza", "N")
-                lineas.append(
-                    f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
-                )
-            embed_resumen.add_field(name="📋 Resultados", value="\n".join(lineas), inline=False)
-            embed_resumen.set_footer(text=f"Banner: {banner['nombre']} | Mostrando imágenes a continuación...")
-
-            banner_img = banner.get("banner_img", "")
-            if banner_img and os.path.exists(banner_img):
-                file = discord.File(banner_img, filename="banner.png")
-                embed_resumen.set_thumbnail(url="attachment://banner.png")
-                await ctx.send(embed=embed_resumen, file=file)
-            else:
-                await ctx.send(embed=embed_resumen)
-
-            for i, card in enumerate(cards_obtained):
-                rarity = card.get("rareza", "N")
-                embed_carta = discord.Embed(
-                    title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
-                    description=card.get("descripcion", ""),
-                    color=get_rarity_color(rarity),
-                )
-                embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — {banner['nombre']}")
-                image_path = card.get("imagen", "")
-                if image_path and os.path.exists(image_path):
-                    card_file = discord.File(image_path, filename="carta.png")
-                    embed_carta.set_image(url="attachment://carta.png")
-                    await ctx.send(embed=embed_carta, file=card_file)
-                else:
-                    await ctx.send(embed=embed_carta)
+            await carousel.send()
 
     # ─── !banners ───
 
