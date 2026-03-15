@@ -350,6 +350,146 @@ class BannerResultView(discord.ui.View):
 
 
 # ─────────────────────────────────────────
+# CARRUSEL DE MULTI-TIRADA
+# ─────────────────────────────────────────
+
+# Orden de rareza de mayor a menor
+RARITY_SORT = {"G": 0, "SP": 1, "UR": 2, "SSR": 3, "R": 4, "N": 5, "E": 6, "M": 7, "F": 8}
+
+
+def build_stats_text(card: dict) -> str:
+    """Formatea los stats de una carta en texto legible."""
+    stats = card.get("stats", {})
+    if not stats:
+        return ""
+    stat_emojis = {
+        "Evasion": "👻", "Fuerza": "💥", "Reaccion": "🌀", "Reacción": "🌀",
+        "Defensa": "🛡️", "Velocidad": "💨", "IQ": "🧠", "Carisma": "✨",
+        "Precision": "🎯", "Precisión": "🎯", "Energia": "⚡", "Energía": "⚡",
+        "Suerte": "🍀",
+    }
+    lines = []
+    for stat, val in stats.items():
+        emoji = stat_emojis.get(stat, "•")
+        lines.append(f"{emoji} **{stat}:** {val}")
+    return "\n".join(lines)
+
+
+class MultiPullCarouselView(discord.ui.View):
+    """Carrusel de navegación para multi-tiradas del banner."""
+
+    def __init__(self, ctx, cards: list, banner: dict, cost: int, balance_after: int, timeout=300):
+        super().__init__(timeout=timeout)
+        self.ctx = ctx
+        self.author_id = ctx.author.id
+        # Ordenar cartas de mayor a menor rareza
+        self.cards = sorted(cards, key=lambda c: RARITY_SORT.get(c.get("rareza", "N"), 99))
+        self.banner = banner
+        self.cost = cost
+        self.balance_after = balance_after
+        self.index = 0
+        self.message = None
+        self._update_buttons()
+
+    def _update_buttons(self):
+        self.prev_btn.disabled = (self.index == 0)
+        self.next_btn.disabled = (self.index == len(self.cards) - 1)
+        self.counter_btn.label = f"{self.index + 1} / {len(self.cards)}"
+
+    def _build_embed(self) -> tuple[discord.Embed, discord.File | None]:
+        card = self.cards[self.index]
+        rarity = card.get("rareza", "N")
+        emoji = get_rarity_emoji(rarity)
+
+        embed = discord.Embed(
+            title=f"{emoji} {card['nombre']} ({rarity})",
+            description=card.get("descripcion", ""),
+            color=get_rarity_color(rarity),
+        )
+
+        # Info básica
+        embed.add_field(name="💎 Valor", value=format_gems(card.get("valor", 0)), inline=True)
+        embed.add_field(name="⭐ Rareza", value=f"{emoji} {rarity}", inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=True)  # spacer
+
+        # Stats
+        stats_text = build_stats_text(card)
+        if stats_text:
+            embed.add_field(name="📊 Stats", value=stats_text, inline=False)
+
+        # Footer con resumen del pull
+        embed.set_footer(
+            text=(
+                f"Carta {self.index + 1}/{len(self.cards)} • "
+                f"Banner: {self.banner['nombre']} • "
+                f"Gasto: {format_gems(self.cost)} • "
+                f"Balance: {format_gems(self.balance_after)}"
+            )
+        )
+
+        # Imagen de la carta
+        image_path = card.get("imagen", "")
+        file = None
+        if image_path and os.path.exists(image_path):
+            file = discord.File(image_path, filename="carta.png")
+            embed.set_image(url="attachment://carta.png")
+
+        return embed, file
+
+    async def _refresh(self, interaction: discord.Interaction):
+        self._update_buttons()
+        embed, file = self._build_embed()
+        if file:
+            await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
+        else:
+            await interaction.response.edit_message(embed=embed, attachments=[], view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message(
+                "❌ Solo quien hizo el pull puede navegar.", ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple, row=0)
+    async def prev_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index = max(0, self.index - 1)
+        await self._refresh(interaction)
+
+    @discord.ui.button(label="1 / 1", style=discord.ButtonStyle.gray, disabled=True, row=0)
+    async def counter_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass  # Solo muestra el contador, no hace nada
+
+    @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple, row=0)
+    async def next_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index = min(len(self.cards) - 1, self.index + 1)
+        await self._refresh(interaction)
+
+    @discord.ui.button(label="🏆 Mejor carta", style=discord.ButtonStyle.green, row=1)
+    async def mejor_carta(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Salta directo a la carta de mayor rareza (ya es la primera)."""
+        self.index = 0
+        await self._refresh(interaction)
+
+    @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red, row=1)
+    async def cerrar(self, interaction: discord.Interaction, button: discord.ui.Button):
+        for item in self.children:
+            item.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.stop()
+
+    async def send(self):
+        """Envía el carrusel con el primer mensaje."""
+        embed, file = self._build_embed()
+        self._update_buttons()
+        if file:
+            self.message = await self.ctx.send(embed=embed, file=file, view=self)
+        else:
+            self.message = await self.ctx.send(embed=embed, view=self)
+
+
+# ─────────────────────────────────────────
 # COG PRINCIPAL
 # ─────────────────────────────────────────
 class GachaBanners(commands.Cog):
@@ -643,57 +783,15 @@ class GachaBanners(commands.Cog):
                 f"Comprada ({format_gems(cost)})", user_id
             )
         else:
-            # Multi-tirada: primero un resumen general
-            embed_resumen = discord.Embed(
-                title=f"{banner['emoji']} Banner {banner['nombre']} — {len(cards_obtained)} tiradas",
-                description=(
-                    f"Gastaste **{format_gems(cost)}**\n"
-                    f"Balance restante: **{format_gems(get_balance(user_id))}**"
-                ),
-                color=banner["color"],
+            # Multi-tirada: carrusel ordenado de mayor a menor rareza
+            carousel = MultiPullCarouselView(
+                ctx=ctx,
+                cards=cards_obtained,
+                banner=banner,
+                cost=cost,
+                balance_after=get_balance(user_id),
             )
-            # Lista compacta de resultados
-            lineas = []
-            for card in cards_obtained:
-                rarity = card.get("rareza", "N")
-                lineas.append(
-                    f"{get_rarity_emoji(rarity)} **{card['nombre']}** — {rarity} | {format_gems(card.get('valor', 0))}"
-                )
-            embed_resumen.add_field(
-                name="📋 Resultados",
-                value="\n".join(lineas),
-                inline=False,
-            )
-            embed_resumen.set_footer(
-                text=f"Banner: {banner['nombre']} | Mostrando imágenes a continuación..."
-            )
-
-            # Thumbnail del banner si existe
-            banner_img = banner.get("banner_img", "")
-            if banner_img and os.path.exists(banner_img):
-                file = discord.File(banner_img, filename="banner.png")
-                embed_resumen.set_thumbnail(url="attachment://banner.png")
-                await ctx.send(embed=embed_resumen, file=file)
-            else:
-                await ctx.send(embed=embed_resumen)
-
-            # Luego enviar cada carta con su imagen
-            for i, card in enumerate(cards_obtained):
-                rarity = card.get("rareza", "N")
-                embed_carta = discord.Embed(
-                    title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
-                    description=card.get("descripcion", ""),
-                    color=get_rarity_color(rarity),
-                )
-                embed_carta.set_footer(text=f"Carta {i+1}/{len(cards_obtained)} — {banner['nombre']}")
-
-                image_path = card.get("imagen", "")
-                if image_path and os.path.exists(image_path):
-                    card_file = discord.File(image_path, filename="carta.png")
-                    embed_carta.set_image(url="attachment://carta.png")
-                    await ctx.send(embed=embed_carta, file=card_file)
-                else:
-                    await ctx.send(embed=embed_carta)
+            await carousel.send()
 
     # ─── !banners ───
 
