@@ -217,8 +217,9 @@ async def start_web_server():
 # LISTA DE COGS
 # ─────────────────────────────────────────
 COGS = [
-    "cogs.economia",    # !trabajar, !diaria, !casino, !pesca, !minar, !rob
-    "cogs.gacha",       # !gacha, !gacha_comprar, !inventario, !vender, !album
+    "cogs.economia",       # !trabajar, !diaria, !casino, !pesca, !minar, !rob
+    "cogs.gacha_banners",  # !gacha <anime>, !gacha_comprar <anime>, !banners, !banner_info
+    "cogs.gacha",          # !inventario, !vender, !vender_mayoreo, !vender_rareza, !album
     "cogs.juegos",      # !blackjack, !ruleta, !adivina, !encuentra_gema
     "cogs.duelos",      # !dueloamistoso, !duelohonor, !cancelar_duelo
     "cogs.intercambio", # !intercambio, !cancelar_intercambio

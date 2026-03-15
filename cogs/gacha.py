@@ -152,9 +152,9 @@ class Gacha(commands.Cog):
     # ─────────────────────────────────────────
     # !gacha
     # ─────────────────────────────────────────
-    @commands.command()
+    @commands.command(name="gacha_sin_banner", hidden=True)
     async def gacha(self, ctx):
-        """Tirada gratuita de gacha (cooldown 4 horas)."""
+        """[Reemplazado por gacha_banners] Tirada gratuita de gacha (cooldown 4 horas)."""
         user_id = ctx.author.id
         remaining = db.check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
         if remaining > 0:
@@ -173,9 +173,9 @@ class Gacha(commands.Cog):
     # ─────────────────────────────────────────
     # !gacha_comprar
     # ─────────────────────────────────────────
-    @commands.command()
+    @commands.command(name="gacha_comprar_sin_banner", hidden=True)
     async def gacha_comprar(self, ctx, cantidad: int = None):
-        """Compra tiradas de gacha con gemas. Precios: 1=50💎 5=225💎 10=400💎"""
+        """[Reemplazado por gacha_banners] Compra tiradas de gacha con gemas."""
         PRICES = {1: 50, 5: 225, 10: 400}
 
         if cantidad not in PRICES:
