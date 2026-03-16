@@ -25,12 +25,12 @@ from cogs.utils import (
 try:
     import config
     GITHUB_TOKEN = getattr(config, "GITHUB_TOKEN", os.getenv("GITHUB_TOKEN", ""))
-    GITHUB_REPO  = getattr(config, "GITHUB_REPO", os.getenv("GITHUB_REPO", ""))
-    BACKUP_BRANCH = getattr(config, "BACKUP_BRANCH", "backup-data")
 except Exception:
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
-    GITHUB_REPO  = os.getenv("GITHUB_REPO", "")
-    BACKUP_BRANCH = "backup-data"
+
+# Mismo repositorio y rama que usa main.py para los backups automáticos
+GITHUB_REPO   = "CosmicDragneel21/Project-KC"
+BACKUP_BRANCH = "backup-auto"
 
 
 class Admin(commands.Cog):
@@ -275,60 +275,143 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def backup_now(self, ctx):
-        """Crea un backup manual inmediato en GitHub."""
-        if not GITHUB_TOKEN or not GITHUB_REPO:
-            await ctx.send("❌ `GITHUB_TOKEN` y `GITHUB_REPO` deben estar configurados."); return
-        await ctx.send("🔄 Creando backup...")
-        try:
-            await self._push_backup()
-            await ctx.send("✅ Backup creado en GitHub exitosamente.")
-        except Exception as e:
-            await ctx.send(f"❌ Error: {e}")
+        """Crea un backup manual de data.json y catalogo.json en GitHub."""
+        if not GITHUB_TOKEN:
+            await ctx.send("❌ `GITHUB_TOKEN` no está configurado en las variables de entorno de Railway."); return
+
+        msg = await ctx.send("🔄 Creando backup en GitHub...")
+        resultados = await self._push_backup()
+
+        exitosos = sum(1 for r in resultados if r["ok"])
+        color = discord.Color.green() if exitosos == len(resultados) else discord.Color.orange()
+
+        embed = discord.Embed(
+            title=f"📦 Backup Manual — {exitosos}/{len(resultados)} archivos",
+            color=color,
+        )
+        for r in resultados:
+            if r["ok"]:
+                embed.add_field(
+                    name=f"✅ {r['archivo']}",
+                    value=f"`backups/{r['backup_name']}`",
+                    inline=False,
+                )
+            else:
+                embed.add_field(
+                    name=f"❌ {r['archivo']}",
+                    value=f"Error: {r['error']}",
+                    inline=False,
+                )
+        embed.add_field(
+            name="📁 Repositorio",
+            value=f"`{GITHUB_REPO}` — rama `{BACKUP_BRANCH}`",
+            inline=False,
+        )
+        embed.set_footer(text=time.strftime("Backup: %d/%m/%Y %H:%M UTC"))
+        await msg.edit(content=None, embed=embed)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def backup_status(self, ctx):
-        """Muestra el estado del sistema de backup."""
+        """Muestra el estado de la configuración del sistema de backup."""
         embed = discord.Embed(title="📊 Estado del Backup", color=discord.Color.blue())
-        embed.add_field(name="GitHub Token", value="✅ Configurado" if GITHUB_TOKEN else "❌ No configurado", inline=True)
-        embed.add_field(name="Repositorio", value=GITHUB_REPO or "No configurado", inline=True)
-        embed.add_field(name="Rama", value=BACKUP_BRANCH, inline=True)
+        embed.add_field(
+            name="GitHub Token",
+            value="✅ Configurado" if GITHUB_TOKEN else "❌ No configurado",
+            inline=True,
+        )
+        embed.add_field(
+            name="Repositorio",
+            value=f"`{GITHUB_REPO}`" if GITHUB_REPO else "❌ No configurado",
+            inline=True,
+        )
+        embed.add_field(name="Rama", value=f"`{BACKUP_BRANCH}`", inline=True)
+        embed.add_field(
+            name="Archivos respaldados",
+            value=f"`{self.bot.DATA_FILE}` — inventarios, gemas y penalizaciones\n"
+                  f"`{self.bot.CATALOG_FILE}` — catálogo de cartas",
+            inline=False,
+        )
+        embed.add_field(
+            name="Backup automático",
+            value="Cada **1 hora** via el scheduler de `main.py`",
+            inline=False,
+        )
         await ctx.send(embed=embed)
 
-    async def _push_backup(self):
-        """Sube bot_data.db a GitHub como backup."""
+    async def _push_backup(self) -> list[dict]:
+        """
+        Sube data.json y catalogo.json al repositorio de GitHub.
+        Cada backup se guarda con timestamp en la carpeta backups/.
+        Devuelve lista de resultados por archivo.
+        """
         import base64
 
-        if not os.path.exists("bot_data.db"):
-            raise FileNotFoundError("No se encontró bot_data.db")
-
-        with open("bot_data.db", "rb") as f:
-            content = base64.b64encode(f.read()).decode()
+        archivos = [
+            self.bot.DATA_FILE,
+            self.bot.CATALOG_FILE,
+        ]
 
         headers = {
             "Authorization": f"token {GITHUB_TOKEN}",
             "Accept": "application/vnd.github.v3+json",
         }
-        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/backups/bot_data.db"
-        timestamp = time.strftime("%Y-%m-%d %H:%M UTC")
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        resultados = []
 
         async with aiohttp.ClientSession() as session:
-            # Verificar si ya existe para obtener el SHA
-            async with session.get(url, headers=headers) as r:
-                existing = await r.json() if r.status == 200 else {}
+            for filepath in archivos:
+                nombre_archivo = os.path.basename(filepath)
+                nombre_base = nombre_archivo.replace(".json", "")
+                backup_name = f"{nombre_base}_{timestamp}.json"
+                resultado = {
+                    "archivo": nombre_archivo,
+                    "backup_name": backup_name,
+                    "ok": False,
+                    "error": "",
+                }
 
-            payload = {
-                "message": f"Backup automático {timestamp}",
-                "content": content,
-                "branch": BACKUP_BRANCH,
-            }
-            if existing.get("sha"):
-                payload["sha"] = existing["sha"]
+                try:
+                    if not os.path.exists(filepath):
+                        resultado["error"] = f"Archivo no encontrado en el hoster: `{filepath}`"
+                        resultados.append(resultado)
+                        continue
 
-            async with session.put(url, headers=headers, json=payload) as r:
-                if r.status not in (200, 201):
-                    text = await r.text()
-                    raise Exception(f"GitHub API error {r.status}: {text}")
+                    # Leer el archivo actual del hoster y codificar
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        contenido = f.read()
+                    contenido_b64 = base64.b64encode(
+                        contenido.encode("utf-8")
+                    ).decode("utf-8")
+
+                    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/backups/{backup_name}"
+
+                    payload = {
+                        "message": f"🤖 Backup manual {timestamp} — {nombre_archivo}",
+                        "content": contenido_b64,
+                        "branch": BACKUP_BRANCH,
+                    }
+
+                    # Verificar si ya existe ese archivo exacto (para SHA)
+                    async with session.get(url, headers=headers) as r:
+                        if r.status == 200:
+                            existing = await r.json()
+                            payload["sha"] = existing.get("sha", "")
+
+                    # Subir a GitHub
+                    async with session.put(url, headers=headers, json=payload) as r:
+                        if r.status in (200, 201):
+                            resultado["ok"] = True
+                        else:
+                            data = await r.json()
+                            resultado["error"] = data.get("message", f"HTTP {r.status}")
+
+                except Exception as e:
+                    resultado["error"] = str(e)
+
+                resultados.append(resultado)
+
+        return resultados
 
 
 # ─────────────────────────────────────────

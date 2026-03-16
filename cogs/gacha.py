@@ -14,87 +14,166 @@ from discord.ui import Button, View
 
 from cogs.utils import (
     COOLDOWN_GACHA,
-    add_balance, add_to_inventory, format_cooldown, format_gems,
+    add_balance, add_to_inventory, check_cooldown, format_cooldown, format_gems,
     get_balance, get_inventory, get_rarity_color, get_rarity_emoji,
     remove_card_by_id, remove_from_inventory_by_index, rarity_probabilities,
+    set_cooldown,
 )
-from database import db
+
+
+# Orden de rareza de mayor a menor (E es la más alta)
+RARITY_SORT_INV = {"E": 0, "M": 1, "F": 2, "G": 3, "SP": 4, "UR": 5, "SSR": 6, "R": 7, "N": 8}
+
+STAT_EMOJIS = {
+    "Evasion": "👻", "Evasión": "👻",
+    "Fuerza": "💥",
+    "Reaccion": "🌀", "Reacción": "🌀",
+    "Defensa": "🛡️",
+    "Velocidad": "💨",
+    "IQ": "🧠",
+    "Carisma": "✨",
+    "Precision": "🎯", "Precisión": "🎯",
+    "Energia": "⚡", "Energía": "⚡",
+    "Suerte": "🍀",
+}
+
+# Barras de stats (10 niveles visuales)
+def stat_bar(value: int, max_val: int = 100) -> str:
+    filled = round((value / max_val) * 10)
+    filled = max(0, min(10, filled))
+    return "█" * filled + "░" * (10 - filled)
+
+
+def build_inventory_embed(card: dict, index: int, total: int, total_all: int,
+                           count: int, balance: int, owner_name: str) -> discord.Embed:
+    """Construye el embed enriquecido de una carta del inventario."""
+    rarity = card.get("rareza", "N")
+    emoji = get_rarity_emoji(rarity)
+    color = get_rarity_color(rarity)
+
+    # Título con rareza destacada
+    embed = discord.Embed(
+        title=f"{emoji} {card['nombre']}",
+        description=f"**Rareza:** {emoji} `{rarity}`  •  **Valor:** {format_gems(card.get('valor', 0))}",
+        color=color,
+    )
+
+    # Stats con barras visuales
+    stats = card.get("stats", {})
+    if stats:
+        stats_lines = []
+        for stat, val in stats.items():
+            stat_emoji = STAT_EMOJIS.get(stat, "•")
+            bar = stat_bar(val)
+            stats_lines.append(f"{stat_emoji} **{stat}** `{val:>3}` {bar}")
+        embed.add_field(
+            name="📊 Stats",
+            value="\n".join(stats_lines),
+            inline=False,
+        )
+
+    # Info extra
+    if card.get("descripcion"):
+        embed.add_field(name="📖 Descripción", value=card["descripcion"], inline=False)
+
+    # Copias en inventario
+    if count > 1:
+        embed.add_field(name="📦 Copias", value=f"x{count}", inline=True)
+
+    embed.add_field(name="💎 Balance", value=format_gems(balance), inline=True)
+
+    embed.set_footer(
+        text=f"Carta {index + 1} / {total} únicas  •  {total_all} total  •  {owner_name}"
+    )
+    return embed
 
 
 # ─────────────────────────────────────────
-# Vista del carrusel de inventario
+# Vista del carrusel de inventario (mejorada)
 # ─────────────────────────────────────────
 class InventoryView(View):
-    def __init__(self, ctx, inventory, total_cards, gems, timeout=180):
+    def __init__(self, ctx, inventory: list, card_counts: dict,
+                 total_cards: int, balance: int, timeout=300):
         super().__init__(timeout=timeout)
         self.ctx = ctx
-        self.inventory = inventory
+        self.author_id = ctx.author.id
+        # Ordenar de mayor a menor rareza
+        self.inventory = sorted(
+            inventory,
+            key=lambda c: RARITY_SORT_INV.get(c.get("rareza", "N"), 99)
+        )
+        self.card_counts = card_counts
         self.total_cards = total_cards
-        self.gems = gems
+        self.balance = balance
         self.index = 0
         self.message = None
+        self._update_buttons()
 
-    async def update_message(self):
-        if not self.inventory:
-            await self.ctx.send("📭 Tu inventario está vacío.")
-            return
+    def _update_buttons(self):
+        self.prev_btn.disabled = (self.index == 0)
+        self.next_btn.disabled = (self.index == len(self.inventory) - 1)
+        self.counter_btn.label = f"{self.index + 1} / {len(self.inventory)}"
 
+    def _build(self):
         card = self.inventory[self.index]
-        rarity = card.get("rareza", "N")
-
-        embed = discord.Embed(
-            title=f"{get_rarity_emoji(rarity)} {card['nombre']} ({rarity})",
-            description=card.get("descripcion", ""),
-            color=get_rarity_color(rarity),
+        count = self.card_counts.get(card.get("id"), 1)
+        embed = build_inventory_embed(
+            card, self.index, len(self.inventory),
+            self.total_cards, count, self.balance,
+            self.ctx.author.display_name,
         )
-        embed.add_field(name="Valor", value=format_gems(card.get("valor", 0)), inline=True)
-        embed.set_footer(text=f"Carta {self.index + 1} de {len(self.inventory)} únicas • Total: {self.total_cards}")
-
-        image_path = card.get("imagen", "")
         file = None
+        image_path = card.get("imagen", "")
         if image_path and os.path.exists(image_path):
             file = discord.File(image_path, filename="carta.png")
             embed.set_image(url="attachment://carta.png")
+        return embed, file
 
-        # Actualizar botones
-        for item in self.children:
-            item.disabled = False
-        if self.index == 0:
-            self.prev_btn.disabled = True
-        if self.index == len(self.inventory) - 1:
-            self.next_btn.disabled = True
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message(
+                "❌ Solo el dueño puede navegar.", ephemeral=True
+            )
+            return False
+        return True
 
-        if self.message is None:
-            self.message = await self.ctx.send(embed=embed, file=file, view=self) if file else await self.ctx.send(embed=embed, view=self)
+    async def _refresh(self, interaction: discord.Interaction):
+        self._update_buttons()
+        embed, file = self._build()
+        if file:
+            await interaction.response.edit_message(embed=embed, attachments=[file], view=self)
         else:
-            if file:
-                await self.message.edit(embed=embed, attachments=[file], view=self)
-            else:
-                await self.message.edit(embed=embed, view=self)
+            await interaction.response.edit_message(embed=embed, attachments=[], view=self)
 
-    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple)
-    async def prev_btn(self, interaction, button):
-        if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message("❌ Solo el dueño puede navegar.", ephemeral=True)
-            return
-        self.index = max(0, self.index - 1)
-        await interaction.response.defer()
-        await self.update_message()
+    async def send(self):
+        embed, file = self._build()
+        self._update_buttons()
+        if file:
+            self.message = await self.ctx.send(embed=embed, file=file, view=self)
+        else:
+            self.message = await self.ctx.send(embed=embed, view=self)
 
-    @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple)
-    async def next_btn(self, interaction, button):
-        if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message("❌ Solo el dueño puede navegar.", ephemeral=True)
-            return
-        self.index = min(len(self.inventory) - 1, self.index + 1)
-        await interaction.response.defer()
-        await self.update_message()
+    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple, row=0)
+    async def prev_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index -= 1
+        await self._refresh(interaction)
 
-    @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red)
-    async def close_btn(self, interaction, button):
-        if interaction.user.id != self.ctx.author.id:
-            await interaction.response.send_message("❌ Solo el dueño puede cerrar.", ephemeral=True)
-            return
+    @discord.ui.button(label="1 / 1", style=discord.ButtonStyle.gray, disabled=True, row=0)
+    async def counter_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
+    @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple, row=0)
+    async def next_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index += 1
+        await self._refresh(interaction)
+
+    @discord.ui.button(label="🏆 Mejor carta", style=discord.ButtonStyle.green, row=1)
+    async def mejor_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index = 0
+        await self._refresh(interaction)
+
+    @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red, row=1)
+    async def close_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
         for item in self.children:
             item.disabled = True
         await interaction.response.edit_message(view=self)
@@ -156,7 +235,7 @@ class Gacha(commands.Cog):
     async def gacha(self, ctx):
         """[Reemplazado por gacha_banners] Tirada gratuita de gacha (cooldown 4 horas)."""
         user_id = ctx.author.id
-        remaining = db.check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
+        remaining = check_cooldown(user_id, "gacha", COOLDOWN_GACHA)
         if remaining > 0:
             await ctx.send(f"❌ Ya usaste tu tirada gratuita. Espera **{format_cooldown(remaining)}**.")
             return
@@ -166,7 +245,7 @@ class Gacha(commands.Cog):
             await ctx.send("❌ No hay cartas disponibles en el catálogo.")
             return
 
-        db.set_cooldown(user_id, "gacha")
+        set_cooldown(user_id, "gacha")
         add_to_inventory(user_id, card)
         await self._send_card_result(ctx, card, "Tirada gratuita")
 
@@ -232,16 +311,16 @@ class Gacha(commands.Cog):
     # ─────────────────────────────────────────
     @commands.command()
     async def inventario(self, ctx):
-        """Muestra tu inventario en carrusel de cartas únicas."""
+        """Muestra tu inventario ordenado de mayor a menor rareza con stats y carrusel."""
         user_id = ctx.author.id
         inv = get_inventory(user_id)
-        gems = get_balance(user_id)
+        balance = get_balance(user_id)
 
         if not inv:
             await ctx.send("📭 No tienes cartas en tu inventario. Usa `!gacha` para conseguir una.")
             return
 
-        # Cartas únicas (sin duplicados para el carrusel)
+        # Cartas únicas + conteo de copias
         seen = set()
         unique_inv = []
         card_counts: dict[str, int] = {}
@@ -252,30 +331,33 @@ class Gacha(commands.Cog):
                 seen.add(cid)
                 unique_inv.append(card)
 
-        # Resumen
+        # Resumen por rareza ordenado de mayor a menor
         rarity_summary: dict[str, int] = {}
         for card in inv:
             r = card.get("rareza", "N")
             rarity_summary[r] = rarity_summary.get(r, 0) + 1
 
+        rarity_text = " | ".join(
+            f"{get_rarity_emoji(r)} {r}: **{c}**"
+            for r, c in sorted(rarity_summary.items(),
+                                key=lambda x: RARITY_SORT_INV.get(x[0], 99))
+        )
+
+        # Embed resumen
         embed = discord.Embed(
             title=f"📦 Inventario de {ctx.author.display_name}",
-            color=discord.Color.blue(),
+            description=rarity_text or "Sin cartas",
+            color=discord.Color.gold(),
         )
-        embed.add_field(name="💎 Gemas", value=format_gems(gems), inline=True)
+        embed.add_field(name="💎 Gemas", value=format_gems(balance), inline=True)
         embed.add_field(name="🃏 Total cartas", value=str(len(inv)), inline=True)
-        embed.add_field(name="✨ Únicas", value=str(len(unique_inv)), inline=True)
-
-        rarity_text = " | ".join(
-            f"{get_rarity_emoji(r)} {r}: {c}" for r, c in sorted(rarity_summary.items())
-        )
-        if rarity_text:
-            embed.add_field(name="Por rareza", value=rarity_text, inline=False)
-
+        embed.add_field(name="✨ Cartas únicas", value=str(len(unique_inv)), inline=True)
+        embed.set_footer(text="Las cartas se muestran de mayor a menor rareza — usa ⬅️ ➡️ para navegar")
         await ctx.send(embed=embed)
 
-        view = InventoryView(ctx, unique_inv, len(inv), gems)
-        await view.update_message()
+        # Carrusel
+        view = InventoryView(ctx, unique_inv, card_counts, len(inv), balance)
+        await view.send()
 
     # ─────────────────────────────────────────
     # !vender (carrusel)
