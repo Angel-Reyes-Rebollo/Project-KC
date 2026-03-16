@@ -24,6 +24,20 @@ from cogs.utils import (
 # Orden de rareza de mayor a menor (E es la más alta)
 RARITY_SORT_INV = {"E": 0, "M": 1, "F": 2, "G": 3, "SP": 4, "UR": 5, "SSR": 6, "R": 7, "N": 8}
 
+
+def make_image_file(image_path: str) -> tuple[discord.File | None, str]:
+    """
+    Crea un discord.File con la extensión correcta según el archivo.
+    Soporta .png, .jpg, .jpeg y .gif (los GIF se animan en Discord).
+    Devuelve (file, attachment_url) o (None, "").
+    """
+    if not image_path or not os.path.exists(image_path):
+        return None, ""
+    ext = os.path.splitext(image_path)[1].lower()  # .png, .gif, .jpg, etc.
+    filename = f"carta{ext}"                         # carta.png / carta.gif
+    file = discord.File(image_path, filename=filename)
+    return file, f"attachment://{filename}"
+
 STAT_EMOJIS = {
     "Evasion": "👻", "Evasión": "👻",
     "Fuerza": "💥",
@@ -125,8 +139,9 @@ class InventoryView(View):
         file = None
         image_path = card.get("imagen", "")
         if image_path and os.path.exists(image_path):
-            file = discord.File(image_path, filename="carta.png")
-            embed.set_image(url="attachment://carta.png")
+            file, attachment_url = make_image_file(image_path)
+            if file:
+                embed.set_image(url=attachment_url)
         return embed, file
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -222,8 +237,9 @@ class Gacha(commands.Cog):
 
         image_path = card.get("imagen", "")
         if image_path and os.path.exists(image_path):
-            file = discord.File(image_path, filename="carta.png")
-            embed.set_image(url="attachment://carta.png")
+            file, attachment_url = make_image_file(image_path)
+            if file:
+                embed.set_image(url=attachment_url)
             await ctx.send(embed=embed, file=file)
         else:
             await ctx.send(embed=embed)
@@ -387,8 +403,9 @@ class Gacha(commands.Cog):
 
             image_path = card.get("imagen", "")
             if image_path and os.path.exists(image_path):
-                file = discord.File(image_path, filename="carta.png")
-                embed.set_image(url="attachment://carta.png")
+                file, attachment_url = make_image_file(image_path)
+                if file:
+                    embed.set_image(url=attachment_url)
                 return await channel.send(embed=embed, file=file, view=view)
             return await channel.send(embed=embed, view=view)
 
