@@ -12,10 +12,10 @@ from cogs.utils import (
     COOLDOWN_ADIVINA, COOLDOWN_BLACKJACK, COOLDOWN_CASINO,
     COOLDOWN_DIARIA, COOLDOWN_ENCUENTRA_GEMA, COOLDOWN_GACHA,
     COOLDOWN_MINAR, COOLDOWN_PESCA, COOLDOWN_ROB, COOLDOWN_RULETA,
-    COOLDOWN_TRABAJAR, format_cooldown, format_gems, get_balance,
-    get_rarity_emoji, invoke_command_from_interaction, rarity_probabilities,
+    COOLDOWN_TRABAJAR, check_cooldown, format_cooldown, format_gems,
+    get_balance, get_rarity_emoji, invoke_command_from_interaction,
+    rarity_probabilities,
 )
-from database import db
 
 
 class Utilidades(commands.Cog):
@@ -46,7 +46,7 @@ class Utilidades(commands.Cog):
         ]
         lines = []
         for name, cmd, duration in cooldowns:
-            remaining = db.check_cooldown(user_id, cmd, duration)
+            remaining = check_cooldown(user_id, cmd, duration)
             status = "**✅ ¡LISTO!**" if remaining <= 0 else format_cooldown(remaining)
             lines.append(f"• **{name}:** {status}")
 
@@ -94,7 +94,8 @@ class Utilidades(commands.Cog):
     @commands.command()
     async def top(self, ctx):
         """Muestra el ranking de usuarios con más gemas."""
-        top_users = db.get_top_balances(10)
+        balances = self.bot.user_balances
+        top_users = sorted(balances.items(), key=lambda x: x[1], reverse=True)[:10]
         embed = discord.Embed(title="🏆 Top 10 — Más Ricos", color=discord.Color.gold())
         medals = ["🥇", "🥈", "🥉"]
         lines = []
@@ -114,44 +115,178 @@ class Utilidades(commands.Cog):
     # ─────────────────────────────────────────
     @commands.command()
     async def ayuda(self, ctx):
-        """Muestra todos los comandos disponibles."""
+        """Muestra todos los comandos con descripción y uso, por categorías."""
         es_admin = ctx.author.guild_permissions.administrator
-        embed = discord.Embed(
-            title="🎮 COMANDOS — PROJECT-KC",
-            description="Lista completa de comandos. Usa `!ayuda` para ver este menú.",
-            color=discord.Color.blue(),
-        )
-        embed.add_field(name="💰 Economía",
-            value="`!gacha` `!gacha_comprar` `!trabajar` `!diaria` `!casino` `!pesca` `!minar` `!rob @usuario`",
-            inline=False)
-        embed.add_field(name="📦 Inventario",
-            value="`!inventario` `!vender` `!vender_mayoreo` `!vender_rareza` `!album` `!mostrar`",
-            inline=False)
-        embed.add_field(name="🎮 Minijuegos",
-            value="`!blackjack` `!ruleta` `!adivina` `!encuentra_gema` `!jefe_semanal`",
-            inline=False)
-        embed.add_field(name="⚔️ Duelos",
-            value="`!dueloamistoso @usuario` `!duelohonor @usuario` `!cancelar_duelo`",
-            inline=False)
-        embed.add_field(name="🔄 Intercambio",
-            value="`!intercambio @usuario` `!cancelar_intercambio`",
-            inline=False)
-        embed.add_field(name="🎁 Recompensas",
-            value="`!recibir_recompensa` `!estado_recompensa` `!recibir_gemas`",
-            inline=False)
-        embed.add_field(name="ℹ️ Utilidades",
-            value="`!espera` / `!cd` `!rates` `!status` `!top` `!menu_principal`",
-            inline=False)
 
+        paginas = []
+
+        # ── Página 1: Gacha & Banners ──
+        e = discord.Embed(title="🎲 Gacha & Banners", color=discord.Color.gold())
+        e.add_field(name="`!gacha`",
+            value="Tirada gratuita del pool general. Cooldown: **4h**.", inline=False)
+        e.add_field(name="`!gacha <anime>`",
+            value="Tirada gratuita filtrada a un banner.\n"
+                  "Ej: `!gacha haikyuu` `!gacha bluelock` `!gacha jjk` `!gacha mha` `!gacha sl` `!gacha aot`",
+            inline=False)
+        e.add_field(name="`!gacha_comprar <cantidad>`",
+            value="Compra tiradas del pool general.\n"
+                  "Cantidades: `1` = 50💎 | `5` = 225💎 | `10` = 400💎\n"
+                  "Ej: `!gacha_comprar 5`",
+            inline=False)
+        e.add_field(name="`!gacha_comprar <anime> <cantidad>`",
+            value="Compra tiradas filtradas a un banner.\n"
+                  "Ej: `!gacha_comprar bluelock 10`",
+            inline=False)
+        e.add_field(name="`!banners`",
+            value="Muestra todos los banners disponibles con su imagen.", inline=False)
+        e.add_field(name="`!banner_info <anime>`",
+            value="Detalla las cartas de un banner por rareza con probabilidades.\n"
+                  "Ej: `!banner_info aot`",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 2: Economía ──
+        e = discord.Embed(title="💰 Economía", color=discord.Color.green())
+        e.add_field(name="`!trabajar`",
+            value="Trabaja para ganar entre 20–40💎. Cooldown: **4h**.", inline=False)
+        e.add_field(name="`!diaria`",
+            value="Reclama tu recompensa diaria de **80💎**. Cooldown: **24h**.", inline=False)
+        e.add_field(name="`!casino`",
+            value="Gira el tragaperras y gana gemas. Cooldown: **1h**.", inline=False)
+        e.add_field(name="`!pesca`",
+            value="Lanza la caña y espera a que piquen. Cooldown: **2h**.", inline=False)
+        e.add_field(name="`!minar`",
+            value="Pica roca en busca de gemas. Cooldown: **1 minuto**.\n"
+                  "1% de chance de veta especial (+40💎).",
+            inline=False)
+        e.add_field(name="`!rob @usuario`",
+            value="Intenta robar gemas a otro usuario. Cooldown: **30min**.\n"
+                  "60% de fallar y recibir multa + penalización de 15min.",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 3: Inventario ──
+        e = discord.Embed(title="📦 Inventario & Cartas", color=discord.Color.blue())
+        e.add_field(name="`!inventario`",
+            value="Muestra tu colección en carrusel con imagen y stats de cada carta.",
+            inline=False)
+        e.add_field(name="`!vender`",
+            value="Vende cartas de tu inventario una por una con carrusel.\n"
+                  "Navega con ⬅️ ➡️ y pulsa 💰 Vender en la que quieras.",
+            inline=False)
+        e.add_field(name="`!vender_rareza <rareza>`",
+            value="Vende TODAS las cartas de una rareza de golpe.\n"
+                  "Ej: `!vender_rareza N` `!vender_rareza R` `!vender_rareza SSR`",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 4: Minijuegos ──
+        e = discord.Embed(title="🎮 Minijuegos", color=discord.Color.purple())
+        e.add_field(name="`!blackjack <apuesta> <dificultad>`",
+            value="Juega al blackjack apostando gemas. Cooldown: **15min**.\n"
+                  "Apuesta: 150💎 mín — 2,000💎 máx.\n"
+                  "Dificultades: `facil` `normal` `dificil`\n"
+                  "Ej: `!blackjack 300 normal`\n"
+                  "Durante la partida: `!pedir` `!quedarse` `!rendirse`",
+            inline=False)
+        e.add_field(name="`!ruleta`",
+            value="Apuesta en la ruleta. Cooldown: **5min**.", inline=False)
+        e.add_field(name="`!adivina`",
+            value="Adivina un número y gana gemas. Cooldown: **1h**.", inline=False)
+        e.add_field(name="`!encuentra_gema`",
+            value="Encuentra la gema escondida entre las opciones. Cooldown: **2h**.",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 5: Duelos & Intercambio ──
+        e = discord.Embed(title="⚔️ Duelos & 🔄 Intercambio", color=discord.Color.red())
+        e.add_field(name="`!dueloamistoso @usuario`",
+            value="Reta a otro jugador a un duelo amistoso de 3 rondas.\n"
+                  "Necesitas al menos 3 cartas.", inline=False)
+        e.add_field(name="`!cancelar_duelo`",
+            value="Cancela cualquier duelo pendiente tuyo.", inline=False)
+        e.add_field(name="`!intercambio @usuario`",
+            value="Propone un intercambio de cartas con otro jugador.\n"
+                  "Ambos deben tener cartas en su inventario.",
+            inline=False)
+        e.add_field(name="`!cancelar_intercambio`",
+            value="Cancela cualquier intercambio pendiente tuyo.", inline=False)
+        paginas.append(e)
+
+        # ── Página 6: Recompensas ──
+        e = discord.Embed(title="🎁 Recompensas & Eventos", color=discord.Color.orange())
+        e.add_field(name="`!recibir_recompensa`",
+            value="Reclama la carta de la recompensa temporal activa.\n"
+                  "Solo una vez por usuario por evento.",
+            inline=False)
+        e.add_field(name="`!estado_recompensa`",
+            value="Muestra si hay una recompensa activa y cuánto tiempo queda.",
+            inline=False)
+        e.add_field(name="`!recibir_gemas`",
+            value="Reclama la recompensa fija de gemas si está activa.",
+            inline=False)
+        e.add_field(name="`!eleccion_recompensa <A o B>`",
+            value="Vota en la elección global para recibir una de dos cartas.\n"
+                  "Ej: `!eleccion_recompensa A`",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 7: Utilidades ──
+        e = discord.Embed(title="ℹ️ Utilidades", color=discord.Color.blurple())
+        e.add_field(name="`!espera` / `!cd`",
+            value="Muestra el tiempo restante de todos tus cooldowns de un vistazo.",
+            inline=False)
+        e.add_field(name="`!rates`",
+            value="Muestra las probabilidades actuales de cada rareza en el gacha.",
+            inline=False)
+        e.add_field(name="`!status`",
+            value="Estado del bot: latencia, cartas en catálogo, modo actual.",
+            inline=False)
+        e.add_field(name="`!top`",
+            value="Ranking de los 10 usuarios con más gemas.", inline=False)
+        e.add_field(name="`!menu_principal` / `!menu`",
+            value="Abre el menú rápido con botones para los comandos más usados.",
+            inline=False)
+        paginas.append(e)
+
+        # ── Página 8: Admin (solo si es admin) ──
         if es_admin:
-            embed.add_field(name="👑 Admin",
-                value="`!pausa` `!continuar` `!interfaz` `!dargemas` `!quitargemas` `!darcarta` "
-                      "`!quitarcarta` `!limpiar_inventario` `!reset_data` `!clear` `!backup_now` "
-                      "`!modificar_rates` `!recompensa_tiempo` `!eleccion_carta` `!gemas_fijas`",
+            e = discord.Embed(title="👑 Comandos de Administrador", color=discord.Color.dark_gold())
+            e.add_field(name="`!dargemas @usuario <cantidad>`",
+                value="Da gemas a un usuario. Ej: `!dargemas @user 500`", inline=False)
+            e.add_field(name="`!darcarta @usuario <card_id>`",
+                value="Da una carta específica del catálogo a un usuario.", inline=False)
+            e.add_field(name="`!pausa` / `!continuar`",
+                value="Pausa o reanuda el bot para mantenimiento.", inline=False)
+            e.add_field(name="`!clear <cantidad>`",
+                value="Elimina mensajes del canal. Ej: `!clear 10`", inline=False)
+            e.add_field(name="`!backup_now`",
+                value="Fuerza un backup inmediato a GitHub.", inline=False)
+            e.add_field(name="`!recompensa_tiempo <card_id> <minutos>`",
+                value="Activa una recompensa temporal de carta para todos.\n"
+                      "Ej: `!recompensa_tiempo SSR001 60`",
                 inline=False)
+            e.add_field(name="`!eleccion_carta <id1> <id2>`",
+                value="Crea una votación global entre dos cartas.\n"
+                      "Ej: `!eleccion_carta UR001 SP005`",
+                inline=False)
+            e.add_field(name="`!gemas_fijas <cantidad> <horas>`",
+                value="Activa recompensa de gemas para todos durante X horas.\n"
+                      "Ej: `!gemas_fijas 100 24`",
+                inline=False)
+            e.add_field(name="`!cancelar_recompensa` / `!cancelar_eleccion` / `!cancelar_gemas_fijas`",
+                value="Cancela el evento activo correspondiente.", inline=False)
+            e.add_field(name="`!estado_gemas_fijas`",
+                value="Muestra el estado de la recompensa de gemas activa.", inline=False)
+            paginas.append(e)
 
-        embed.set_footer(text="¡Buena suerte en el gacha!" + (" | Admin 👑" if es_admin else ""))
-        await ctx.send(embed=embed)
+        # Numerar páginas
+        total = len(paginas)
+        for i, p in enumerate(paginas):
+            p.set_footer(text=f"Página {i+1}/{total} • Project-KC" + (" | Admin 👑" if es_admin else ""))
+
+        view = AyudaView(paginas, ctx.author.id)
+        await ctx.send(embed=paginas[0], view=view)
 
     # ─────────────────────────────────────────
     # !menu_principal
@@ -169,6 +304,54 @@ class Utilidades(commands.Cog):
 
         view = MenuPrincipalView(ctx.author.id, self.bot)
         await ctx.send(embed=embed, view=view)
+
+
+# ─────────────────────────────────────────
+# Vista del menú de ayuda (carrusel por categoría)
+# ─────────────────────────────────────────
+class AyudaView(View):
+    def __init__(self, paginas: list, author_id: int, timeout=180):
+        super().__init__(timeout=timeout)
+        self.paginas = paginas
+        self.author_id = author_id
+        self.index = 0
+        self._update_buttons()
+
+    def _update_buttons(self):
+        self.prev_btn.disabled = (self.index == 0)
+        self.next_btn.disabled = (self.index == len(self.paginas) - 1)
+        self.counter_btn.label = f"{self.index + 1} / {len(self.paginas)}"
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.author_id:
+            await interaction.response.send_message(
+                "❌ Solo quien usó `!ayuda` puede navegar.", ephemeral=True
+            )
+            return False
+        return True
+
+    @discord.ui.button(label="⬅️", style=discord.ButtonStyle.blurple)
+    async def prev_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index -= 1
+        self._update_buttons()
+        await interaction.response.edit_message(embed=self.paginas[self.index], view=self)
+
+    @discord.ui.button(label="1 / 1", style=discord.ButtonStyle.gray, disabled=True)
+    async def counter_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        pass
+
+    @discord.ui.button(label="➡️", style=discord.ButtonStyle.blurple)
+    async def next_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.index += 1
+        self._update_buttons()
+        await interaction.response.edit_message(embed=self.paginas[self.index], view=self)
+
+    @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.red)
+    async def cerrar_btn(self, interaction: discord.Interaction, button: discord.ui.Button):
+        for item in self.children:
+            item.disabled = True
+        await interaction.response.edit_message(view=self)
+        self.stop()
 
 
 # ─────────────────────────────────────────

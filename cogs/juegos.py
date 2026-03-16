@@ -16,9 +16,9 @@ from cogs.utils import (
     APUESTA_MINIMA_BJ, APUESTA_MAXIMA_BJ,
     COOLDOWN_ADIVINA, COOLDOWN_BLACKJACK,
     COOLDOWN_ENCUENTRA_GEMA, COOLDOWN_RULETA,
-    add_balance, format_cooldown, format_gems, get_balance,
+    add_balance, check_cooldown, format_cooldown,
+    format_gems, get_balance, set_cooldown,
 )
-from database import db
 
 
 # ─────────────────────────────────────────
@@ -248,7 +248,7 @@ class Juegos(commands.Cog):
             await ctx.send(f"❌ Apuesta fuera de rango ({format_gems(APUESTA_MINIMA_BJ)} - {format_gems(APUESTA_MAXIMA_BJ)}).")
             return
 
-        remaining = db.check_cooldown(user_id, "blackjack", COOLDOWN_BLACKJACK)
+        remaining = check_cooldown(user_id, "blackjack", COOLDOWN_BLACKJACK)
         if remaining > 0:
             await ctx.send(f"⏰ Espera **{format_cooldown(remaining)}** para jugar blackjack.")
             return
@@ -259,7 +259,7 @@ class Juegos(commands.Cog):
             return
 
         add_balance(user_id, -apuesta)
-        db.set_cooldown(user_id, "blackjack")
+        set_cooldown(user_id, "blackjack")
 
         game = BlackjackGame(apuesta, dificultad)
         game.player_hand = [game.deal(), game.deal()]
@@ -386,7 +386,7 @@ class Juegos(commands.Cog):
         if not (0 <= numero <= 36):
             await ctx.send("❌ El número debe estar entre 0 y 36."); return
 
-        remaining = db.check_cooldown(user_id, "ruleta", COOLDOWN_RULETA)
+        remaining = check_cooldown(user_id, "ruleta", COOLDOWN_RULETA)
         if remaining > 0:
             await ctx.send(f"⏰ Espera **{format_cooldown(remaining)}** para jugar ruleta."); return
 
@@ -395,7 +395,7 @@ class Juegos(commands.Cog):
             await ctx.send(f"❌ No tienes {format_gems(apuesta)}. Tienes {format_gems(balance)}."); return
 
         add_balance(user_id, -apuesta)
-        db.set_cooldown(user_id, "ruleta")
+        set_cooldown(user_id, "ruleta")
 
         ganador = random.randint(0, 36)
         color_elegido = ruleta_color(numero)
@@ -426,7 +426,7 @@ class Juegos(commands.Cog):
     async def adivina(self, ctx):
         """Adivina un número del 1 al 10 en 3 intentos (cooldown 1 hora)."""
         user_id = ctx.author.id
-        remaining = db.check_cooldown(user_id, "adivina", COOLDOWN_ADIVINA)
+        remaining = check_cooldown(user_id, "adivina", COOLDOWN_ADIVINA)
         if remaining > 0:
             await ctx.send(f"🎯 Espera **{format_cooldown(remaining)}** para volver a jugar."); return
 
@@ -436,7 +436,7 @@ class Juegos(commands.Cog):
 
         def check(m): return m.author == ctx.author and m.channel == ctx.channel and m.content.isdigit()
 
-        db.set_cooldown(user_id, "adivina")
+        set_cooldown(user_id, "adivina")
         while intentos > 0:
             try:
                 msg = await self.bot.wait_for("message", timeout=30.0, check=check)
@@ -463,11 +463,11 @@ class Juegos(commands.Cog):
     async def encuentra_gema(self, ctx):
         """Juego interactivo de dos rondas para encontrar gemas (cooldown 2 horas)."""
         user_id = ctx.author.id
-        remaining = db.check_cooldown(user_id, "encuentra_gema", COOLDOWN_ENCUENTRA_GEMA)
+        remaining = check_cooldown(user_id, "encuentra_gema", COOLDOWN_ENCUENTRA_GEMA)
         if remaining > 0:
             await ctx.send(f"💎 Espera **{format_cooldown(remaining)}** para buscar gemas."); return
 
-        db.set_cooldown(user_id, "encuentra_gema")
+        set_cooldown(user_id, "encuentra_gema")
         game_id = f"{user_id}_{int(time.time())}"
         active_gem_games[game_id] = {"user_id": user_id, "won_r1": False}
 

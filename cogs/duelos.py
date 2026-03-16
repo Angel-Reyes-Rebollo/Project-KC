@@ -34,7 +34,6 @@ from cogs.utils import (
     add_to_inventory, format_gems, get_inventory,
     get_rarity_color, get_rarity_emoji, RARITY_ORDER,
 )
-from database import db
 
 # Atributos para duelos
 DUEL_ATTRIBUTES = {
